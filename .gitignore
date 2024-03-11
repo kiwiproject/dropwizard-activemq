@@ -1,3 +1,5 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Maven template
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -7,11 +9,19 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-# https://github.com/takari/maven-wrapper#usage-without-binary-jar
-.mvn/wrapper/maven-wrapper.jar
 
-# Eclipse m2e generated files
-# Eclipse Core
-.project
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
+# Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
+!/.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ project files
+.idea
+*.iml
+
+# Fleet settings
+.fleet
+
+# Deployment log
+maven-central-deploy.log
+
+# VS Code configuration files
+.vscode
