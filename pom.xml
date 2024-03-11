@@ -28,6 +28,7 @@
     <properties>
         <!-- required dependency versions -->
         <kiwi-bom.version>2.0.9</kiwi-bom.version>
+        <kiwi.version>3.3.0</kiwi.version>
 
         <!-- test dependency versions -->
     </properties>
@@ -46,6 +47,11 @@
 
     <dependencies>
         <!-- required dependencies -->
+        <dependency>
+            <groupId>org.kiwiproject</groupId>
+            <artifactId>kiwi</artifactId>
+            <version>${kiwi.version}</version>
+        </dependency>
 
         <!-- test dependencies -->
 
