@@ -1,2 +1,2 @@
-# dropwizard-activemq
+# Dropwizard ActiveMQ
 A small library that integrates Dropwizard and ActiveMQ, allowing applications to consume and produce messages.
