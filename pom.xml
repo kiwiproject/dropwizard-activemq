@@ -9,7 +9,7 @@
         <version>3.0.12</version>
     </parent>
 
-    <artifactId>kiwi-beta</artifactId>
+    <artifactId>dropwizard-activemq</artifactId>
     <version>0.5.0-SNAPSHOT</version>
     <name>Dropwizard ActiveMQ</name>
     <description>
@@ -31,6 +31,7 @@
         <kiwi.version>3.3.0</kiwi.version>
 
         <!-- test dependency versions -->
+        <kiwi-test.version>3.2.1</kiwi-test.version>
     </properties>
 
     <dependencyManagement>
@@ -46,14 +47,33 @@
     </dependencyManagement>
 
     <dependencies>
+
         <!-- required dependencies -->
+
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-core</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.kiwiproject</groupId>
             <artifactId>kiwi</artifactId>
             <version>${kiwi.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
         <!-- test dependencies -->
+
+        <dependency>
+            <groupId>org.kiwiproject</groupId>
+            <artifactId>kiwi-test</artifactId>
+            <version>${kiwi-test.version}</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
