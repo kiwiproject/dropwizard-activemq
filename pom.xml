@@ -29,6 +29,7 @@
         <!-- required dependency versions -->
         <kiwi-bom.version>2.0.9</kiwi-bom.version>
         <kiwi.version>3.3.0</kiwi.version>
+        <registry-aware-jersey-client.version>2.0.4</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
         <kiwi-test.version>3.2.1</kiwi-test.version>
@@ -59,6 +60,12 @@
             <groupId>org.kiwiproject</groupId>
             <artifactId>kiwi</artifactId>
             <version>${kiwi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kiwiproject</groupId>
+            <artifactId>registry-aware-jersey-client</artifactId>
+            <version>${registry-aware-jersey-client.version}</version>
         </dependency>
 
         <dependency>
