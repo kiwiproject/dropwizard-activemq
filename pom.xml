@@ -27,6 +27,7 @@
 
     <properties>
         <!-- required dependency versions -->
+        <activemq.version>5.18.3</activemq.version>
         <kiwi-bom.version>2.0.9</kiwi-bom.version>
         <kiwi.version>3.3.0</kiwi.version>
         <registry-aware-jersey-client.version>2.0.4</registry-aware-jersey-client.version>
@@ -52,8 +53,30 @@
         <!-- required dependencies -->
 
         <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+            <version>${activemq.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-jms-pool</artifactId>
+            <version>${activemq.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
         </dependency>
 
         <dependency>
@@ -74,6 +97,13 @@
         </dependency>
 
         <!-- test dependencies -->
+
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <version>${activemq.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.kiwiproject</groupId>
