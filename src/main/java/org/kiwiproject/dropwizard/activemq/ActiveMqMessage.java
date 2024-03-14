@@ -157,5 +157,23 @@ public class ActiveMqMessage {
         return Optional.ofNullable((Integer) properties.get(JMS_X_DELIVERY_COUNT));
     }
 
-    // TODO the rest...
+    public Optional<String> getJMSXGroupId() {
+        return Optional.ofNullable((String) properties.get(JMS_X_GROUP_ID));
+    }
+
+    public Optional<Integer> getJMSXGroupSeq() {
+        return Optional.ofNullable((Integer) properties.get(JMS_X_GROUP_SEQ));
+    }
+
+    public Optional<String> getJMSXUserId() {
+        return Optional.ofNullable((String) properties.get(JMS_X_USER_ID));
+    }
+
+    public boolean wasConsumedFromAQueue() {
+        return getJMSDestination().map(ActiveMQDestination::isQueue).orElse(false);
+    }
+
+    public boolean wasConsumedFromATopic() {
+        return getJMSDestination().map(ActiveMQDestination::isTopic).orElse(false);
+    }
 }
