@@ -151,4 +151,28 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
     }
 
     // TODO finish it...
+
+    /**
+     * @return a set containing the names of the destinations that were initialized for consumers
+     */
+    public Set<String> getInitializedConsumers() {
+        return Set.copyOf(initializedConsumers);
+    }
+
+    /**
+     * @return an Optional that will contain the {@link ActiveMqProducer} returned by {@link #startProducers()}, or
+     * an empty Optional if no producer has been started. Generally you won't need this since {@link #startProducers()}
+     * returns the producer instance.
+     */
+    public Optional<ActiveMqProducer> getActiveMqProducer() {
+        return Optional.ofNullable(activeMqProducer);
+    }
+
+    /**
+     * @return an Optional containing the {@link ElucidationContext} if elucidation is enabled.
+     * Generally you won't need this.
+     */
+    public Optional<ElucidationContext> getElucidationContext() {
+        return Optional.ofNullable(elucidationContext);
+    }
 }
