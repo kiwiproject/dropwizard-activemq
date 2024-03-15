@@ -8,4 +8,9 @@ class StatHelper {
         // TODO
     }
 
+    JolokiaResponseValue getStatsSingleResultOrNull(String name) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getStatsSingleResultOrNull'");
+    }
+
 }
