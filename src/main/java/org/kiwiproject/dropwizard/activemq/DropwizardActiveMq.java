@@ -1,15 +1,24 @@
 package org.kiwiproject.dropwizard.activemq;
 
+import static com.google.common.base.Strings.nullToEmpty;
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
+import static org.kiwiproject.base.KiwiStrings.f;
+import static org.kiwiproject.collect.KiwiLists.isNotNullOrEmpty;
 
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
 import org.apache.activemq.jms.pool.PooledConnectionFactory;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;
+import org.kiwiproject.dropwizard.activemq.health.BrokerHealthCheck;
+import org.kiwiproject.dropwizard.activemq.health.ConsumerStatsHealthCheck;
+import org.kiwiproject.dropwizard.activemq.health.ProducerStatsHealthCheck;
 import org.kiwiproject.dropwizard.activemq.internal.ElucidationConfigurator;
+import org.kiwiproject.dropwizard.lifecycle.KiwiDropwizardLifecycles;
 import org.kiwiproject.elucidation.client.ElucidationRecorder;
 import org.kiwiproject.elucidation.common.model.ConnectionEvent;
 import org.kiwiproject.jersey.client.RegistryAwareClient;
@@ -30,6 +39,7 @@ import io.dropwizard.core.setup.Environment;
  * Use the {@link #builder()} to construct a new instance, then call methods to
  * start consumers and/or producers.
  */
+@Slf4j
 public class DropwizardActiveMq<C extends ActiveMqConfigured> {
 
     private final Environment environment;
@@ -96,18 +106,48 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
     }
 
     private void registerStatsHealthChecks() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'registerStatsHealthChecks'");
+        var healthCheckRegistry = environment.healthChecks();
+
+        if (isNotNullOrEmpty(producerDestinations)) {
+            var name = healthCheckName(ProducerStatsHealthCheck.DEFAULT_NAME);
+            var healthCheck = new ProducerStatsHealthCheck<>(configuration);
+            healthCheckRegistry.register(name, healthCheck);
+        }
+
+        if (isNotNullOrEmpty(consumerDestinations)) {
+            var name = healthCheckName(ConsumerStatsHealthCheck.DEFAULT_NAME);
+            var healthCheck = new ConsumerStatsHealthCheck<>(configuration);
+            healthCheckRegistry.register(name, healthCheck);
+        }
+    }
+
+    private String healthCheckName(String  title) {
+        return healthCheckName(healthCheckNamePrefix, title);
+    }
+
+    private static String healthCheckName(String prefix, String title) {
+        return f("{} {}", nullToEmpty(prefix), title).strip();
     }
 
     private void registerBrokerHealthCheckIfNecessary() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'registerBrokerHealthCheckIfNecessary'");
+        if (!activeMqConfig.isRegisterBrokerHealthCheck()) {
+            LOG.info("Skip registration of BrokerHealthCheck for {}", healthCheckNamePrefix);
+            return;
+        }
+
+        requireNonNull(environment);
+        requireNonNull(factory);
+
+        var name = BrokerHealthCheck.createHealthCheckNameWithPrefix(healthCheckNamePrefix);
+        var healthCheck = new BrokerHealthCheck(name, factory, configuration.getServiceName());
+        environment.healthChecks().register(name, healthCheck);
     }
 
     private void manageActiveMQConnectionFactory() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'manageActiveMQConnectionFactory'");
+        requireNonNull(environment);
+        requireNonNull(factory);
+
+        KiwiDropwizardLifecycles.manage(environment.lifecycle(), factory::start, factory::stop);
     }
 
     // TODO finish it...
