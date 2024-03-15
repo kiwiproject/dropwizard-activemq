@@ -1,11 +1,14 @@
 package org.kiwiproject.dropwizard.activemq;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.nullToEmpty;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.base.KiwiStrings.f;
+import static org.kiwiproject.collect.KiwiArrays.isNotNullOrEmpty;
 import static org.kiwiproject.collect.KiwiLists.isNotNullOrEmpty;
 
 import lombok.Builder;
@@ -17,8 +20,11 @@ import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;
 import org.kiwiproject.dropwizard.activemq.health.BrokerHealthCheck;
 import org.kiwiproject.dropwizard.activemq.health.ConsumerStatsHealthCheck;
 import org.kiwiproject.dropwizard.activemq.health.ProducerStatsHealthCheck;
+import org.kiwiproject.dropwizard.activemq.internal.Consumer;
 import org.kiwiproject.dropwizard.activemq.internal.ElucidationConfigurator;
+import org.kiwiproject.dropwizard.activemq.internal.ProducerDelegate;
 import org.kiwiproject.dropwizard.lifecycle.KiwiDropwizardLifecycles;
+import org.kiwiproject.elucidation.client.ElucidationClient;
 import org.kiwiproject.elucidation.client.ElucidationRecorder;
 import org.kiwiproject.elucidation.common.model.ConnectionEvent;
 import org.kiwiproject.jersey.client.RegistryAwareClient;
@@ -29,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import io.dropwizard.core.setup.Environment;
 
@@ -150,7 +157,105 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
         KiwiDropwizardLifecycles.manage(environment.lifecycle(), factory::start, factory::stop);
     }
 
-    // TODO finish it...
+    /**
+     * Starts consuming from configured consumer desintations when {@link ActiveMqConfig#isAutoRegisterConsumers()}
+     * is {@code true}.
+     * <p>
+     * Incoming messages will be passed to the consumer delegate.
+     *
+     * @param consumerDelegate the consumer that should process received messages
+     * @return this instance, for fluent method-chaining
+     */
+    public DropwizardActiveMq<C> startConsumers(ActiveMqConsumer consumerDelegate) {
+        checkArgumentNotNull(consumerDelegate);
+        requireNonNull(consumerDestinations);
+
+        if (autoStartConsumers) {
+            consumerDestinations.forEach(destination -> startConsumer(destination, consumerDelegate));
+        }
+
+        return this;
+    }
+
+    /**
+     * Starts consuming from the given destinations.
+     * <p>
+     * Incoming messages will be passed to the consumer delegate.
+     *
+     * @param consumerDelegate the consumer that should process received messages
+     * @param destinations the explicit destinations to consume
+     * @return this instance, for fluent method-chaining
+     * @throws IllegalArgumentException if no destinations are specified
+     */
+    public DropwizardActiveMq<C> startConsumer(ActiveMqConsumer consumerDelegate, String... destinations) {
+        checkArgument(isNotNullOrEmpty(destinations),
+                "No destinations specified, which would result in no messages being consumed!");
+
+        Stream.of(destinations).forEach(dest -> startConsumer(dest, consumerDelegate));
+
+        return this;
+    }
+
+    private void startConsumer(String destination, ActiveMqConsumer consumerDelegate) {
+        requireNonNull(factory);
+        requireNonNull(environment);
+
+        checkArgumentNotBlank(destination);
+        checkArgumentNotNull(consumerDelegate);
+
+        checkForExistingConsumer(destination);
+
+        var consumer = new Consumer(
+            factory,
+            destination,
+            consumerDelegate,
+            ElucidationClient.of(eventRecorder, consumingTextMessageEventFactory),
+            configuration.getServiceName()
+        );
+
+        addConsumer(destination);
+
+        environment.lifecycle().manage(consumer);
+        environment.healthChecks().register("consumer-" + destination, consumer.getHealtCheck());
+    }
+
+    private void checkForExistingConsumer(String destination) {
+        checkArgumentNotBlank(destination);
+
+        if (!allowMultipleConsumersPerDestination && initializedConsumers.contains(destination)) {
+            throw new IllegalStateException(f("A consumer for destination '{}' already exists", destination));
+        }
+    }
+
+    private void addConsumer(String destination) {
+        LOG.debug("Adding initialized consumer for destination: {}", destination);
+        initializedConsumers.add(destination);
+    }
+
+    /**
+     * Instantiates a producer for the configured destination(s).
+     * <p>
+     * Note that if you are using fluent method-chaining, this is a terminal method since it
+     * must return the {@link ActiveMqProducer} for use by the caller.
+     *
+     * @return a new producer instance
+     * @see ProducerDelegate
+     */
+    public ActiveMqProducer startProducers() {
+        requireNonNull(factory);
+        requireNonNull(producerDestinations);
+        requireNonNull(defaultProducerDestinations);
+
+        activeMqProducer = new ProducerDelegate(factory,
+                producerDestinations,
+                defaultProducerDestinations,
+                allowDynamicDestinations,
+                timeToLive,
+                ElucidationClient.of(eventRecorder, producingTextMessageEventFactory),
+                configuration.getServiceName());
+
+        return activeMqProducer;
+    }
 
     /**
      * @return a set containing the names of the destinations that were initialized for consumers
