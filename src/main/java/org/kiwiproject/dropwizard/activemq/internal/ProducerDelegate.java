@@ -7,6 +7,7 @@ import org.kiwiproject.elucidation.client.ElucidationClient;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 import javax.jms.ConnectionFactory;
 
@@ -21,6 +22,19 @@ public class ProducerDelegate implements ActiveMqProducer {
                             ElucidationClient<String> elucidation,
                             String serviceName) {
         // TODO
+    }
+
+    @Override
+    public void produce(String destination, String payload, PayloadDestination payloadDestination,
+            Map<String, Object> headers) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'produce'");
+    }
+
+    @Override
+    public void produceBytesMessage(String destination, byte[] payload) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'produceBytesMessage'");
     }
 
     // TODO
