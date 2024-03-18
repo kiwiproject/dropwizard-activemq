@@ -2,9 +2,12 @@ package org.kiwiproject.dropwizard.activemq.health;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.joining;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
+import static org.kiwiproject.base.KiwiStrings.f;
 import static org.kiwiproject.collect.KiwiLists.isNullOrEmpty;
+import static org.kiwiproject.collect.KiwiMaps.newHashMap;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.google.common.annotations.VisibleForTesting;
@@ -23,6 +26,8 @@ import org.kiwiproject.metrics.health.HealthCheckResults;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends HealthCheck {
 
-    private static final String LINE_SEPARATOR = "\n<br />";
+    private static final String HTML_LINE_SEPARATOR = "\n<br />";
 
     protected final C activeMqConfigured;
     protected final ActiveMqConfig config;
@@ -117,8 +122,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
                 key = info.getName();
                 JolokiaResponseValue result = statHelper.getStatsSingleResultOrNull(info.getName());
                 if (nonNull(result)) {
-                    // inject destination info, so that we have context of the result in later
-                    // processinf
+                    // inject destination info, so that we have context of the result in later processing
                     result.setDestinationInfo(info);
                 }
                 resultMap.put(key, result);
@@ -172,14 +176,52 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
         return resultBuilder;
     }
 
-    private Map<String, Object> buildResultMap(Object est, JolokiaResponseValue stats) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'buildResultMap'");
+    private Map<String, Object> buildResultMap(Object destination, JolokiaResponseValue details) {
+        String message;
+        if (isNull(details)) {
+            message = f("Unable to retrieve stats for: {}", destination);
+        } else {
+            message = getCurrentThresholdMessage(details);
+        }
+
+        return newHashMap("message", message, "details", details);
     }
 
+    protected String getCurrentThresholdMessage(JolokiaResponseValue details) {
+        return f("{} - Pending messages: {} (threshold: {}), Active consumers: {} (threshold: {})",
+                details.getName(),
+                details.getQueueSize(),
+                healthConfig.getMaxPendingThreshold(),
+                details.getConsumerCount(),
+                healthConfig.getMinConsumerThreshold()
+        );
+    }
+
+    /**
+     * For configured destination types (e.g., QUEUE/TOPIC), do not consider it as an "unhealthy" state
+     * if there are zero messages queued.
+     * <p>
+     * Note: override this to provide early exit conditions for "healthy" result.
+     *
+     * @param stats the JolokiaResponseValue to inspect
+     * @return true if the given JolokiaResponseValue should be ignored when checking health (and consider it healthy)
+     */
     protected boolean isIgnored(JolokiaResponseValue stats) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isIgnored'");
+        var destinationType = getResponseDestinationTypeOrNull(stats);
+        return healthConfig.isIgnoreEmptyQueuesWithNoConsumers()
+                && destinationType == DestinationIdentifier.DestinationType.QUEUE
+                && nothingEnqueued(stats);
+    }
+
+    static DestinationIdentifier.DestinationType getResponseDestinationTypeOrNull(JolokiaResponseValue stats) {
+        return Optional.ofNullable(stats)
+                .map(JolokiaResponseValue::getDestinationInfo)
+                .map(DestinationIdentifier.DestinationInfo::getType)
+                .orElse(null);
+    }
+
+    private boolean nothingEnqueued(JolokiaResponseValue stats) {
+        return isNull(stats.getQueueSize()) || stats.getQueueSize() == 0;
     }
 
     protected boolean responseNotRequired(String destination) {
@@ -203,9 +245,22 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
         // no-op
     }
 
-    private static String concatenateUnhealthyMessages(Map<String, Map<String, Object>> unhealthyResults) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'concatenateUnhealthyMessages'");
+    private static String concatenateUnhealthyMessages(Map<String, Map<String, Object>> results) {
+        if (results.isEmpty()) {
+            return "";
+        }
+
+        var messages = results.values().stream()
+                .map(StatsHealthCheck::getMessageStringOrNull)
+                .collect(joining("," + HTML_LINE_SEPARATOR));
+
+        return f("<strong>Unhealthy</strong>{}{}", HTML_LINE_SEPARATOR, messages);
+    }
+
+    private static String getMessageStringOrNull(Map<String, Object> resultMap) {
+        return Optional.ofNullable(resultMap.get("message"))
+                .map(Objects::toString)
+                .orElse(null);
     }
 
     protected ActiveMqHealthConfig getHealthConfig() {
@@ -215,23 +270,17 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     // Abstract methods
 
     /**
-     * TODO
-     *
-     * @return
+     * @return the list of destinations for this health check
      */
     protected abstract List<String> getDestinationList();
 
     /**
-     * TODO
-     *
-     * @return
+     * @return true if this health checks ActiveMQ producers, false if it checks consumers
      */
     protected abstract boolean isProducer();
 
     /**
-     * TODO
-     *
-     * @return
+     * @return true if the ActiveMQ stats exceed thresholds (implies unhealthy), otherwise false (implies healthy)
      */
     protected abstract boolean isExceedingConfiguredThresholds(JolokiaResponseValue stats);
 
