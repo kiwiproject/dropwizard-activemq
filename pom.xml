@@ -35,6 +35,7 @@
         <registry-aware-jersey-client.version>2.0.4</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
+        <commons-collections4.version>4.4</commons-collections4.version>
         <kiwi-test.version>3.2.1</kiwi-test.version>
     </properties>
 
@@ -113,11 +114,24 @@
         <!-- test dependencies -->
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${commons-collections4.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
             <version>${activemq.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-testing</artifactId>
+            <scope>test</scope>
+          </dependency>
 
         <dependency>
             <groupId>org.kiwiproject</groupId>

@@ -3,6 +3,7 @@ package org.kiwiproject.dropwizard.test.util;
 import lombok.experimental.UtilityClass;
 
 import org.kiwiproject.config.TlsContextConfiguration;
+import org.kiwiproject.io.KiwiPaths;
 
 @UtilityClass
 public class TestObjectFactory {
@@ -11,14 +12,28 @@ public class TestObjectFactory {
         return "test-service-" + System.currentTimeMillis();
     }
 
+    /*
+     * Used the following command to generate the keystore:
+     *
+     * keytool -genkeypair -alias testkey -keyalg RSA -keysize 2048 -keystore test-keystore.jks -dname "CN=Test, OU=Test, O=Test, L=Test, S=Test, C=US" -storepass password -keypass password
+     *
+     * To create the sample trust store, first exported the above keystore:
+     *
+     * keytool -export -alias testkey -keystore test-keystore.jks -file testkey.cer -storepass password
+     *
+     * Finally, created the trust store using:
+     *
+     * keytool -import -alias testkey -file testkey.cer -keystore test-truststore.jks -storepass password -noprompt
+     *
+     * Voila!
+     */
+
     public static String keyStorePath() {
-        // TODO real impl (and create the test keystore)
-        return "test-keystore.jks";
+        return KiwiPaths.pathFromResourceName("test-keystore.jks").toFile().getAbsolutePath();
     }
 
     public static String trustStorePath() {
-        // TODO real impl (and create the test truststore)
-        return "test-truststore.jks";
+        return KiwiPaths.pathFromResourceName("test-truststore.jks").toFile().getAbsolutePath();
     }
 
     public static TlsContextConfiguration newTlsContextConfiguration() {
