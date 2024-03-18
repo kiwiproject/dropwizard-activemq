@@ -1,33 +1,49 @@
 package org.kiwiproject.dropwizard.activemq.health;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;
 
 import java.util.List;
 
+/**
+ * Health check for consumers. This is automatically registered by DropwizardActiveMq unless explicitly disabled.
+ *
+ * @see org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig#setEnableStatsHealthChecks(boolean)
+ */
 public class ConsumerStatsHealthCheck<C extends ActiveMqConfigured> extends StatsHealthCheck<C> {
 
     public static final String DEFAULT_NAME = "ActiveMQ Consumer Stats";
 
     public ConsumerStatsHealthCheck(C activeMqConfigured) {
         super(activeMqConfigured);
-        //TODO Auto-generated constructor stub
+    }
+
+    @VisibleForTesting
+    ConsumerStatsHealthCheck(C activeMqConfigured, StatHelper statHelper) {
+        super(activeMqConfigured, statHelper);
     }
 
     @Override
     protected List<String> getDestinationList() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDestinationList'");
+        return config.getConsumers();
     }
 
     @Override
     protected boolean isProducer() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isProducer'");
+        return false;
     }
 
     @Override
     protected boolean isExceedingConfiguredThresholds(JolokiaResponseValue stats) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isExceedingConfiguredThresholds'");
+        return isExceedingQueueThreshold(stats) || isBelowConsumerThreshold(stats);
+    }
+
+    private boolean isExceedingQueueThreshold(JolokiaResponseValue stats) {
+        return stats.getQueueSize() >= getHealthConfig().getMaxPendingThreshold();
+    }
+
+    private boolean isBelowConsumerThreshold(JolokiaResponseValue stats) {
+        return stats.getConsumerCount() <= getHealthConfig().getMinConsumerThreshold();
     }
 }
