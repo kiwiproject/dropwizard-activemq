@@ -4,6 +4,8 @@ import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 
 class StatHelper {
 
+    static final String DLQ_QUEUE_NAME = "ActiveMQ.DLQ";
+
     StatHelper(ActiveMqConfig config) {
         // TODO
     }
