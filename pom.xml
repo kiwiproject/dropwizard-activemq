@@ -31,6 +31,7 @@
         <elucidation.version>5.0.0</elucidation.version>
         <kiwi-bom.version>2.0.9</kiwi-bom.version>
         <kiwi.version>3.3.0</kiwi.version>
+        <metrics-healthchecks-severity.version>2.0.2</metrics-healthchecks-severity.version>
         <registry-aware-jersey-client.version>2.0.4</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
@@ -90,6 +91,12 @@
             <groupId>org.kiwiproject</groupId>
             <artifactId>kiwi</artifactId>
             <version>${kiwi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kiwiproject</groupId>
+            <artifactId>metrics-healthchecks-severity</artifactId>
+            <version>${metrics-healthchecks-severity.version}</version>
         </dependency>
 
         <dependency>
