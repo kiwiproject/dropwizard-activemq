@@ -1,4 +1,4 @@
-package org.kiwiproject.dropwizard.test.util;
+package org.kiwiproject.dropwizard.activemq.test.util;
 
 import lombok.experimental.UtilityClass;
 
