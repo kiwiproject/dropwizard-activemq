@@ -2,7 +2,7 @@ package org.kiwiproject.dropwizard.activemq.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.kiwiproject.dropwizard.test.util.TestObjectFactory.uniqueServiceName;
+import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.uniqueServiceName;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -10,7 +10,6 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,10 +19,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Session;
-import javax.jms.Topic;
 
 @DisplayName("SessionProvider")
 class SessionProviderTest {

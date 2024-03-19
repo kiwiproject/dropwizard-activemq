@@ -1,7 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.kiwiproject.dropwizard.test.util.TestObjectFactory.newTlsContextConfiguration;
+import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.newTlsContextConfiguration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -2,7 +2,7 @@ package org.kiwiproject.dropwizard.activemq;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.kiwiproject.dropwizard.test.util.TestObjectFactory.newTlsContextConfiguration;
+import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.newTlsContextConfiguration;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSslConnectionFactory;
