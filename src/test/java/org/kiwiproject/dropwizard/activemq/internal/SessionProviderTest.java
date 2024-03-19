@@ -147,6 +147,7 @@ class SessionProviderTest {
             return checkSessionDestination(destination, isProducer, serviceName);
         }
 
+        @SuppressWarnings("resource")
         private Session checkSessionDestination(String destination,
                                                 boolean isProducer,
                                                 String serviceName) throws JMSException {
