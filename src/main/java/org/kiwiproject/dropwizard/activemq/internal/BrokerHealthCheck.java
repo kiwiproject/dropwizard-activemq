@@ -107,7 +107,7 @@ public class BrokerHealthCheck extends HealthCheck {
             } catch (ExecutionException e) {
                 LOG.error("Unexpected ExecutionException performing {} health check for broker: {}", name, brokerUrl, e);
                 return newUnhealthyResult(HealthStatus.CRITICAL, e,
-                        "There is some problem with the broker (we don't know what happened):" + brokerUrl);
+                        "There is some problem with the broker (we don't know what happened): " + brokerUrl);
             }
         } finally {
             executor.shutdownNow();
