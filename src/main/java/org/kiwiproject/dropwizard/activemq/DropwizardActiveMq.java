@@ -17,9 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.jms.pool.PooledConnectionFactory;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;
-import org.kiwiproject.dropwizard.activemq.health.BrokerHealthCheck;
 import org.kiwiproject.dropwizard.activemq.health.ConsumerStatsHealthCheck;
 import org.kiwiproject.dropwizard.activemq.health.ProducerStatsHealthCheck;
+import org.kiwiproject.dropwizard.activemq.internal.BrokerHealthCheck;
 import org.kiwiproject.dropwizard.activemq.internal.Consumer;
 import org.kiwiproject.dropwizard.activemq.internal.ElucidationConfigurator;
 import org.kiwiproject.dropwizard.activemq.internal.ProducerDelegate;
@@ -216,7 +216,7 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
         addConsumer(destination);
 
         environment.lifecycle().manage(consumer);
-        environment.healthChecks().register("consumer-" + destination, consumer.getHealtCheck());
+        environment.healthChecks().register("consumer-" + destination, consumer.getHealthCheck());
     }
 
     private void checkForExistingConsumer(String destination) {

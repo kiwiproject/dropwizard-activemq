@@ -28,7 +28,7 @@ public class Consumer implements Managed, Runnable {
         throw new UnsupportedOperationException("Unimplemented method 'run'");
     }
 
-    public HealthCheck getHealtCheck() {
+    public HealthCheck getHealthCheck() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getHealtCheck'");
     }
