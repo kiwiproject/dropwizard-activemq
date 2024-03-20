@@ -69,7 +69,8 @@ public class Consumer implements Managed, Runnable {
 
     private static final KiwiEnvironment KIWI_ENVIRONMENT = new DefaultEnvironment();
     private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
-    private static final long TEN_SECONDS_IN_MILLIS = TimeUnit.SECONDS.toMillis(10);
+    private static final long TEN = 10L;
+    private static final long TEN_SECONDS_IN_MILLIS = TimeUnit.SECONDS.toMillis(TEN);
 
     private final String destination;
     private final ActiveMqConsumer delegateConsumer;
@@ -284,6 +285,29 @@ public class Consumer implements Managed, Runnable {
 
         properties.put(JMS_CORRELATION_ID, correlationId);
         properties.put(JMS_CORRELATION_ID_AS_BYTES, correlationIdAsBytes);
+    }
+
+    @Override
+    public void start() throws Exception {
+        LOG.info("Starting thread '{}'", threadName);
+        thread.start();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        LOG.info("Waiting until thread '{}' is stopped... (is currently alive? {})",
+                threadName, thread.isAlive());
+
+        if (thread.isAlive()) {
+            stopping.set(true);
+
+            LOG.trace("Wait up to {} seconds for thread '{}'' to die", TEN, threadName);
+            thread.join(TEN_SECONDS_IN_MILLIS);
+
+            // TODO Maybe split into INFO and WARN level based on whether is still alive or not (WARN if still alive)
+            LOG.info("Thread '{}' is stopped or we timed out waiting for it to die (is still alive? {})",
+                    threadName, thread.isAlive());
+        }
     }
 
     public HealthCheck getHealthCheck() {
