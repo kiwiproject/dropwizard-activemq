@@ -17,7 +17,7 @@ class DynamicDestinationsTest {
 
     @Test
     void shouldBuildDynamicDestinations_WhenGivenOnlyTopics() {
-        assertThat(DynamicDestinations.buildDynamicDestination(List.of("topicA", "topicB"), List.of()))
+        assertThat(DynamicDestinations.buildDynamicDestination(List.of("topicA", "topicB")))
                 .isEqualTo("*:topicA,topicB");
     }
 
