@@ -36,6 +36,7 @@
 
         <!-- test dependency versions -->
         <commons-collections4.version>4.4</commons-collections4.version>
+        <jaxb-runtime.version>4.0.5 </jaxb-runtime.version>
         <kiwi-test.version>3.2.1</kiwi-test.version>
     </properties>
 
@@ -131,7 +132,14 @@
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-testing</artifactId>
             <scope>test</scope>
-          </dependency>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <version>${jaxb-runtime.version}</version>
+            <artifactId>jaxb-runtime</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.kiwiproject</groupId>

@@ -288,7 +288,7 @@ public class Consumer implements Managed, Runnable {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         LOG.info("Starting thread '{}'", threadName);
         thread.start();
     }
@@ -301,7 +301,7 @@ public class Consumer implements Managed, Runnable {
         if (thread.isAlive()) {
             stopping.set(true);
 
-            LOG.trace("Wait up to {} seconds for thread '{}'' to die", TEN, threadName);
+            LOG.trace("Wait up to {} seconds for thread '{}' to die", TEN, threadName);
             thread.join(TEN_SECONDS_IN_MILLIS);
 
             // TODO Maybe split into INFO and WARN level based on whether is still alive or not (WARN if still alive)
