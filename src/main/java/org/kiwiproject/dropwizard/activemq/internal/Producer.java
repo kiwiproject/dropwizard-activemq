@@ -8,9 +8,13 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
+import java.util.Map;
 
 import javax.jms.ConnectionFactory;
 
+/**
+ * This internal class uses JMS {@link javax.jms.MessageProducer} instances to send messages.
+ */
 @Slf4j
 public class Producer {
 
@@ -35,6 +39,33 @@ public class Producer {
         this.destination = requireNotBlank(destination);
         this.isDefaultProducer = isDefaultProducer;
         this.serviceName = requireNotBlank(serviceName);
+    }
+
+    public void produce(String payload) {
+        produce(payload, destination);
+    }
+
+    public void produce(String payload, String destination) {
+        produce(payload, destination, Map.of());
+    }
+
+    public void produce(String payload, Map<String, Object> headers) {
+        produce(payload, destination, headers);
+    }
+
+    public void produce(String payload, String destination, Map<String, Object> headers) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'produce'");
+    }
+
+    public void produceBytesMessage(byte[] payload) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'produceBytesMessage'");
+    }
+
+    public void produceBytesMessage(byte[] payload, String destination) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'produceBytesMessage'");
     }
 
     // TODO
