@@ -1,4 +1,4 @@
-package org.kiwiproject.dropwizard.activemq.internal;
+package org.kiwiproject.dropwizard.activemq.util;
 
 import javax.jms.JMSException;
 
