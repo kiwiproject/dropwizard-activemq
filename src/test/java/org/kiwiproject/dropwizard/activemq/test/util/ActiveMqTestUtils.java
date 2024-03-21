@@ -2,7 +2,7 @@ package org.kiwiproject.dropwizard.activemq.test.util;
 
 import lombok.experimental.UtilityClass;
 
-import org.kiwiproject.dropwizard.activemq.internal.UncheckedJMSException;
+import org.kiwiproject.dropwizard.activemq.util.UncheckedJMSException;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
