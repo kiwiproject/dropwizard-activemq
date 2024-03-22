@@ -70,7 +70,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     }
 
     @Override
-    protected Result check() throws Exception {
+    protected Result check() {
         if (isNull(lastResult) || refreshIntervalElapsed()) {
             CompletableFuture<Result> future = Async.doAsync(this::performCheck);
 
