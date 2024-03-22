@@ -13,14 +13,7 @@
             "MemoryPercentUsage": 0,
             "CursorMemoryUsage": 0,
             "InFlightCount": 0,
-            "Subscriptions": [
-                {
-                    "objectName": "org.apache.activemq:brokerName=kiwi-internal,clientId=ID_fake-host-4-34820-1534155641398-0_1,consumerId=ID_fake-host-4-34820-1534155641398-1_1_1_1,destinationName=test,destinationType=Queue,endpoint=Consumer,type=Broker"
-                },
-                {
-                    "objectName": "org.apache.activemq:brokerName=kiwi-internal,clientId=ID_fake-host-8-34820-1534155641398-0_1,consumerId=ID_fake-host-8-34820-1534155641398-1_1_1_1,destinationName=test,destinationType=Queue,endpoint=Consumer,type=Broker"
-                }
-            ],
+            "Subscriptions": [],
             "CacheEnabled": true,
             "ForwardCount": 0,
             "StoreMessageSize": 0,
@@ -30,14 +23,14 @@
             "MaxAuditDepth": 10000,
             "TotalBlockedTime": 0,
             "BlockedSends": 0,
-            "QueueSize": 3,
+            "QueueSize": "{QUEUE_COUNT}",
             "MaxPageSize": 200,
             "PrioritizedMessages": false,
             "MemoryUsagePortion": 1,
             "Paused": false,
             "EnqueueCount": 5,
             "MessageGroups": {},
-            "ConsumerCount": 2,
+            "ConsumerCount": "{CONSUMER_COUNT}",
             "AverageMessageSize": 2358,
             "CursorFull": false,
             "MaxProducersToAudit": 64,
