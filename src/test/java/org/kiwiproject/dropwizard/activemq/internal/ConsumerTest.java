@@ -77,7 +77,7 @@ class ConsumerTest {
         connection.start();
 
         session = ActiveMqTestUtils.createNonTransactedSession(connection);
-        producer = ActiveMqTestUtils.createProducerQueue(session, QUEUE_NAME);
+        producer = ActiveMqTestUtils.createQueueProducer(session, QUEUE_NAME);
 
         // mock the ElucidationClient so we don't attempt to contact a (non-existent) elucidation server
         elucidationClient = mockElucidationClient();
