@@ -5,5 +5,13 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ActiveMqConstants {
 
-    public static final String ALL_EVENTS_QUEUE = "queue:all_events";
+    /**
+     * The "bare" name of the "All Events" queue.
+     */
+    public static final String ALL_EVENTS_QUEUE_NAME = "all_events";
+
+    /**
+     * The prefixed name of the "All Events" queue.
+     */
+    public static final String ALL_EVENTS_QUEUE = "queue:" + ALL_EVENTS_QUEUE_NAME;
 }
