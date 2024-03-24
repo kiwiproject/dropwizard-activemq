@@ -176,8 +176,8 @@ class StatHelperTest {
 
         @ParameterizedTest
         @ValueSource(strings = {
-            "http://localhost/api/jolokia",
-            "http://localhost:67000/api/jolokia"
+                "http://localhost/api/jolokia",
+                "http://localhost:67000/api/jolokia"
         })
         void attemptClientGet_shouldReturnFalse_OnInvalidUrls(String url) {
             var urls = List.of(url);
@@ -266,23 +266,23 @@ class StatHelperTest {
 
                 assertThat(statHelper.getCurrentBaseUrl()).isEqualTo(BASE_HTTP_URL_1);
                 assertThat(statHelper.getUrlsForDestination("foo")).containsExactly(
-                    STATS_URL_1,
-                    STATS_URL_2,
-                    STATS_URL_3);
+                        STATS_URL_1,
+                        STATS_URL_2,
+                        STATS_URL_3);
 
                 statHelper.incrementBaseUrlIndexIfCurrentUrlMatches(BASE_HTTP_URL_1);
                 assertThat(statHelper.getCurrentBaseUrl()).isEqualTo(BASE_HTTP_URL_2);
                 assertThat(statHelper.getUrlsForDestination("foo")).containsExactly(
-                    STATS_URL_2,
-                    STATS_URL_3,
-                    STATS_URL_1);
+                        STATS_URL_2,
+                        STATS_URL_3,
+                        STATS_URL_1);
 
                 statHelper.incrementBaseUrlIndexIfCurrentUrlMatches(BASE_HTTP_URL_2);
                 assertThat(statHelper.getCurrentBaseUrl()).isEqualTo(BASE_HTTP_URL_3);
                 assertThat(statHelper.getUrlsForDestination("foo")).containsExactly(
-                    STATS_URL_3,
-                    STATS_URL_1,
-                    STATS_URL_2);
+                        STATS_URL_3,
+                        STATS_URL_1,
+                        STATS_URL_2);
 
                 statHelper.incrementBaseUrlIndexIfCurrentUrlMatches(BASE_HTTP_URL_3);
             });
@@ -330,9 +330,9 @@ class StatHelperTest {
 
         var urls = statHelper.getUrlsForDestination("foo");
         assertThat(urls).containsOnly(
-            httpUrlAsHttps(STATS_URL_1),
-            httpUrlAsHttps(STATS_URL_2),
-            httpUrlAsHttps(STATS_URL_3)
+                httpUrlAsHttps(STATS_URL_1),
+                httpUrlAsHttps(STATS_URL_2),
+                httpUrlAsHttps(STATS_URL_3)
         );
     }
 
@@ -357,9 +357,9 @@ class StatHelperTest {
 
         var urls = statHelper.getUrlsForDestination("foo");
         assertThat(urls).containsOnly(
-            STATS_URL_1,
-            STATS_URL_2,
-            STATS_URL_3
+                STATS_URL_1,
+                STATS_URL_2,
+                STATS_URL_3
         );
     }
 }

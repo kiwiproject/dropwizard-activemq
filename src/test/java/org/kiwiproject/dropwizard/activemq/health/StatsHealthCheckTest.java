@@ -55,18 +55,18 @@ class StatsHealthCheckTest {
         List<JolokiaResponseValue> statResults = statHelper.getStats("test");
 
         assertAll(
-            () -> assertThat(urlCaptor.getValue())
-                    .isEqualTo("http://unit-test-1/api/jolokia/read/org.apache.activemq:type=Broker,brokerName=*,destinationType=*,destinationName=test"),
-            () -> assertThat(statResults).hasSize(1)
+                () -> assertThat(urlCaptor.getValue())
+                        .isEqualTo("http://unit-test-1/api/jolokia/read/org.apache.activemq:type=Broker,brokerName=*,destinationType=*,destinationName=test"),
+                () -> assertThat(statResults).hasSize(1)
         );
 
         var value = first(statResults);
         assertAll(
-            () -> assertThat(value.getName()).isEqualTo("test"),
-            () -> assertThat(value.getQueueSize()).isEqualTo(3),
-            () -> assertThat(value.getConsumerCount()).isEqualTo(2),
-            () -> assertThat(value.getEnqueueCount()).isEqualTo(5),
-            () -> assertThat(value.getDequeueCount()).isEqualTo(2)
+                () -> assertThat(value.getName()).isEqualTo("test"),
+                () -> assertThat(value.getQueueSize()).isEqualTo(3),
+                () -> assertThat(value.getConsumerCount()).isEqualTo(2),
+                () -> assertThat(value.getEnqueueCount()).isEqualTo(5),
+                () -> assertThat(value.getDequeueCount()).isEqualTo(2)
         );
     }
 
@@ -93,8 +93,8 @@ class StatsHealthCheckTest {
         configureMockResponse();
 
         assertAll(
-            () -> assertThat(healthCheck.isProducer()).isEqualTo(healthCheck instanceof ProducerStatsHealthCheck),
-            () -> assertThat(healthCheck.getDestinationList()).containsExactly("queue:test")
+                () -> assertThat(healthCheck.isProducer()).isEqualTo(healthCheck instanceof ProducerStatsHealthCheck),
+                () -> assertThat(healthCheck.getDestinationList()).containsExactly("queue:test")
         );
 
         var result = healthCheck.check();
@@ -108,18 +108,18 @@ class StatsHealthCheckTest {
         var details = result.getDetails();
 
         assertAll(
-            () -> assertThat(details).hasSize(3),
+                () -> assertThat(details).hasSize(3),
 
-            () -> {
-                var healthyResults = MapUtils.getMap(details, "healthyResults");
-                assertThat(healthyResults).hasSize(1);
-                verifyDetailMessage(result, "details.healthyResults.test.message",
-                        "test - Pending messages: 3 (threshold: 100), Active consumers: 2 (threshold: 0)");
-            },
+                () -> {
+                    var healthyResults = MapUtils.getMap(details, "healthyResults");
+                    assertThat(healthyResults).hasSize(1);
+                    verifyDetailMessage(result, "details.healthyResults.test.message",
+                            "test - Pending messages: 3 (threshold: 100), Active consumers: 2 (threshold: 0)");
+                },
 
-            () -> assertThat(MapUtils.getMap(details, "unhealthyResults")).isEmpty(),
+                () -> assertThat(MapUtils.getMap(details, "unhealthyResults")).isEmpty(),
 
-            () -> assertThat((List<String>) details.get("ignoredDestinations")).isEmpty()
+                () -> assertThat((List<String>) details.get("ignoredDestinations")).isEmpty()
         );
     }
 
@@ -154,8 +154,8 @@ class StatsHealthCheckTest {
         configureMockResponse();
 
         assertAll(
-            () -> assertThat(healthCheck.isProducer()).isEqualTo(healthCheck instanceof ProducerStatsHealthCheck),
-            () -> assertThat(healthCheck.getDestinationList()).containsExactly("queue:test")
+                () -> assertThat(healthCheck.isProducer()).isEqualTo(healthCheck instanceof ProducerStatsHealthCheck),
+                () -> assertThat(healthCheck.getDestinationList()).containsExactly("queue:test")
         );
 
         var result = healthCheck.check();
@@ -169,18 +169,18 @@ class StatsHealthCheckTest {
         var details = result.getDetails();
 
         assertAll(
-            () -> assertThat(details).hasSize(3),
+                () -> assertThat(details).hasSize(3),
 
-            () -> assertThat(MapUtils.getMap(details, "healthyResults")).isEmpty(),
+                () -> assertThat(MapUtils.getMap(details, "healthyResults")).isEmpty(),
 
-            () -> {
-                var unhealthyResults = MapUtils.getMap(details, "unhealthyResults");
-                assertThat(unhealthyResults).hasSize(1);
-                verifyDetailMessage(result, "details.unhealthyResults.test.message",
-                        "test - Pending messages: 3 (threshold: 1), Active consumers: 2 (threshold: 3)");
-            },
+                () -> {
+                    var unhealthyResults = MapUtils.getMap(details, "unhealthyResults");
+                    assertThat(unhealthyResults).hasSize(1);
+                    verifyDetailMessage(result, "details.unhealthyResults.test.message",
+                            "test - Pending messages: 3 (threshold: 1), Active consumers: 2 (threshold: 3)");
+                },
 
-            () -> assertThat((List<String>) details.get("ignoredDestinations")).isEmpty()
+                () -> assertThat((List<String>) details.get("ignoredDestinations")).isEmpty()
         );
     }
 
@@ -230,7 +230,7 @@ class StatsHealthCheckTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 5, 15})
+    @ValueSource(ints = { 1, 5, 15 })
     void shouldReportUnhealthy_WhenNoConsumers_AndSomePendingMessages(int queueCount) {
         var config = new ActiveMqConfig();
         config.setConsumers(List.of("queue:test"));
@@ -250,7 +250,7 @@ class StatsHealthCheckTest {
 
         var expectedMessage = f("test - Pending messages: {} (threshold: 100), Active consumers: 0 (threshold: 0)", queueCount);
         verifyDetailMessage(result, "details.unhealthyResults.test.message",
-                        expectedMessage);
+                expectedMessage);
     }
 
     @Test
@@ -289,9 +289,9 @@ class StatsHealthCheckTest {
         var result = new ConsumerStatsHealthCheck<>(appConfig, statHelper).check();
 
         assertThatResult(result)
-            .isUnhealthy()
-            .hasMessageContaining(UNHEALTHY_MSG_PREFIX)
-            .hasNoError();
+                .isUnhealthy()
+                .hasMessageContaining(UNHEALTHY_MSG_PREFIX)
+                .hasNoError();
 
         Map<String, Object> details = result.getDetails();
         assertThat(details).hasSize(3);

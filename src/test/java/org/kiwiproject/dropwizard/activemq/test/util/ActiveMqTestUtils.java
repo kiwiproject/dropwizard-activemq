@@ -47,7 +47,7 @@ public class ActiveMqTestUtils {
     /**
      * Create a new {@link ConsumerMessageListener} for a JMS {@link Queue} having the given name.
      *
-     * @param session the JMS session that the consumer listener will be attached to
+     * @param session   the JMS session that the consumer listener will be attached to
      * @param queueName the ActiveMQ queue name
      * @return a new instance
      */
@@ -58,9 +58,9 @@ public class ActiveMqTestUtils {
     /**
      * Create a new {@link ConsumerMessageListener} for the given session and destination.
      *
-     * @param session the JMS session that the consumer listener will be attached to
+     * @param session         the JMS session that the consumer listener will be attached to
      * @param destinationName the name of the JMS destination
-     * @param destination the JMS {@link Destination} for which to create the consumer and listener
+     * @param destination     the JMS {@link Destination} for which to create the consumer and listener
      * @return a new instance
      */
     public static ConsumerMessageListener createConsumerMessageListener(Session session,
@@ -81,7 +81,7 @@ public class ActiveMqTestUtils {
      * Create a {@link MessageProducer} that can send messages to a {@link Queue} with the given name.
      *
      * @param session the JMS session
-     * @param name the name of the JMS Queue
+     * @param name    the name of the JMS Queue
      * @return a new MessageProducer instance
      * @throws UncheckedJMSException
      */
@@ -97,7 +97,7 @@ public class ActiveMqTestUtils {
      * Creates a {@link Queue}.
      *
      * @param session the JMS session
-     * @param name the name of the JMS Queue
+     * @param name    the name of the JMS Queue
      * @return a new Queue instance
      * @throws UncheckedJMSException
      */

@@ -41,9 +41,9 @@ class MessageTypeParserTest {
                     """;
 
             assertAll(
-                () -> assertThat(typeParser.findAllTypes(json)).isEmpty(),
-                () -> assertThat(typeParser.isEchoedMessage(json)).isFalse(),
-                () -> assertUnknownMessageType(json)
+                    () -> assertThat(typeParser.findAllTypes(json)).isEmpty(),
+                    () -> assertThat(typeParser.isEchoedMessage(json)).isFalse(),
+                    () -> assertUnknownMessageType(json)
             );
         }
 
@@ -56,14 +56,14 @@ class MessageTypeParserTest {
                     """;
 
             assertAll(
-                () -> assertThat(typeParser.findAllTypes(json)).isEmpty(),
-                () -> assertThat(typeParser.isEchoedMessage(json)).isFalse(),
-                () -> assertUnknownMessageType(json)
+                    () -> assertThat(typeParser.findAllTypes(json)).isEmpty(),
+                    () -> assertThat(typeParser.isEchoedMessage(json)).isFalse(),
+                    () -> assertUnknownMessageType(json)
             );
         }
 
         @ParameterizedTest
-        @ValueSource(strings = { "", " ", "   "})
+        @ValueSource(strings = { "", " ", "   " })
         void whenBlankMessageType(String value) {
             var json = """
                     {
@@ -80,37 +80,37 @@ class MessageTypeParserTest {
         @Test
         void whenNullMessageType_InEchoedMessage() {
             var json = """
-                {
-                    "messageType": "ECHO_MESSAGE",
-                    "echoedMessage": {
-                        "messageType": null
+                    {
+                        "messageType": "ECHO_MESSAGE",
+                        "echoedMessage": {
+                            "messageType": null
+                        }
                     }
-                }
-                """;
+                    """;
 
             assertAll(
-                () -> assertThat(typeParser.findAllTypes(json)).containsOnly("ECHO_MESSAGE"),
-                () -> assertThat(typeParser.isEchoedMessage(json)).isTrue(),
-                () -> assertUnknownMessageType(json)
+                    () -> assertThat(typeParser.findAllTypes(json)).containsOnly("ECHO_MESSAGE"),
+                    () -> assertThat(typeParser.isEchoedMessage(json)).isTrue(),
+                    () -> assertUnknownMessageType(json)
             );
         }
 
         @ParameterizedTest
-        @ValueSource(strings = { "", " ", "   "})
+        @ValueSource(strings = { "", " ", "   " })
         void whenBlankMessageType_InEchoedMessage(String value) {
             var json = """
-                {
-                    "messageType": "ECHO_MESSAGE",
-                    "echoedMessage": {
-                        "messageType": "%s"
+                    {
+                        "messageType": "ECHO_MESSAGE",
+                        "echoedMessage": {
+                            "messageType": "%s"
+                        }
                     }
-                }
-                """.formatted(value);
+                    """.formatted(value);
 
             assertAll(
-                () -> assertThat(typeParser.findAllTypes(json)).containsOnly("ECHO_MESSAGE"),
-                () -> assertThat(typeParser.isEchoedMessage(json)).isTrue(),
-                () -> assertUnknownMessageType(json)
+                    () -> assertThat(typeParser.findAllTypes(json)).containsOnly("ECHO_MESSAGE"),
+                    () -> assertThat(typeParser.isEchoedMessage(json)).isTrue(),
+                    () -> assertUnknownMessageType(json)
             );
         }
 
@@ -129,34 +129,34 @@ class MessageTypeParserTest {
             var statusChangeType = "STATUS_CHANGE";
 
             assertAll(
-                () -> assertThat(typeParser.findAllTypes(json)).describedAs(description).containsOnly(statusChangeType),
-                () -> assertThat(typeParser.findType(json)).describedAs(description).isEqualTo(statusChangeType),
-                () -> assertThat(typeParser.findTypeSafe(json)).describedAs(description).contains(statusChangeType),
-                () -> assertThat(typeParser.isEchoedMessage(json)).describedAs(description).isFalse()
+                    () -> assertThat(typeParser.findAllTypes(json)).describedAs(description).containsOnly(statusChangeType),
+                    () -> assertThat(typeParser.findType(json)).describedAs(description).isEqualTo(statusChangeType),
+                    () -> assertThat(typeParser.findTypeSafe(json)).describedAs(description).contains(statusChangeType),
+                    () -> assertThat(typeParser.isEchoedMessage(json)).describedAs(description).isFalse()
             );
         }
     }
 
     static List<Arguments> messagesWithMultipleMessageTypes() {
         return List.of(
-            Arguments.of("should ignore duplicates", """
-                    {
-                        "messageType": "STATUS_CHANGE",
-                        "messageType": "STATUS_CHANGE"
-                    }
-                    """),
-            Arguments.of("should ignore capitalization differences", """
-                    {
-                        "messageType": "Status_Change",
-                        "messageType": "STATUS_CHANGE"
-                    }
-                    """),
-            Arguments.of("should choose last one", """
-                    {
-                        "messageType": "ORDER_CREATED",
-                        "messageType": "STATUS_CHANGE"
-                    }
-                    """)
+                Arguments.of("should ignore duplicates", """
+                        {
+                            "messageType": "STATUS_CHANGE",
+                            "messageType": "STATUS_CHANGE"
+                        }
+                        """),
+                Arguments.of("should ignore capitalization differences", """
+                        {
+                            "messageType": "Status_Change",
+                            "messageType": "STATUS_CHANGE"
+                        }
+                        """),
+                Arguments.of("should choose last one", """
+                        {
+                            "messageType": "ORDER_CREATED",
+                            "messageType": "STATUS_CHANGE"
+                        }
+                        """)
         );
     }
 
@@ -175,10 +175,10 @@ class MessageTypeParserTest {
             var orderCreatedType = "ORDER_CREATED";
 
             assertAll(
-                () -> assertThat(typeParser.findAllTypes(json)).containsOnly(orderCreatedType),
-                () -> assertThat(typeParser.findType(json)).isEqualTo(orderCreatedType),
-                () -> assertThat(typeParser.findTypeSafe(json)).contains(orderCreatedType),
-                () -> assertThat(typeParser.isEchoedMessage(json)).isFalse()
+                    () -> assertThat(typeParser.findAllTypes(json)).containsOnly(orderCreatedType),
+                    () -> assertThat(typeParser.findType(json)).isEqualTo(orderCreatedType),
+                    () -> assertThat(typeParser.findTypeSafe(json)).contains(orderCreatedType),
+                    () -> assertThat(typeParser.isEchoedMessage(json)).isFalse()
             );
         }
 
@@ -197,10 +197,10 @@ class MessageTypeParserTest {
             var orderCreatedType = "ORDER_CREATED";
 
             assertAll(
-                () -> assertThat(typeParser.findAllTypes(json)).contains("ECHO_MESSAGE", orderCreatedType),
-                () -> assertThat(typeParser.findType(json)).isEqualTo(orderCreatedType),
-                () -> assertThat(typeParser.findTypeSafe(json)).contains(orderCreatedType),
-                () -> assertThat(typeParser.isEchoedMessage(json)).isTrue()
+                    () -> assertThat(typeParser.findAllTypes(json)).contains("ECHO_MESSAGE", orderCreatedType),
+                    () -> assertThat(typeParser.findType(json)).isEqualTo(orderCreatedType),
+                    () -> assertThat(typeParser.findTypeSafe(json)).contains(orderCreatedType),
+                    () -> assertThat(typeParser.isEchoedMessage(json)).isTrue()
             );
         }
     }
@@ -211,46 +211,46 @@ class MessageTypeParserTest {
         @Test
         void shouldFindMessageTypeOfNormalMessage() {
             var json = """
-                {
-                    "metaData": {
-                        "type": "ORDER_CREATED"
+                    {
+                        "metaData": {
+                            "type": "ORDER_CREATED"
+                        }
                     }
-                }
-                """;
+                    """;
 
             var orderCreatedType = "ORDER_CREATED";
 
             assertAll(
-                () -> assertThat(typeParser.findAllTypes(json)).containsOnly(orderCreatedType),
-                () -> assertThat(typeParser.findType(json)).isEqualTo(orderCreatedType),
-                () -> assertThat(typeParser.findTypeSafe(json)).contains(orderCreatedType),
-                () -> assertThat(typeParser.isEchoedMessage(json)).isFalse()
+                    () -> assertThat(typeParser.findAllTypes(json)).containsOnly(orderCreatedType),
+                    () -> assertThat(typeParser.findType(json)).isEqualTo(orderCreatedType),
+                    () -> assertThat(typeParser.findTypeSafe(json)).contains(orderCreatedType),
+                    () -> assertThat(typeParser.isEchoedMessage(json)).isFalse()
             );
         }
 
         @Test
         void shouldFindMessageTypeOfEchoedMessage() {
             var json = """
-                {
-                    "metaData": {
-                        "type": "ECHO_MESSAGE"
-                    },
-                    "echoedMessage": {
+                    {
                         "metaData": {
-                            "type": "ORDER_CREATED"
+                            "type": "ECHO_MESSAGE"
+                        },
+                        "echoedMessage": {
+                            "metaData": {
+                                "type": "ORDER_CREATED"
+                            }
                         }
                     }
-                }
-                """;
+                    """;
 
-        var orderCreatedType = "ORDER_CREATED";
+            var orderCreatedType = "ORDER_CREATED";
 
-        assertAll(
-            () -> assertThat(typeParser.findAllTypes(json)).contains("ECHO_MESSAGE", orderCreatedType),
-            () -> assertThat(typeParser.findType(json)).isEqualTo(orderCreatedType),
-            () -> assertThat(typeParser.findTypeSafe(json)).contains(orderCreatedType),
-            () -> assertThat(typeParser.isEchoedMessage(json)).isTrue()
-        );
+            assertAll(
+                    () -> assertThat(typeParser.findAllTypes(json)).contains("ECHO_MESSAGE", orderCreatedType),
+                    () -> assertThat(typeParser.findType(json)).isEqualTo(orderCreatedType),
+                    () -> assertThat(typeParser.findTypeSafe(json)).contains(orderCreatedType),
+                    () -> assertThat(typeParser.isEchoedMessage(json)).isTrue()
+            );
         }
     }
 

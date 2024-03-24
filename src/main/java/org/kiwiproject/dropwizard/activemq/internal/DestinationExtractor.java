@@ -29,11 +29,11 @@ class DestinationExtractor {
     static final String BYTES_MESSAGE_TYPE = ActiveMqMessage.ContentType.BYTES.convertToMessageType();
 
     private static final List<Pair<Pattern, String>> DESTINATION_REPLACEMENTS = List.of(
-        Pair.of(STRIP_PREFIX, EMPTY_REPLACEMENT),
-        Pair.of(STRIP_VIRTUAL_TOPIC, EMPTY_REPLACEMENT),
-        Pair.of(STRIP_DYNAMIC_DESTINATION_PREFIX, EMPTY_REPLACEMENT),
-        Pair.of(NORMALIZE_USER_GROUP, FIRST_GROUP_REPLACEMENT),
-        Pair.of(NORMALIZE_USER, FIRST_GROUP_REPLACEMENT)
+            Pair.of(STRIP_PREFIX, EMPTY_REPLACEMENT),
+            Pair.of(STRIP_VIRTUAL_TOPIC, EMPTY_REPLACEMENT),
+            Pair.of(STRIP_DYNAMIC_DESTINATION_PREFIX, EMPTY_REPLACEMENT),
+            Pair.of(NORMALIZE_USER_GROUP, FIRST_GROUP_REPLACEMENT),
+            Pair.of(NORMALIZE_USER, FIRST_GROUP_REPLACEMENT)
     );
 
     static List<String> simplifyDestinations(String destinationCsv) {

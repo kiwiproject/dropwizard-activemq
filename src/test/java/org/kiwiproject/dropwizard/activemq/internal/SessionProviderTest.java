@@ -88,7 +88,7 @@ class SessionProviderTest {
     class NewDestination {
 
         @ParameterizedTest
-        @ValueSource(booleans = { true, false})
+        @ValueSource(booleans = { true, false })
         void shouldCreateFixedTopicDestination(boolean isProducer) throws JMSException {
             var name = "fixedtopic:test";
 

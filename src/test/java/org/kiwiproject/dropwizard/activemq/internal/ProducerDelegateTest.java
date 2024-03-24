@@ -43,7 +43,7 @@ class ProducerDelegateTest {
 
     private Producer testProducer;
     private Producer allEventsProducer;
-    private  ConnectionFactory factory;
+    private ConnectionFactory factory;
     private ElucidationClient<String> elucidationClient;
     private String serviceName;
 
@@ -71,8 +71,8 @@ class ProducerDelegateTest {
         var delegate = newDefaultProducerDelegate(List.of(), List.of());
 
         assertAll(
-            () -> assertThat(delegate.producers).containsOnlyKeys(ALL_EVENTS_DESTINATION),
-            () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_DESTINATION)).isTrue()
+                () -> assertThat(delegate.producers).containsOnlyKeys(ALL_EVENTS_DESTINATION),
+                () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_DESTINATION)).isTrue()
         );
     }
 
@@ -81,9 +81,9 @@ class ProducerDelegateTest {
         var delegate = newDefaultProducerDelegate(List.of(NAMED_DESTINATION), List.of());
 
         assertAll(
-            () -> assertThat(delegate.producers).containsOnlyKeys(NAMED_DESTINATION, ALL_EVENTS_DESTINATION),
-            () -> assertThat(delegate.containsDestination(NAMED_DESTINATION)).isTrue(),
-            () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_DESTINATION)).isTrue()
+                () -> assertThat(delegate.producers).containsOnlyKeys(NAMED_DESTINATION, ALL_EVENTS_DESTINATION),
+                () -> assertThat(delegate.containsDestination(NAMED_DESTINATION)).isTrue(),
+                () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_DESTINATION)).isTrue()
         );
     }
 
@@ -92,9 +92,9 @@ class ProducerDelegateTest {
         var delegate = newDefaultProducerDelegate(List.of(ALL_EVENTS_DESTINATION), List.of());
 
         assertAll(
-            () -> assertThat(delegate.producers).containsOnlyKeys(ALL_EVENTS_DESTINATION),
-            () -> assertThat(delegate.containsDestination(ALL_EVENTS_DESTINATION)).isTrue(),
-            () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_DESTINATION)).isFalse()
+                () -> assertThat(delegate.producers).containsOnlyKeys(ALL_EVENTS_DESTINATION),
+                () -> assertThat(delegate.containsDestination(ALL_EVENTS_DESTINATION)).isTrue(),
+                () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_DESTINATION)).isFalse()
         );
     }
 
@@ -104,11 +104,11 @@ class ProducerDelegateTest {
         var delegate = newDefaultProducerDelegate(List.of("test"), defaultDestinations);
 
         assertAll(
-            () -> assertThat(delegate.producers).containsOnlyKeys("test", "queue1", "queue2"),
-            () -> assertThat(delegate.containsDestination("test")).isTrue(),
-            () -> assertThat(delegate.containsDefaultDestination("queue1")).isTrue(),
-            () -> assertThat(delegate.containsDefaultDestination("queue2")).isTrue(),
-            () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_DESTINATION)).isFalse()
+                () -> assertThat(delegate.producers).containsOnlyKeys("test", "queue1", "queue2"),
+                () -> assertThat(delegate.containsDestination("test")).isTrue(),
+                () -> assertThat(delegate.containsDefaultDestination("queue1")).isTrue(),
+                () -> assertThat(delegate.containsDefaultDestination("queue2")).isTrue(),
+                () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_DESTINATION)).isFalse()
         );
     }
 
@@ -235,9 +235,9 @@ class ProducerDelegateTest {
                 serviceName);
 
         delegate.producers.putAll(newHashMap(
-            identifier, testProducer,
-            queue1, queue1Producer,
-            queue2, queue2Producer
+                identifier, testProducer,
+                queue1, queue1Producer,
+                queue2, queue2Producer
         ));
 
         delegate.produceToDestinationAndAllEventsQueue(destination, payload);
@@ -327,9 +327,9 @@ class ProducerDelegateTest {
 
     private ProducerDelegate newDefaultProducerDelegateNoDynamicDestinations() {
         return newDefaultProducerDelegateAllowingDynamicDestinations(
-            false,
-            NAMED_DESTINATION, testProducer,
-            ALL_EVENTS_DESTINATION, allEventsProducer
+                false,
+                NAMED_DESTINATION, testProducer,
+                ALL_EVENTS_DESTINATION, allEventsProducer
         );
     }
 

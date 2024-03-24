@@ -271,17 +271,17 @@ class MockActiveMqConsumerTest {
         consumer.consume(t2m1_message);
 
         assertAll(
-            () -> assertThat(consumer.consumedHistory()).containsOnly(q1m1_message, t2m1_message),
-            () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_1_NAME)).containsOnly(q1m1_message),
-            () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_2_NAME)).isEmpty(),
-            () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
-            () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_2_NAME)).containsOnly(t2m1_message),
+                () -> assertThat(consumer.consumedHistory()).containsOnly(q1m1_message, t2m1_message),
+                () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_1_NAME)).containsOnly(q1m1_message),
+                () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_2_NAME)).isEmpty(),
+                () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
+                () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_2_NAME)).containsOnly(t2m1_message),
 
-            () -> assertThat(consumer.ignoredHistory()).isEmpty(),
-            () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_1_NAME)).isEmpty(),
-            () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_2_NAME)).isEmpty(),
-            () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
-            () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_2_NAME)).isEmpty()
+                () -> assertThat(consumer.ignoredHistory()).isEmpty(),
+                () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_1_NAME)).isEmpty(),
+                () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_2_NAME)).isEmpty(),
+                () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
+                () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_2_NAME)).isEmpty()
         );
     }
 
@@ -302,17 +302,17 @@ class MockActiveMqConsumerTest {
         consumer.consume(t2m1_message);
 
         assertAll(
-            () -> assertThat(consumer.consumedHistory()).isEmpty(),
-            () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_1_NAME)).isEmpty(),
-            () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_2_NAME)).isEmpty(),
-            () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
-            () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_2_NAME)).isEmpty(),
+                () -> assertThat(consumer.consumedHistory()).isEmpty(),
+                () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_1_NAME)).isEmpty(),
+                () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_2_NAME)).isEmpty(),
+                () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
+                () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_2_NAME)).isEmpty(),
 
-            () -> assertThat(consumer.ignoredHistory()).containsOnly(q1m1_message, t2m1_message),
-            () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_1_NAME)).containsOnly(q1m1_message),
-            () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_2_NAME)).isEmpty(),
-            () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
-            () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_2_NAME)).containsOnly(t2m1_message)
+                () -> assertThat(consumer.ignoredHistory()).containsOnly(q1m1_message, t2m1_message),
+                () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_1_NAME)).containsOnly(q1m1_message),
+                () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_2_NAME)).isEmpty(),
+                () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
+                () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_2_NAME)).containsOnly(t2m1_message)
         );
     }
 
@@ -389,11 +389,11 @@ class MockActiveMqConsumerTest {
 
     private static String createJsonPayload(String destinationType, int destinationNumber, int messageNumber) {
         return """
-            {
-                "%s": %d,
-                "message": %d
-            }
-            """.formatted(destinationType, destinationNumber, messageNumber);
+                {
+                    "%s": %d,
+                    "message": %d
+                }
+                """.formatted(destinationType, destinationNumber, messageNumber);
     }
 
     private static ActiveMqMessage createMessageWithEmptyProperties() {
@@ -436,9 +436,9 @@ class MockActiveMqConsumerTest {
                                                ActiveMqMessage message) {
 
         assertAll(
-            () -> assertThat(consumer.consume(message)).isEqualTo(ActiveMqConsumer.Result.IGNORED),
-            () -> assertThat(consumer.consumedHistory(destination)).isEmpty(),
-            () -> assertThat(consumer.ignoredHistory(destination)).contains(message)
+                () -> assertThat(consumer.consume(message)).isEqualTo(ActiveMqConsumer.Result.IGNORED),
+                () -> assertThat(consumer.consumedHistory(destination)).isEmpty(),
+                () -> assertThat(consumer.ignoredHistory(destination)).contains(message)
         );
     }
 
@@ -454,9 +454,9 @@ class MockActiveMqConsumerTest {
                                                 ActiveMqMessage message) {
 
         assertAll(
-            () -> assertThat(consumer.consume(message)).isEqualTo(ActiveMqConsumer.Result.CONSUMED),
-            () -> assertThat(consumer.consumedHistory(destination)).contains(message),
-            () -> assertThat(consumer.ignoredHistory(destination)).isEmpty()
+                () -> assertThat(consumer.consume(message)).isEqualTo(ActiveMqConsumer.Result.CONSUMED),
+                () -> assertThat(consumer.consumedHistory(destination)).contains(message),
+                () -> assertThat(consumer.ignoredHistory(destination)).isEmpty()
         );
     }
 }

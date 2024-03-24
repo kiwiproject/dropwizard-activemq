@@ -15,6 +15,6 @@ public class ActiveMqMessageException extends RuntimeException {
 
     public ActiveMqMessageException(String category, String message, Throwable throwable) {
         super(message, throwable);
-        this.category =  requireNotBlank(category);
+        this.category = requireNotBlank(category);
     }
 }

@@ -96,7 +96,7 @@ class DeadLetterQueueHealthCheckTest {
         }
 
         @ParameterizedTest
-        @ValueSource(longs = {1, 5, 15})
+        @ValueSource(longs = { 1, 5, 15 })
         void whenQueueSizeIsGreaterThanZero(long queueSize) {
             when(statHelper.getStatsSingleResultOrNull(anyString())).thenReturn(newJolokiaResponseValue(queueSize));
 

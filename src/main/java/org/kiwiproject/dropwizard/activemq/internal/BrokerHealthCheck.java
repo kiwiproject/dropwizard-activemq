@@ -93,7 +93,7 @@ public class BrokerHealthCheck extends HealthCheck {
 
             try {
                 LOG.trace("Wait up to {} {} for health check result in {} for broker: {}",
-                    jmsCheckWaitTime, jmsCheckWaitTimeUnit, name, brokerUrl);
+                        jmsCheckWaitTime, jmsCheckWaitTimeUnit, name, brokerUrl);
                 var resultFuture = completionService.poll(jmsCheckWaitTime, jmsCheckWaitTimeUnit);
                 return getResult(resultFuture, brokerUrl);
             } catch (InterruptedException e) {
@@ -123,7 +123,7 @@ public class BrokerHealthCheck extends HealthCheck {
     }
 
     private static Optional<String> getBrokerUrlFromPooledConnectionFactory(
-        PooledConnectionFactory pooledConnectionFactory) {
+            PooledConnectionFactory pooledConnectionFactory) {
 
         var connectionFactory = pooledConnectionFactory.getConnectionFactory();
         if (connectionFactory instanceof ActiveMQConnectionFactory amqConnectionFactory) {

@@ -26,10 +26,10 @@ public class MessageTypeParser {
     // This must be a List since we attempt to find the messageType in this specific order.
     // (It could be a LinkedHashSet, but List makes the intent for it to be ordered more clear.)
     private static final List<String> MESSAGE_TYPE_PATHS = List.of(
-        "messageType",
-        "metaData.type",
-        "echoedMessage.messageType",
-        "echoedMessage.metaData.type"
+            "messageType",
+            "metaData.type",
+            "echoedMessage.messageType",
+            "echoedMessage.metaData.type"
     );
 
     private static final String ECHOED_MESSAGE_TYPE = "ECHO_MESSAGE";

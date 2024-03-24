@@ -33,7 +33,7 @@ public interface ActiveMqProducer {
      * sent as a JMS {@link javax.jms.TextMessage}.
      *
      * @param destination the destination topic, virtual topic, or queue
-     * @param payload the payload to produce
+     * @param payload     the payload to produce
      */
     default void produceToDestination(String destination, String payload) {
         produce(destination, payload, SPECIFIED_ONLY);
@@ -44,7 +44,7 @@ public interface ActiveMqProducer {
      * sent as a JMS {@link javax.jms.TextMessage}.
      *
      * @param destination the destination topic, virtual topic, or queue
-     * @param payload the payload to produce
+     * @param payload     the payload to produce
      */
     default void produceToDestinationAndAllEventsQueue(String destination, String payload) {
         produce(destination, payload, SPECIFIED_AND_ALL_EVENTS);
@@ -53,10 +53,10 @@ public interface ActiveMqProducer {
     /**
      * Produce a message as a JMS {@link javax.jms.TextMessage}.
      *
-     * @param destination the destination topic, virtual topic, or queue
-     * @param payload the payload to produce
+     * @param destination        the destination topic, virtual topic, or queue
+     * @param payload            the payload to produce
      * @param payloadDestination whether to send the message solely to the specified destination or to the
-     * "All Events" queue as well (as defined in {@link ActiveMqConstants})
+     *                           "All Events" queue as well (as defined in {@link ActiveMqConstants})
      */
     default void produce(String destination, String payload, PayloadDestination payloadDestination) {
         produce(destination, payload, payloadDestination, Map.of());
@@ -67,8 +67,8 @@ public interface ActiveMqProducer {
      * sent as a JMS {@link javax.jms.TextMessage}, with the specified headers.
      *
      * @param destination the destination topic, virtual topic, or queue
-     * @param payload the payload to produce
-     * @param headers headers to add to the message prior to sending it
+     * @param payload     the payload to produce
+     * @param headers     headers to add to the message prior to sending it
      */
     default void produceToDestinationWithHeaders(String destination,
                                                  String payload,
@@ -81,8 +81,8 @@ public interface ActiveMqProducer {
      * sent as a JMS {@link javax.jms.TextMessage}, with the specified headers.
      *
      * @param destination the destination topic, virtual topic, or queue
-     * @param payload the payload to produce
-     * @param headers headers to add to the message prior to sending it
+     * @param payload     the payload to produce
+     * @param headers     headers to add to the message prior to sending it
      */
     default void produceToDestinationAndAllEventsWithHeaders(String destination,
                                                              String payload,
@@ -93,11 +93,11 @@ public interface ActiveMqProducer {
     /**
      * Produce a message as a JMS {@link javax.jms.TextMessage}.
      *
-     * @param destination the destination topic, virtual topic, or queue
-     * @param payload the payload to produce
+     * @param destination        the destination topic, virtual topic, or queue
+     * @param payload            the payload to produce
      * @param payloadDestination whether to send the message solely to the specified destination or to the
-     * "All Events" queue as well (as defined in {@link ActiveMqConstants})
-     * @param headers headers to add to the message prior to sending it
+     *                           "All Events" queue as well (as defined in {@link ActiveMqConstants})
+     * @param headers            headers to add to the message prior to sending it
      */
     void produce(String destination,
                  String payload,
@@ -115,7 +115,7 @@ public interface ActiveMqProducer {
      * a custom byte array.
      *
      * @param destination the destination topic, virtual topic, or queue
-     * @param payload the payload to produce
+     * @param payload     the payload to produce
      */
     default void produceBytesMessage(String destination, String payload) {
         produceBytesMessage(destination, payload.getBytes(UTF_8));
@@ -125,7 +125,7 @@ public interface ActiveMqProducer {
      * Produce a message as a JMS {@link javax.jms.BytesMessage}.
      *
      * @param destination the destination topic, virtual topic, or queue
-     * @param payload the payload to produce
+     * @param payload     the payload to produce
      */
     void produceBytesMessage(String destination, byte[] payload);
 }

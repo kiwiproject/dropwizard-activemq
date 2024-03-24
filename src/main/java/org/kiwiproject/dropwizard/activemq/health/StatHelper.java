@@ -217,7 +217,7 @@ class StatHelper {
                 LOG.trace("Failed to connect to: {}, probably not the primary broker", url, e);
             } else {
                 LOG.warn("Encountered exception fetching response from: {}," +
-                        " exception type: {}, exception message: {} (enable DEBUG for details)",
+                                " exception type: {}, exception message: {} (enable DEBUG for details)",
                         url, e.getClass(), e.getMessage());
                 LOG.debug("Exception from: {}", url, e);
             }

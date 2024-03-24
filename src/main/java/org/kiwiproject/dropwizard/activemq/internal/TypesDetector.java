@@ -19,7 +19,7 @@ class TypesDetector {
     private static final MessageTypeParser MESSAGE_TYPE_PARSER = new MessageTypeParser(JSON_HELPER);
 
     static ActiveMqMessage.ContentType determineContentTypeOf(String payload) {
-        return JSON_HELPER.isJson(payload) ?  JSON :  TEXT;
+        return JSON_HELPER.isJson(payload) ? JSON : TEXT;
     }
 
     static String determineMessageTypeFrom(String payload) {
@@ -37,4 +37,5 @@ class TypesDetector {
         var messageType = contentType.convertToMessageType();
         LOG.trace("{} detected -> message identified as [{}]", messageType);
         return messageType;
-    }}
+    }
+}

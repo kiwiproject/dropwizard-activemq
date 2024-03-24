@@ -57,7 +57,7 @@ public class Producer {
     /**
      * Set properties on the message using {@link Message#setObjectProperty(String, Object)}.
      *
-     * @param message the JMS message
+     * @param message    the JMS message
      * @param properties the properties to set
      */
     public static void setHeaderProperties(Message message, Map<String, Object> properties) {

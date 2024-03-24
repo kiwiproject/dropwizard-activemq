@@ -166,7 +166,7 @@ public class ProducerDelegate implements ActiveMqProducer {
         producers.entrySet().stream()
                 .filter(destinationAndProducer ->
                         destinationIsNot(excludedDestination, destinationAndProducer) &&
-                        isDefaultProducer(destinationAndProducer))
+                                isDefaultProducer(destinationAndProducer))
                 .forEach(destinationAndProducer -> {
                     destinationAndProducer.getValue().produce(payload, headers);
                     recordElucidationEvent(destinationAndProducer.getKey(), payload);

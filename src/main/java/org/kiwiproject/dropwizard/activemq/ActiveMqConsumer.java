@@ -44,7 +44,7 @@ public interface ActiveMqConsumer {
      * @param message the message to validate
      * @return the message type
      * @throws ActiveMqMessageInvalidMessageTypeException if the message type is missing, blank, or
-     * equals the UNKNOWN_MESSAGE_TYPE
+     *                                                    equals the UNKNOWN_MESSAGE_TYPE
      */
     default String requireValidMessageType(ActiveMqMessage message) {
         var messageType = message.getMessageType()
@@ -68,13 +68,13 @@ public interface ActiveMqConsumer {
      * the log level to TRACE (temporarily) to view message contents for aid when debugging a problem.
      *
      * @param message the message
-     * @param e the exception to handle
+     * @param e       the exception to handle
      */
     default void handleException(ActiveMqMessage message, ActiveMqMessageException e) {
         var logger = getLogger();
 
         logger.warn("Failed to process an ActiveMqMessage: " +
-                "exception type={}, contentType={}, messageType={}, reason={} (body and stack trace at TRACE level)",
+                        "exception type={}, contentType={}, messageType={}, reason={} (body and stack trace at TRACE level)",
                 e.getCategory(),
                 message.getContentType(),
                 message.getMessageType(),

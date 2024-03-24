@@ -15,8 +15,8 @@ import java.util.Map;
  * There are far more fields than this, so we should add to these
  * properties if we find use for others in the future.
  */
- @Getter
- @Setter
+@Getter
+@Setter
 public class JolokiaResponseValue extends FlexibleJsonModel {
 
     private DestinationIdentifier.DestinationInfo destinationInfo;  // additional value holder

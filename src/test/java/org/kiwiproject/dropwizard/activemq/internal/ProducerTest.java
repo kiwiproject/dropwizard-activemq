@@ -103,7 +103,7 @@ class ProducerTest {
         var propertyValueCaptor = ArgumentCaptor.forClass(String.class);
         verify(message, TWICE).setObjectProperty(propertyNameCaptor.capture(), propertyValueCaptor.capture());
         assertThat(propertyNameCaptor.getAllValues()).containsOnly(
-            ActiveMqMessage.JMS_X_GROUP_ID, ActiveMqMessage.KIWI_AMQ_CONTENT_TYPE_KEY);
+                ActiveMqMessage.JMS_X_GROUP_ID, ActiveMqMessage.KIWI_AMQ_CONTENT_TYPE_KEY);
         assertThat(propertyValueCaptor.getAllValues()).containsOnly("My-Group-Id", "JSON");
 
         var messageCaptor = ArgumentCaptor.forClass(TextMessage.class);
@@ -161,10 +161,10 @@ class ProducerTest {
         when(message.getText()).thenReturn(PAYLOAD);
 
         var headers = Map.<String, Object>of(
-            "p1", "v1",
-            "p2", "v2",
-            "p3", "v3",
-            "p4", "v4"
+                "p1", "v1",
+                "p2", "v2",
+                "p3", "v3",
+                "p4", "v4"
         );
 
         producer.produce(PAYLOAD, headers);
@@ -173,9 +173,9 @@ class ProducerTest {
         var propertyValueCaptor = ArgumentCaptor.forClass(String.class);
         verify(message, atLeast(4)).setObjectProperty(propertyNameCaptor.capture(), propertyValueCaptor.capture());
         assertThat(propertyNameCaptor.getAllValues()).containsOnly(
-            ActiveMqMessage.KIWI_AMQ_CONTENT_TYPE_KEY, "p1", "p2", "p3", "p4");
+                ActiveMqMessage.KIWI_AMQ_CONTENT_TYPE_KEY, "p1", "p2", "p3", "p4");
         assertThat(propertyValueCaptor.getAllValues()).containsOnly(
-            "JSON", "v1", "v2", "v3", "v4");
+                "JSON", "v1", "v2", "v3", "v4");
     }
 
     @Test
@@ -211,7 +211,7 @@ class ProducerTest {
 
         producer.produceBytesMessage(PAYLOAD.getBytes(UTF_8));
 
-        var payloadCaptor =  ArgumentCaptor.forClass(byte[].class);
+        var payloadCaptor = ArgumentCaptor.forClass(byte[].class);
         verify(message).writeBytes(payloadCaptor.capture());
         assertThat(payloadCaptor.getValue()).isEqualTo(PAYLOAD.getBytes(UTF_8));
 
