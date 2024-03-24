@@ -48,7 +48,7 @@ public class DestinationIdentifier {
 
         } else if (name.startsWith(TOPIC_PREFIX)) {  // this is an ActiveMQ virtual topic
 
-            // Producers all produce to VirtualTopic.<name> while consumers all
+            // Producers produce to VirtualTopic.<name> while consumers
             // consume from a queue named Consumer.<serviceName>.VirtualTopic.<name>
 
             var trimmedName = trimPrefix(name, TOPIC_PREFIX);
@@ -64,6 +64,11 @@ public class DestinationIdentifier {
         } else if (name.startsWith(DYNAMIC_PREFIX)) {
 
             var trimmedName = trimPrefix(name, DYNAMIC_PREFIX);
+
+            // Note we use a topic here! This means that dynamic destination
+            // strings can omit the "topic://" prefix for topics, but they
+            // must always include the "queue://" prefix for queues.
+
             dest = new DestinationInfo(DestinationType.TOPIC, trimmedName);
 
         } else {

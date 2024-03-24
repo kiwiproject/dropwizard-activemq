@@ -370,27 +370,25 @@ class ConsumerTest {
         String messageType = assertPresentAndGet(messageTypeOptional);
         assertThat(messageType).isEqualTo(expectedMessageType);
 
-        // TODO Why does the following switch expression blow up with a "Bad operand in call stack" with JSON_HELPER but not with r ???
-        // var r = JSON_HELPER.getPath(body, "payload", String.class);
+        // TODO Why does the following switch expression blow up with a "Bad operand in call stack" in Gitpod ???
 
-        // var payload = switch (messageType) {
-        //     case SPECIFIC_TEXT_MESSAGE_TYPE -> JSON_HELPER.getPath(body, "payload", String.class);
-        //     // case SPECIFIC_TEXT_MESSAGE_TYPE -> r;
-        //     case GENERIC_TEXT_MESSAGE_TYPE -> KiwiXml.toObject(body, InternalMessage.class).getPayload();
-        //     case BYTES_MESSAGE_TYPE -> new String(Base64.getDecoder().decode(body), UTF_8);
-        //     default -> throw new IllegalStateException(f("Received an unexpected type: {}", messageType));
-        // };
+        var payload = switch (messageType) {
+            case SPECIFIC_TEXT_MESSAGE_TYPE -> JSON_HELPER.getPath(body, "payload", String.class);
+            case GENERIC_TEXT_MESSAGE_TYPE -> KiwiXml.toObject(body, InternalMessage.class).getPayload();
+            case BYTES_MESSAGE_TYPE -> new String(Base64.getDecoder().decode(body), UTF_8);
+            default -> throw new IllegalStateException(f("Received an unexpected type: {}", messageType));
+        };
 
-        String payload;
-        if (SPECIFIC_TEXT_MESSAGE_TYPE.equals(messageType)) {
-            payload = JSON_HELPER.getPath(body, "payload", String.class);
-        } else if (GENERIC_TEXT_MESSAGE_TYPE.equals(messageType)) {
-            payload = KiwiXml.toObject(body, InternalMessage.class).getPayload();
-        } else if (BYTES_MESSAGE_TYPE.equals(messageType)) {
-            payload = new String(Base64.getDecoder().decode(body), UTF_8);
-        } else {
-            throw new IllegalStateException(f("Received an unexpected type: {}", messageType));
-        }
+//        String payload;
+//        if (SPECIFIC_TEXT_MESSAGE_TYPE.equals(messageType)) {
+//            payload = JSON_HELPER.getPath(body, "payload", String.class);
+//        } else if (GENERIC_TEXT_MESSAGE_TYPE.equals(messageType)) {
+//            payload = KiwiXml.toObject(body, InternalMessage.class).getPayload();
+//        } else if (BYTES_MESSAGE_TYPE.equals(messageType)) {
+//            payload = new String(Base64.getDecoder().decode(body), UTF_8);
+//        } else {
+//            throw new IllegalStateException(f("Received an unexpected type: {}", messageType));
+//        }
 
         assertThat(payload)
                 .withFailMessage("For type [%s], the payload [%s] did not match expected value [%s]",

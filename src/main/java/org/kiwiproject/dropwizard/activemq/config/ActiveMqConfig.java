@@ -10,10 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.kiwiproject.config.TlsContextConfiguration;
-import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer;
-import org.kiwiproject.dropwizard.activemq.DropwizardActiveMq;
-import org.kiwiproject.dropwizard.activemq.health.ConsumerStatsHealthCheck;
-import org.kiwiproject.dropwizard.activemq.health.ProducerStatsHealthCheck;
 import org.kiwiproject.validation.KiwiConstraintViolations;
 import org.kiwiproject.validation.KiwiValidations;
 
@@ -25,12 +21,10 @@ import java.util.List;
 @Slf4j
 public class ActiveMqConfig {
 
-    // TODO Fix all the @link and @see with FQCNs once added
-
     public static final String DEFAULT_BROKER_URI = "tcp://localhost:61616";
 
     /**
-     * The ful URI of the ActiveMQ broker, including failover, connection options, etc.
+     * The full URI of the ActiveMQ broker, including failover, connection options, etc.
      */
     @NotBlank
     private String brokerUri = DEFAULT_BROKER_URI;
@@ -49,8 +43,8 @@ public class ActiveMqConfig {
     /**
      * Should producer and consumer statistics health checks be enabled?
      *
-     * @see ConsumerStatsHealthCheck
-     * @see ProducerStatsHealthCheck
+     * @see org.kiwiproject.dropwizard.activemq.health.ConsumerStatsHealthCheck ConsumerStatsHealthCheck
+     * @see org.kiwiproject.dropwizard.activemq.health.ProducerStatsHealthCheck ProducerStatsHealthCheck
      */
     private boolean enableStatsHealthChecks = true;
 
@@ -61,7 +55,8 @@ public class ActiveMqConfig {
 
     /**
      * Should all configured consumers be automatically registered when
-     * {@link DropwizardActiveMq#startConsumers(ActiveMqConsumer)} is called?
+     * {@link org.kiwiproject.dropwizard.activemq.DropwizardActiveMq#startConsumers(org.kiwiproject.dropwizard.activemq.ActiveMqConsumer) DropwizardActiveMq#startConsumers}
+     * is called?
      */
     private boolean autoRegisterConsumers = true;
 
@@ -79,14 +74,18 @@ public class ActiveMqConfig {
      * List of default producer destinations.
      * <p>
      * If none set this will be defaulted to a list containing
-     * {@link org.kiwiproject.dropwizard.activemq.ActiveMqConstants#ALL_EVENTS_QUEUE}.
+     * {@link org.kiwiproject.dropwizard.activemq.ActiveMqConstants#ALL_EVENTS_QUEUE ALL_EVENTS_QUEUE}.
      */
     private List<String> defaultProducers = new ArrayList<>();
 
     /**
      * Should dynamic destinations be permitted?
      * <p>
-     * TODO Explain what "dynamic destinations" are!
+     * Dynamic destinations let you specify more than one destination
+     * using strings like {@code "*:topic://topic-A,topic://topic-B,queue://queue-audit"}.
+     * <p>
+     * You can omit "topic://" for topics, so the above can be simplified
+     * to just {@code "*:topic-A,topic-B,queue://queue-audit"}.
      */
     private boolean allowDynamicDestinations;
 
