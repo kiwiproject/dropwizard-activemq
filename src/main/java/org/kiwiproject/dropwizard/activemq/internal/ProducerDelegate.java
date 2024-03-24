@@ -12,19 +12,16 @@ import static org.kiwiproject.dropwizard.activemq.internal.DestinationExtractor.
 import static org.kiwiproject.dropwizard.activemq.util.DynamicDestinations.DYNAMIC_DESTINATION_ID;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.kiwiproject.dropwizard.activemq.ActiveMqProducer;
 import org.kiwiproject.elucidation.client.ElucidationClient;
 
+import javax.jms.ConnectionFactory;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.jms.ConnectionFactory;
 
 @Slf4j
 public class ProducerDelegate implements ActiveMqProducer {

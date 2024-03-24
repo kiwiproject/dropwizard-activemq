@@ -3,7 +3,6 @@ package org.kiwiproject.dropwizard.activemq.test.util;
 import static org.kiwiproject.base.KiwiStrings.f;
 
 import lombok.experimental.UtilityClass;
-
 import org.kiwiproject.dropwizard.activemq.util.UncheckedJMSException;
 
 import javax.jms.Connection;

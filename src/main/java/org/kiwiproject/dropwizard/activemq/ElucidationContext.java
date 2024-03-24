@@ -2,7 +2,6 @@ package org.kiwiproject.dropwizard.activemq;
 
 import lombok.Builder;
 import lombok.Getter;
-
 import org.kiwiproject.elucidation.client.ElucidationRecorder;
 import org.kiwiproject.elucidation.common.model.ConnectionEvent;
 

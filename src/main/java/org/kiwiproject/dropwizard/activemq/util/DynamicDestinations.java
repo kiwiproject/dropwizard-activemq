@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import lombok.experimental.UtilityClass;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;

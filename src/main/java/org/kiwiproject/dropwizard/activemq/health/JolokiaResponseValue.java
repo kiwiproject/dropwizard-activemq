@@ -2,10 +2,8 @@ package org.kiwiproject.dropwizard.activemq.health;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier;
 import org.kiwiproject.json.FlexibleJsonModel;
 

@@ -11,9 +11,9 @@ import static org.kiwiproject.base.KiwiStrings.f;
 import static org.kiwiproject.collect.KiwiArrays.isNotNullOrEmpty;
 import static org.kiwiproject.collect.KiwiLists.isNotNullOrEmpty;
 
+import io.dropwizard.core.setup.Environment;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.activemq.jms.pool.PooledConnectionFactory;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;
@@ -36,8 +36,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
-import io.dropwizard.core.setup.Environment;
 
 /**
  * The main entry point to initialize the library for consuming and/or producing

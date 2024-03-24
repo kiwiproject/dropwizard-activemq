@@ -1,7 +1,6 @@
 package org.kiwiproject.dropwizard.activemq.health;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;
 
 import java.util.List;

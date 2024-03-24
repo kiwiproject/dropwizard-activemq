@@ -21,24 +21,29 @@ import static org.kiwiproject.metrics.health.HealthCheckResults.newUnhealthyResu
 
 import com.codahale.metrics.health.HealthCheck;
 import com.google.common.annotations.VisibleForTesting;
-
+import io.dropwizard.lifecycle.Managed;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.activemq.ActiveMQMessageConsumer;
 import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.jms.pool.PooledMessageConsumer;
 import org.kiwiproject.base.DefaultEnvironment;
 import org.kiwiproject.base.KiwiEnvironment;
 import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer;
-import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer.Result;
+import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageException;
 import org.kiwiproject.dropwizard.activemq.util.Utils;
 import org.kiwiproject.elucidation.client.ElucidationClient;
 import org.kiwiproject.metrics.health.HealthStatus;
 
+import javax.jms.BytesMessage;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.TextMessage;
 import java.lang.reflect.Field;
 import java.util.Base64;
 import java.util.HashMap;
@@ -48,15 +53,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.jms.BytesMessage;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.TextMessage;
-
-import io.dropwizard.lifecycle.Managed;
 
 /**
  * This is an internal class that instantiates and manages an {@link ActiveMQMessageConsumer}.

@@ -1,7 +1,6 @@
 package org.kiwiproject.dropwizard.activemq.test.util;
 
 import lombok.experimental.UtilityClass;
-
 import org.kiwiproject.config.TlsContextConfiguration;
 import org.kiwiproject.io.KiwiPaths;
 

@@ -18,8 +18,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
-
 import org.awaitility.Durations;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,17 +36,14 @@ import org.kiwiproject.metrics.health.HealthCheckResults;
 import org.kiwiproject.metrics.health.HealthStatus;
 import org.kiwiproject.xml.KiwiXml;
 
-import java.util.Base64;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
-
-import jakarta.xml.bind.annotation.XmlRootElement;
+import java.util.Base64;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @DisplayName("Consumer")
 class ConsumerTest {

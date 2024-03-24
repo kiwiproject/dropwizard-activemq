@@ -9,6 +9,15 @@ import static org.kiwiproject.test.assertj.KiwiAssertJ.assertIsExactType;
 import static org.kiwiproject.test.constants.KiwiTestConstants.JSON_HELPER;
 import static org.mockito.Mockito.mock;
 
+import io.dropwizard.testing.junit5.DropwizardClientExtension;
+import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.collections4.IterableUtils;
 import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
@@ -36,16 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
-
-import io.dropwizard.testing.junit5.DropwizardClientExtension;
-import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.core.Response;
 
 @DisplayName("StatHelper")
 class StatHelperTest {

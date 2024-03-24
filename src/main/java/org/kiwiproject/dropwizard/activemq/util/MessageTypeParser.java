@@ -5,9 +5,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.kiwiproject.logging.LazyLogParameterSupplier.lazy;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.kiwiproject.json.JsonHelper;
 

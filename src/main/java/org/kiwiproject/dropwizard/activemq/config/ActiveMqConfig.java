@@ -2,21 +2,23 @@ package org.kiwiproject.dropwizard.activemq.config;
 
 import static java.util.Objects.isNull;
 
+import io.dropwizard.util.Duration;
+import io.dropwizard.validation.ValidationMethod;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.kiwiproject.config.TlsContextConfiguration;
+import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer;
+import org.kiwiproject.dropwizard.activemq.DropwizardActiveMq;
+import org.kiwiproject.dropwizard.activemq.health.ConsumerStatsHealthCheck;
+import org.kiwiproject.dropwizard.activemq.health.ProducerStatsHealthCheck;
 import org.kiwiproject.validation.KiwiConstraintViolations;
 import org.kiwiproject.validation.KiwiValidations;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.dropwizard.util.Duration;
-import io.dropwizard.validation.ValidationMethod;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -77,7 +79,7 @@ public class ActiveMqConfig {
      * List of default producer destinations.
      * <p>
      * If none set this will be defaulted to a list containing
-     * {@link org.kiwiproject.dropwizard.activemq.ActiveMqConstants.ActiveMqConstants#ALL_EVENTS_QUEUE}.
+     * {@link org.kiwiproject.dropwizard.activemq.ActiveMqConstants#ALL_EVENTS_QUEUE}.
      */
     private List<String> defaultProducers = new ArrayList<>();
 

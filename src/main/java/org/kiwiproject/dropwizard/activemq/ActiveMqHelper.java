@@ -1,10 +1,8 @@
 package org.kiwiproject.dropwizard.activemq;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQSslConnectionFactory;
 import org.apache.activemq.jms.pool.PooledConnectionFactory;

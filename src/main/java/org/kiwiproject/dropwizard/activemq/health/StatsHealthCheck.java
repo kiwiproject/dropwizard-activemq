@@ -11,11 +11,9 @@ import static org.kiwiproject.collect.KiwiMaps.newHashMap;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.google.common.annotations.VisibleForTesting;
-
+import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import lombok.AccessLevel;
-
 import org.kiwiproject.concurrent.Async;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;

@@ -1,7 +1,6 @@
 package org.kiwiproject.dropwizard.activemq.internal;
 
 import lombok.experimental.UtilityClass;
-
 import org.apache.activemq.command.ActiveMQDestination;
 import org.apache.commons.lang3.tuple.Pair;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;

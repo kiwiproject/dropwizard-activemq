@@ -9,24 +9,21 @@ import static org.kiwiproject.dropwizard.activemq.ActiveMqMessage.JMS_X_GROUP_ID
 import static org.kiwiproject.dropwizard.activemq.ActiveMqMessage.KIWI_AMQ_CONTENT_TYPE_KEY;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageHeaderException;
 import org.kiwiproject.dropwizard.activemq.util.Utils;
 import org.kiwiproject.dropwizard.activemq.util.Utils.FunctionThrowsException;
-
-import java.time.Duration;
-import java.util.Map;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import java.time.Duration;
+import java.util.Map;
 
 /**
  * This internal class uses JMS {@link javax.jms.MessageProducer} instances to send messages.

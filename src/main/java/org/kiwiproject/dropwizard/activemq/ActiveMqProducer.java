@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.kiwiproject.dropwizard.activemq.ActiveMqProducer.PayloadDestination.SPECIFIED_AND_ALL_EVENTS;
 import static org.kiwiproject.dropwizard.activemq.ActiveMqProducer.PayloadDestination.SPECIFIED_ONLY;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public interface ActiveMqProducer {

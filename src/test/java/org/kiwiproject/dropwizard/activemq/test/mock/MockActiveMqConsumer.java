@@ -7,21 +7,18 @@ import static org.kiwiproject.base.KiwiStrings.f;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageException;
 import org.kiwiproject.dropwizard.activemq.util.UncheckedJMSException;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.Topic;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 public class MockActiveMqConsumer implements ActiveMqConsumer {
