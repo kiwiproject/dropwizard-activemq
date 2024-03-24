@@ -3,6 +3,7 @@ package org.kiwiproject.dropwizard.activemq.test.junit.jupiter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.jms.pool.PooledConnectionFactory;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -86,6 +87,9 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
 
     /**
      * Use this in a test to get a new {@link ConnectionFactory} for the embedded broker.
+     * <p>
+     * Once you have the factory, you need to create a {@link javax.jms.Connection}, for example,
+     * using {@link ConnectionFactory#createConnection()}, and then create a {@link javax.jms.Session}.
      *
      * @return a JMS connection factory
      */
@@ -93,5 +97,23 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
         var factory = new ActiveMQConnectionFactory();
         factory.setBrokerURL(service.getVmConnectorURI().toString());
         return factory;
+    }
+
+    /**
+     * Use this in a test to get a new {@link PooledConnectionFactory} for the embedded broker.
+     * <p>
+     * Once you have the factory, you need to create a {@link javax.jms.Connection}, for example,
+     * using {@link ConnectionFactory#createConnection()}, and then create a {@link javax.jms.Session}.
+     *
+     * @return an ActiveMQ pooled connection factory
+     */
+    public PooledConnectionFactory newPooledConnectionFactory() {
+        var factory = new ActiveMQConnectionFactory();
+        factory.setBrokerURL(service.getVmConnectorURI().toString());
+
+        var pooledFactory = new PooledConnectionFactory();
+        pooledFactory.setConnectionFactory(factory);
+
+        return pooledFactory;
     }
 }

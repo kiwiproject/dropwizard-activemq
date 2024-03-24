@@ -137,7 +137,10 @@ class ActiveMqProducerAndConsumerTest {
             activeMqConfig.setConsumers(List.of("topic:dest1"));
             dropwizardActiveMq = newDropwizardActiveMq();
 
-            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+            var returnedValue = dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+
+            assertThat(returnedValue).isSameAs(dropwizardActiveMq);
+            assertThat(dropwizardActiveMq.getInitializedConsumers()).containsOnly("topic:dest1");
 
             verify(lifecycle).manage(isA(Consumer.class));
             verify(healthChecks).register(eq("consumer-topic:dest1"), isA(HealthCheck.class));
@@ -148,7 +151,10 @@ class ActiveMqProducerAndConsumerTest {
             activeMqConfig.setConsumers(List.of("topic:dest1", "topic:dest2"));
             dropwizardActiveMq = newDropwizardActiveMq();
 
-            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+            var returnedValue = dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+
+            assertThat(returnedValue).isSameAs(dropwizardActiveMq);
+            assertThat(dropwizardActiveMq.getInitializedConsumers()).containsOnly("topic:dest1", "topic:dest2");
 
             verify(lifecycle, times(2)).manage(isA(Consumer.class));
             verify(healthChecks).register(eq("consumer-topic:dest1"), isA(HealthCheck.class));
@@ -163,6 +169,7 @@ class ActiveMqProducerAndConsumerTest {
                     "topic:dest1", "topic:dest2");
 
             assertThat(returnedValue).isSameAs(dropwizardActiveMq);
+            assertThat(dropwizardActiveMq.getInitializedConsumers()).containsOnly("topic:dest1", "topic:dest2");
 
             verify(lifecycle, times(2)).manage(isA(Consumer.class));
             verify(healthChecks).register(eq("consumer-topic:dest1"), isA(HealthCheck.class));
