@@ -28,10 +28,10 @@ public class ActiveMqMessages {
     public static ActiveMqMessage newBytesActiveMqMessage(byte[] bytes,
                                                           Map<String, Object> properties) {
         return newActiveMqMessage(
-            Base64.getEncoder().encodeToString(bytes),
-            ContentType.BYTES,
-            ContentType.BYTES.convertToMessageType(),
-            properties);
+                Base64.getEncoder().encodeToString(bytes),
+                ContentType.BYTES,
+                ContentType.BYTES.convertToMessageType(),
+                properties);
     }
 
     // JSON factory methods

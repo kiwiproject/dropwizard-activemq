@@ -193,10 +193,10 @@ class ConsumerTest {
         var jmsConsumer = createMockActiveMqConsumer();
 
         var textMessage = session.createTextMessage("""
-            {
-                "payload": "with-missing-required-messageType"
-            }
-            """);
+                {
+                    "payload": "with-missing-required-messageType"
+                }
+                """);
 
         producer.send(textMessage);
 
@@ -263,16 +263,16 @@ class ConsumerTest {
         var textMessage = session.createTextMessage(JSON_HELPER.toJson(new InternalMessage()));
         producer.send(textMessage);
 
-         // Need minor wait to make sure the Consumer.loop ingests the message
-         waitForSingleMessage(jmsConsumer);
+        // Need minor wait to make sure the Consumer.loop ingests the message
+        waitForSingleMessage(jmsConsumer);
 
-         assertThat(jmsConsumer.consumedHistory()).isEmpty();
-         assertThat(jmsConsumer.ignoredHistory()).hasSize(1);
-         assertThat(jmsConsumer.ignoredHistory(QUEUE_NAME)).hasSize(1);
+        assertThat(jmsConsumer.consumedHistory()).isEmpty();
+        assertThat(jmsConsumer.ignoredHistory()).hasSize(1);
+        assertThat(jmsConsumer.ignoredHistory(QUEUE_NAME)).hasSize(1);
 
-         assertConsumerIsHealthy();
+        assertConsumerIsHealthy();
 
-         verifyNoInteractions(elucidationClient);
+        verifyNoInteractions(elucidationClient);
     }
 
     @Test

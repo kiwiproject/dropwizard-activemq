@@ -52,17 +52,17 @@ class BrokerHealthCheckTest {
     @Test
     void shouldCreateHealthCheckNameWithPrefix() {
         assertAll(
-            () -> assertThat(BrokerHealthCheck.createHealthCheckNameWithPrefix(null))
-                    .isEqualTo("ActiveMQ Producer/Consumer"),
+                () -> assertThat(BrokerHealthCheck.createHealthCheckNameWithPrefix(null))
+                        .isEqualTo("ActiveMQ Producer/Consumer"),
 
-            () -> assertThat(BrokerHealthCheck.createHealthCheckNameWithPrefix(""))
-                    .isEqualTo("ActiveMQ Producer/Consumer"),
+                () -> assertThat(BrokerHealthCheck.createHealthCheckNameWithPrefix(""))
+                        .isEqualTo("ActiveMQ Producer/Consumer"),
 
-            () -> assertThat(BrokerHealthCheck.createHealthCheckNameWithPrefix("  \r\n\t  "))
-                    .isEqualTo("ActiveMQ Producer/Consumer"),
+                () -> assertThat(BrokerHealthCheck.createHealthCheckNameWithPrefix("  \r\n\t  "))
+                        .isEqualTo("ActiveMQ Producer/Consumer"),
 
-            () -> assertThat(BrokerHealthCheck.createHealthCheckNameWithPrefix("Internal"))
-                    .isEqualTo("Internal ActiveMQ Producer/Consumer")
+                () -> assertThat(BrokerHealthCheck.createHealthCheckNameWithPrefix("Internal"))
+                        .isEqualTo("Internal ActiveMQ Producer/Consumer")
         );
     }
 
@@ -100,12 +100,12 @@ class BrokerHealthCheckTest {
         var waitTimeMillis = 1L;
         var healthCheck = spy(new BrokerHealthCheck("testBrokerHealthCheck", factory, waitTimeMillis, TimeUnit.MILLISECONDS, serviceName));
         Mockito.doAnswer(invocation -> {
-            // ensure sleep time is much more than health check's timeout
-            var sleepTime = 5 * waitTimeMillis;
-            new DefaultEnvironment().sleepQuietly(sleepTime, TimeUnit.MILLISECONDS);
-            return HealthCheck.Result.unhealthy("should never see this (should time out before getting here!!!)");
-        }).when(healthCheck)
-        .doProduceConsumeCheck(anyString());
+                    // ensure sleep time is much more than health check's timeout
+                    var sleepTime = 5 * waitTimeMillis;
+                    new DefaultEnvironment().sleepQuietly(sleepTime, TimeUnit.MILLISECONDS);
+                    return HealthCheck.Result.unhealthy("should never see this (should time out before getting here!!!)");
+                }).when(healthCheck)
+                .doProduceConsumeCheck(anyString());
 
         assertThatHealthCheck(healthCheck)
                 .isUnhealthy()

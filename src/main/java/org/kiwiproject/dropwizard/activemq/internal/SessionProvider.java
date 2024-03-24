@@ -56,7 +56,7 @@ class SessionProvider implements AutoCloseable {
         }
 
         LOG.error("Unexpected JMS configuration. Returning a Queue (which probably is not correct)." +
-                " A {} destination should start with '{}', '{}', '{}', or '{}' but was: '{}'",
+                        " A {} destination should start with '{}', '{}', '{}', or '{}' but was: '{}'",
                 isProducer ? "producer" : "consumer",
                 DestinationIdentifier.FIXED_TOPIC_PREFIX,
                 DestinationIdentifier.TOPIC_PREFIX,

@@ -1,9 +1,9 @@
 {
-    "request": {
-        "mbean": "org.apache.activemq:brokerName=*,destinationName=VirtualTopic.test,destinationType=*,type=Broker",
-        "type": "read"
-    },
-    "error_type": "javax.management.InstanceNotFoundException",
-    "error": "javax.management.InstanceNotFoundException: No MBean with pattern org.apache.activemq:brokerName=*,destinationName=VirtualTopic.test,destinationType=*,type=Broker found for reading attributes",
-    "status": 404
+  "request": {
+    "mbean": "org.apache.activemq:brokerName=*,destinationName=VirtualTopic.test,destinationType=*,type=Broker",
+    "type": "read"
+  },
+  "error_type": "javax.management.InstanceNotFoundException",
+  "error": "javax.management.InstanceNotFoundException: No MBean with pattern org.apache.activemq:brokerName=*,destinationName=VirtualTopic.test,destinationType=*,type=Broker found for reading attributes",
+  "status": 404
 }

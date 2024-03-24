@@ -126,7 +126,7 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
         }
     }
 
-    private String healthCheckName(String  title) {
+    private String healthCheckName(String title) {
         return healthCheckName(healthCheckNamePrefix, title);
     }
 
@@ -181,7 +181,7 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
      * Incoming messages will be passed to the consumer delegate.
      *
      * @param consumerDelegate the consumer that should process received messages
-     * @param destinations the explicit destinations to consume
+     * @param destinations     the explicit destinations to consume
      * @return this instance, for fluent method-chaining
      * @throws IllegalArgumentException if no destinations are specified
      */
@@ -204,11 +204,11 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
         checkForExistingConsumer(destination);
 
         var consumer = new Consumer(
-            factory,
-            destination,
-            consumerDelegate,
-            ElucidationClient.of(eventRecorder, consumingTextMessageEventFactory),
-            configuration.getServiceName()
+                factory,
+                destination,
+                consumerDelegate,
+                ElucidationClient.of(eventRecorder, consumingTextMessageEventFactory),
+                configuration.getServiceName()
         );
 
         addConsumer(destination);

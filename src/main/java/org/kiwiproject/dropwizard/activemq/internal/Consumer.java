@@ -327,10 +327,10 @@ public class Consumer implements Managed, Runnable {
                 }
 
                 return newUnhealthyResult(
-                    HealthStatus.CRITICAL,
-                    throwable,
-                    "%s is NOT consuming messages from %s due to uncaught exception!",
-                    threadName, destination
+                        HealthStatus.CRITICAL,
+                        throwable,
+                        "%s is NOT consuming messages from %s due to uncaught exception!",
+                        threadName, destination
                 );
             }
         };
@@ -347,8 +347,8 @@ public class Consumer implements Managed, Runnable {
                 DELEGATE.setAccessible(true);
             } catch (Exception e) {
                 throw new ConsumerProviderException(
-                    "Unable to get 'delegate' field or make it accessible (maybe ActiveMQ is now using the JPMS?)",
-                    e);
+                        "Unable to get 'delegate' field or make it accessible (maybe ActiveMQ is now using the JPMS?)",
+                        e);
             }
         }
 

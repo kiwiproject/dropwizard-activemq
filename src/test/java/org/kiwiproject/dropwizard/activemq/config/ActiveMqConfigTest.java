@@ -55,14 +55,14 @@ class ActiveMqConfigTest {
     @SuppressWarnings("unused")
     private static Stream<Object[]> tlsConfigurationArgumentFactory() {
         return Stream.of(
-            new Object[] { true, true, true, true },
-            new Object[] { true, true, false, false },
-            new Object[] { true, false, true, true },
-            new Object[] { true, false, false, false },
-            new Object[] { false, true, true, true },
-            new Object[] { false, true, false, false },
-            new Object[] { false, false, true, true },
-            new Object[] { false, false, false, true }
+                new Object[] { true, true, true, true },
+                new Object[] { true, true, false, false },
+                new Object[] { true, false, true, true },
+                new Object[] { true, false, false, false },
+                new Object[] { false, true, true, true },
+                new Object[] { false, true, false, false },
+                new Object[] { false, false, true, true },
+                new Object[] { false, false, false, true }
         );
     }
 
