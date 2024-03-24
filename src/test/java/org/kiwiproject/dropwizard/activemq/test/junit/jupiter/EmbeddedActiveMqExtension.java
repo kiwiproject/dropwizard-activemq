@@ -1,16 +1,14 @@
 package org.kiwiproject.dropwizard.activemq.test.junit.jupiter;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import java.time.Duration;
-
 import javax.jms.ConnectionFactory;
+import java.time.Duration;
 
 /**
  * Creates an embedded ActiveMQ broker for use in JUnit 5 tests.
@@ -42,12 +40,17 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
 
     private final BrokerService service;
 
+    // TODO Enhance this to allow configuring via a builder? Another option would be
+    //  a factory method that allows you to provide a Consumer<BrokerService> which
+    //  con be configured however you want, perhaps with a few defaults (like in the no-args ctor)
+
     public EmbeddedActiveMqExtension() {
         service = new BrokerService();
+        service.setBrokerName("embedded-broker");
+        service.setEnableStatistics(false);
+        service.setPersistent(false);
         service.setUseJmx(false);
         service.setUseShutdownHook(false);
-        service.setPersistent(false);
-        service.setBrokerName("embedded-broker");
     }
 
     @Override
