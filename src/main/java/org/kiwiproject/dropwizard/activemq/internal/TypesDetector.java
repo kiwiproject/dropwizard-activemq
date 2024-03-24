@@ -35,7 +35,7 @@ class TypesDetector {
         }
 
         var messageType = contentType.convertToMessageType();
-        LOG.trace("{} detected -> message identified as [{}]", messageType);
+        LOG.trace("{} detected -> message identified as [{}]", contentType, messageType);
         return messageType;
     }
 }
