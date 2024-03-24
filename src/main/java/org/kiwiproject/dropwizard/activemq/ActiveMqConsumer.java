@@ -36,7 +36,7 @@ public interface ActiveMqConsumer {
     }
 
     /**
-     * Valdiate that the {@link ActiveMqMessage} has a valid message type which is not
+     * Validate that the {@link ActiveMqMessage} has a valid message type which is not
      * equal to {@link MessageTypeParser#UNKNOWN_MESSAGE_TYPE}.
      * <p>
      * Only use this when a message is required to have a <strong>known</strong> message type.
