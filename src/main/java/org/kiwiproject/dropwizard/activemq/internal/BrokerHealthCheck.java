@@ -80,7 +80,7 @@ public class BrokerHealthCheck extends HealthCheck {
         // This health check creates a temporary queue (see ConsumerAndProducerProvider). In ActiveMQ, creating
         // a temporary queue makes a blocking call. When AMQ is down, the call will block until it is alive
         // again. The following code uses a CompletionService to perform the check asynchronously, and waits up
-        // to a maxiumum timeout before reporting as unhealthy.
+        // to a maximum timeout before reporting as unhealthy.
 
         var brokerUrl = getBrokerUrl(factory).orElse("[unknown-broker-URL]");
         LOG.trace("Start health check {} for broker: {}", name, brokerUrl);
@@ -196,7 +196,7 @@ public class BrokerHealthCheck extends HealthCheck {
             throws InterruptedException, ExecutionException {
 
         // CompletionService#poll(long timeout, TimeUnit unit) returns null if the waiting time
-        // elapsed before a result is available. So if it is null, return unhealth result and
+        // elapsed before a result is available. So if it is null, return unhealthy result and
         // otherwise get the Result from the Future.
 
         if (nonNull(resultFuture)) {

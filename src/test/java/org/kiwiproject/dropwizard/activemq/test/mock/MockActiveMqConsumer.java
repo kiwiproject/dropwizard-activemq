@@ -91,9 +91,9 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
 
     private final Multimap<String, String> consuming = ArrayListMultimap.create();
     private final Multimap<String, String> ignoring = ArrayListMultimap.create();
-    private Error error;
-    private boolean validateBodyIsPresentOrThrowException;
-    private boolean validateMessageTypeIsPresentOrThrowException;
+    private final Error error;
+    private final boolean validateBodyIsPresentOrThrowException;
+    private final boolean validateMessageTypeIsPresentOrThrowException;
 
     private final AtomicLong receivedCount = new AtomicLong();
 

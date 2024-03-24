@@ -20,7 +20,7 @@ class SessionProvider implements AutoCloseable {
 
     static final String CLOSE_METHOD_NAME = "close";
 
-    protected String serviceName;
+    protected final String serviceName;
     protected Connection connection;
     protected Session session;
 

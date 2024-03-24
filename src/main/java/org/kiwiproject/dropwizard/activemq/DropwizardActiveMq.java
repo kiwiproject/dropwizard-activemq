@@ -156,7 +156,7 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
     }
 
     /**
-     * Starts consuming from configured consumer desintations when {@link ActiveMqConfig#isAutoRegisterConsumers()}
+     * Starts consuming from configured consumer destinations when {@link ActiveMqConfig#isAutoRegisterConsumers()}
      * is {@code true}.
      * <p>
      * Incoming messages will be passed to the consumer delegate.
@@ -273,7 +273,7 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
 
     /**
      * @return an Optional containing the {@link ElucidationContext} if elucidation is enabled.
-     * Generally you won't need this.
+     * Generally, you won't need this.
      */
     public Optional<ElucidationContext> getElucidationContext() {
         return Optional.ofNullable(elucidationContext);

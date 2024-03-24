@@ -125,8 +125,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
                 }
                 resultMap.put(key, result);
             } else {
-                LOG.warn("Unable to evalulate a destination for: {} (no DestinationInfo)", dest);
-                resultMap.put(key, null);
+                LOG.warn("Unable to evaluate a destination for: {} (no DestinationInfo)", dest);
             }
         } catch (Exception e) {
             LOG.error("Encountered exception trying to gather stats for destination: {}", key, e);
@@ -235,6 +234,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     /**
      * This is a no-op. Override to run additional checks.
      */
+    @SuppressWarnings({ "EmptyMethod", "unused" })
     protected void runAdditionalChecks(JolokiaResponseValue stats,
                                        Map<String, Object> resultMap,
                                        Map<String, Map<String, Object>> healthyResults,

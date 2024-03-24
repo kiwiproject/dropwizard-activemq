@@ -71,7 +71,7 @@ public class ActiveMqMessage {
 
     /**
      * The type of message. If {@link #getContentType()} is "JSON", then this will be the result of
-     * {@link org.kiwiproject.org.kiwiproject.dropwizard.activemq.util.MessageTypeParser#findType(String)}.
+     * {@link org.kiwiproject.dropwizard.activemq.util.MessageTypeParser#findType(String)}.
      * <p>
      * If it is a different but recognized content type, it will be the result of
      * {@link ContentType#convertToMessageType()}

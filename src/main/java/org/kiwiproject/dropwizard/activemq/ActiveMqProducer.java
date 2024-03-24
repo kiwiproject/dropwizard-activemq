@@ -10,7 +10,7 @@ import java.util.Map;
 public interface ActiveMqProducer {
 
     /**
-     * Tells whetheer the message sent to the {@link #produce(String, String, PayloadDestination)} method
+     * Tells whether the message sent to the {@link #produce(String, String, PayloadDestination)} method
      * should send the payload to just the specified destination (SPECIFIED_ONLY) or to both the destination
      * and the All Events queue (SPECIFIED_AND_ALL_EVENTS).
      */
@@ -108,7 +108,7 @@ public interface ActiveMqProducer {
      * Produce a message as a JMS {@link javax.jms.BytesMessage} by converting
      * the payload into bytes using UTF-8 as the character set.
      * <p>
-     * Conversion from String to byte array is done using {@link String#getBytes(String)}
+     * Conversion from String to a byte array is done using {@link String#getBytes(String)}
      * with {@link StandardCharsets#UTF_8} as the character set.
      * <p>
      * Use {@link #produceBytesMessage(String, byte[])} if you want to provide

@@ -24,7 +24,7 @@ public class TestObjectFactory {
      *
      * keytool -import -alias testkey -file testkey.cer -keystore test-truststore.jks -storepass password -noprompt
      *
-     * Voila!
+     * Voilà!
      */
 
     public static String keyStorePath() {

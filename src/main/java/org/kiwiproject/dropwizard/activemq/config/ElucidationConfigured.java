@@ -23,7 +23,7 @@ public interface ElucidationConfigured {
      */
     @NotNull
     default ServiceIdentifier getElucidationService() {
-        return ServiceIdentifier.of("elicidation-service");
+        return ServiceIdentifier.of("elucidation-service");
     }
 
     /**
@@ -37,7 +37,7 @@ public interface ElucidationConfigured {
      * Whether Elucidation is enabled, using the supplied {@link ElucidationConfigProvider}.
      * <p>
      * This method is provided specifically for testing purposes, and should generally not
-     * be used in production code, which is why it is maked as {@link Beta}.
+     * be used in production code, which is why it is marked as {@link Beta}.
      */
     @Beta
     default boolean isElucidationEnabled(ElucidationConfigProvider provider) {

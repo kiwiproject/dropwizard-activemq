@@ -76,7 +76,7 @@ class StatsHealthCheckTest {
         config.setProducers(List.of("queue:test"));
         appConfig.setActiveMqConfig(config);
 
-        assertHealthyHealthCheck(new ProducerStatsHealthCheck<TestAppConfig>(appConfig, statHelper));
+        assertHealthyHealthCheck(new ProducerStatsHealthCheck<>(appConfig, statHelper));
     }
 
     @Test
@@ -85,7 +85,7 @@ class StatsHealthCheckTest {
         config.setConsumers(List.of("queue:test"));
         appConfig.setActiveMqConfig(config);
 
-        assertHealthyHealthCheck(new ConsumerStatsHealthCheck<TestAppConfig>(appConfig, statHelper));
+        assertHealthyHealthCheck(new ConsumerStatsHealthCheck<>(appConfig, statHelper));
     }
 
     @SuppressWarnings("unchecked")
@@ -106,6 +106,7 @@ class StatsHealthCheckTest {
                 .hasNoError();
 
         var details = result.getDetails();
+        assertThat(details).isNotNull();
 
         assertAll(
                 () -> assertThat(details).hasSize(3),
@@ -134,7 +135,7 @@ class StatsHealthCheckTest {
         config.setHealthConfig(healthConfig);
         appConfig.setActiveMqConfig(config);
 
-        assertUnhealthyHealthCheck(new ProducerStatsHealthCheck<TestAppConfig>(appConfig, statHelper));
+        assertUnhealthyHealthCheck(new ProducerStatsHealthCheck<>(appConfig, statHelper));
     }
 
     @Test
@@ -147,6 +148,8 @@ class StatsHealthCheckTest {
         config.setConsumers(List.of("queue:test"));
         config.setHealthConfig(healthConfig);
         appConfig.setActiveMqConfig(config);
+
+        assertUnhealthyHealthCheck(new ConsumerStatsHealthCheck<>(appConfig, statHelper));
     }
 
     @SuppressWarnings("unchecked")
@@ -167,6 +170,7 @@ class StatsHealthCheckTest {
                 .hasNoError();
 
         var details = result.getDetails();
+        assertThat(details).isNotNull();
 
         assertAll(
                 () -> assertThat(details).hasSize(3),

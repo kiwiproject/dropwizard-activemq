@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 public class ActiveMqConfig {
 
-    // TODO Fix all the @link and @see with FQCNs onces added
+    // TODO Fix all the @link and @see with FQCNs once added
 
     public static final String DEFAULT_BROKER_URI = "tcp://localhost:61616";
 
@@ -114,7 +114,7 @@ public class ActiveMqConfig {
     private boolean useSecureActiveMQConnections = true;
 
     /**
-     * Should DropwizardActiveMq connect to ActiveMQ's REST APIs only via secure connections, e.g., TLS,
+     * Should DropwizardActiveMq connect to the ActiveMQ REST API only via secure connections, e.g., TLS,
      * to gather statistics?
      */
     private boolean useSecureRestConnections = true;
@@ -129,7 +129,7 @@ public class ActiveMqConfig {
 
     /**
      * TLS configuration to use when connecting to the ActiveMQ message broker and/or to
-     * ActiveMQ's REST API.
+     * the ActiveMQ REST API.
      * <p>
      * Required only when using secure connections.
      */
@@ -142,8 +142,8 @@ public class ActiveMqConfig {
      * properties is true, then we require a tlsConfiguration to be present. When using secure connections, this
      * also validates that the values in the tlsConfiguration are valid.
      * <p>
-     * Note that if both "useSecureXxxConnections" propertis are true, they both use the same tlsConfiguration.
-     * This should be find in most circumstances. If at some point we find this assumption no longer holds,
+     * Note that if both "useSecureXxxConnections" properties are true, they both use the same tlsConfiguration.
+     * This should be fine in most circumstances. If at some point we find this assumption no longer holds,
      * we would need to permit separate TLS configuration for the broker versus the REST APIs.
      */
     @ValidationMethod(message = "tlsConfiguration must exist and be valid when using secure connections")
@@ -173,12 +173,12 @@ public class ActiveMqConfig {
     }
 
     /**
-     * Sanity check validation: if using secure ActiveMQ connections, then the broker URI should contain "ssl://".
+     * Check secure broker URLs: if using secure ActiveMQ connections, then the broker URI should contain "ssl://".
      * If not using secure connections, then the broker URI should not contain "ssl://".
      * <p>
      * This is certainly not foolproof, but it should catch most simple configuration errors, such as saying
-     * you want to use secure conections but you're not using the "ssl" scheme in the broker URI, or saying you
-     * do not want to use secure conections but you are using the "ssl" scheme in the broker URI.
+     * you want to use secure connections, but you're not using the "ssl" scheme in the broker URI, or saying you
+     * do not want to use secure connections, but you are using the "ssl" scheme in the broker URI.
      */
     @ValidationMethod(message = "must use ssk scheme only for secure connections")
     public boolean isBrokerUriForSslProbablyValid() {

@@ -415,10 +415,10 @@ class MockActiveMqConsumerTest {
     }
 
     private static ActiveMqMessage createMessageFrom(String body, String messageType, ActiveMQDestination destination) {
-        return ActiveMqMessages.newJsonActiveMqMessage(body, messageType, createPropertiesMapFrom(destination));
+        return ActiveMqMessages.newJsonActiveMqMessage(body, messageType, createPropertyMapFrom(destination));
     }
 
-    private static Map<String, Object> createPropertiesMapFrom(ActiveMQDestination destination) {
+    private static Map<String, Object> createPropertyMapFrom(ActiveMQDestination destination) {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ActiveMqMessage.JMS_DESTINATION, destination);
         return properties;

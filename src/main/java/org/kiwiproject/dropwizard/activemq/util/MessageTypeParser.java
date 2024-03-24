@@ -24,7 +24,7 @@ public class MessageTypeParser {
     public static final String UNKNOWN_MESSAGE_TYPE = "UNKNOWN";
 
     // This must be a List since we attempt to find the messageType in this specific order.
-    // (It could be a LinkedHashSet, but List makes the intent for it to be ordered more clear.)
+    // (It could be a LinkedHashSet, but using List makes the intent for it to be ordered more clear.)
     private static final List<String> MESSAGE_TYPE_PATHS = List.of(
             "messageType",
             "metaData.type",
@@ -67,7 +67,7 @@ public class MessageTypeParser {
      * <p>
      * Returns "UNKNOWN" if there is no messageType or if it is null or blank.
      * <p>
-     * If this is an ECHO_MESSAGE then the messageType of the echoedMessage is returned.
+     * If this is an ECHO_MESSAGE, then the messageType of the echoedMessage is returned.
      *
      * @param json the message JSON
      * @return the upper-cased message type
