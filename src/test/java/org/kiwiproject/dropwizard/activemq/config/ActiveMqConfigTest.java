@@ -88,6 +88,9 @@ class ActiveMqConfigTest {
                                         boolean expectedResult) {
 
             config.setUseSecureActiveMQConnections(useSecureActiveMQConnections);
+            config.setBrokerUri(brokerUri);
+
+            assertThat(config.isBrokerUriForSslProbablyValid()).isEqualTo(expectedResult);
         }
     }
 }
