@@ -355,11 +355,11 @@ public class Consumer implements Managed, Runnable {
         @Getter
         private MessageConsumer consumer;
 
-        ConsumerProvider(ConnectionFactory factory, String uri, String serviceName) throws JMSException {
+        ConsumerProvider(ConnectionFactory factory, String destination, String serviceName) throws JMSException {
             super(factory, serviceName);
 
             try {
-                consumer = session.createConsumer(newDestination(uri, session, false));
+                consumer = session.createConsumer(newDestination(destination, session, false));
             } catch (JMSException e) {
                 LOG.warn("Caught JMSException: errorCode={}, message={} (enable DEBUG for stack traces)",
                         e.getErrorCode(), e.getMessage());
