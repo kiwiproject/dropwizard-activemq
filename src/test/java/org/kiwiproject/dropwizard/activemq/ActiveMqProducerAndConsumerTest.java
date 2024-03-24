@@ -34,6 +34,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.internal.Consumer;
 import org.kiwiproject.dropwizard.activemq.internal.ProducerDelegate;
@@ -306,8 +308,19 @@ class ActiveMqProducerAndConsumerTest {
             );
         }
 
-        @Test
-        void shouldStartWhenProducingToDynamicDestinations() {
+        /**
+         * Queues must be prefixed with "queue://" but topics can be prefixed with "topic://" or not.
+         * <p>
+         * Order should not matter.
+         */
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "*:topic://topic-A,queue://queue-B",
+                "*:queue://queue-B,topic://topic-A",
+                "*:topic-A,queue://queue-B",
+                "*:queue://queue-B,topic-A"
+        })
+        void shouldStartWhenProducingToDynamicDestinations(String dynamicDestination) {
             activeMqConfig.setAllowDynamicDestinations(true);
             activeMqConfig.setProducers(List.of());
             activeMqConfig.setDefaultProducers(List.of());
@@ -320,7 +333,7 @@ class ActiveMqProducerAndConsumerTest {
             var activeMqProducer = dropwizardActiveMq.startProducers();
 
             activeMqProducer.produceToDestinationAndAllEventsQueue(
-                    "*:topic://topic-A,queue://queue-B",
+                    dynamicDestination,
                     """
                             {
                                 "messageType": "TESTING",
