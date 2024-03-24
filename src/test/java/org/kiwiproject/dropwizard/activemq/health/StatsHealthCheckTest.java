@@ -13,6 +13,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.codahale.metrics.health.HealthCheck;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.collections4.MapUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,9 +30,6 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 import java.util.Map;
-
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.core.Response;
 
 @DisplayName("StatsHealthCheck")
 class StatsHealthCheckTest {

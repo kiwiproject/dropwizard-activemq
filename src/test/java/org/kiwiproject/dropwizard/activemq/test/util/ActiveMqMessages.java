@@ -3,7 +3,6 @@ package org.kiwiproject.dropwizard.activemq.test.util;
 import static org.kiwiproject.test.constants.KiwiTestConstants.JSON_HELPER;
 
 import lombok.experimental.UtilityClass;
-
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage.ContentType;
 import org.kiwiproject.dropwizard.activemq.util.MessageTypeParser;

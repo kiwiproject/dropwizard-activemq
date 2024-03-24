@@ -14,9 +14,11 @@ import static org.kiwiproject.collect.KiwiLists.newListStartingAtCircularOffset;
 import static org.kiwiproject.jaxrs.KiwiEntities.safeReadEntity;
 
 import com.google.common.annotations.VisibleForTesting;
-
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -26,6 +28,7 @@ import org.kiwiproject.jaxrs.KiwiResponses;
 import org.kiwiproject.jaxrs.exception.JaxrsNotFoundException;
 import org.kiwiproject.json.JsonHelper;
 
+import javax.net.ssl.HostnameVerifier;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +37,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import javax.net.ssl.HostnameVerifier;
-
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 @Slf4j
 class StatHelper {

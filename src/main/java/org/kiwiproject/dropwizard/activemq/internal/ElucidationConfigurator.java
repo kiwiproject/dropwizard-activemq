@@ -7,7 +7,6 @@ import static org.kiwiproject.dropwizard.activemq.internal.TypesDetector.determi
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-
 import org.kiwiproject.dropwizard.activemq.ElucidationContext;
 import org.kiwiproject.dropwizard.activemq.config.ElucidationConfigured;
 import org.kiwiproject.elucidation.client.ElucidationRecorder;

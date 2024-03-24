@@ -7,9 +7,7 @@ import static org.kiwiproject.metrics.health.HealthCheckResults.newUnhealthyResu
 
 import com.codahale.metrics.health.HealthCheck;
 import com.google.common.annotations.VisibleForTesting;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.jaxrs.exception.JaxrsNotFoundException;
 

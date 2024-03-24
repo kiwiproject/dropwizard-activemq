@@ -10,7 +10,6 @@ import static org.kiwiproject.dropwizard.activemq.ActiveMqConstants.ALL_EVENTS_Q
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.kiwiproject.dropwizard.activemq.ActiveMqProducer;
 

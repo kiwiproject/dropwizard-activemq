@@ -1,7 +1,6 @@
 package org.kiwiproject.dropwizard.activemq.test.mock;
 
 import com.google.errorprone.annotations.Immutable;
-
 import lombok.Getter;
 
 import java.util.Map;

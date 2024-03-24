@@ -1,12 +1,10 @@
 package org.kiwiproject.dropwizard.activemq.config;
 
 import com.google.common.annotations.Beta;
-
-import org.kiwiproject.config.provider.ElucidationConfigProvider;
-import org.kiwiproject.jersey.client.ServiceIdentifier;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.kiwiproject.config.provider.ElucidationConfigProvider;
+import org.kiwiproject.jersey.client.ServiceIdentifier;
 
 /**
  * Your {@link io.dropwizard.core.Configuration} class should implement this interface

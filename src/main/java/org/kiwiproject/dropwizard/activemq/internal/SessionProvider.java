@@ -5,16 +5,14 @@ import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.kiwiproject.dropwizard.activemq.util.Utils;
-
-import java.util.Optional;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Session;
+import java.util.Optional;
 
 @Getter
 @Slf4j

@@ -6,7 +6,6 @@ import static org.kiwiproject.dropwizard.activemq.util.MessageTypeParser.UNKNOWN
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage.ContentType;
 import org.kiwiproject.dropwizard.activemq.util.MessageTypeParser;

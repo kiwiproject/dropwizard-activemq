@@ -5,7 +5,6 @@ import static java.util.Objects.nonNull;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.kiwiproject.elucidation.client.ElucidationResult;
 
 import java.util.function.BiConsumer;

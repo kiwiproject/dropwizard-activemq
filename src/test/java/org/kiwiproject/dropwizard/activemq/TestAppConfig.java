@@ -2,14 +2,12 @@ package org.kiwiproject.dropwizard.activemq;
 
 import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.uniqueServiceName;
 
+import io.dropwizard.core.Configuration;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;
-
-import io.dropwizard.core.Configuration;
 
 @Getter
 @Setter
