@@ -69,4 +69,24 @@ class ActiveMqHelperTest {
             );
         }
     }
+
+    @Nested
+    class NewPooledConnectionFactory {
+
+        @Test
+        void shouldCreatePooledFactory() {
+            config.setUseSecureActiveMQConnections(false);
+            var factory = helper.newPooledConnectionFactory(config);
+
+            assertThat(factory.getConnectionFactory()).isExactlyInstanceOf(ActiveMQConnectionFactory.class);
+        }
+
+        @Test
+        void shouldCreatePooledFactory_WithSecureFactory() {
+            config.setUseSecureActiveMQConnections(true);
+            var factory = helper.newPooledConnectionFactory(config);
+
+            assertThat(factory.getConnectionFactory()).isExactlyInstanceOf(ActiveMQSslConnectionFactory.class);
+        }
+    }
 }

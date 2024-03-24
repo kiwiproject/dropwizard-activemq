@@ -39,7 +39,7 @@ public class ActiveMqTestUtils {
     /**
      * Create a new {@link ConsumerMessageListener} whose consumer name will be prefixed with "listener-".
      *
-     * @param destinationName the ActiveMQ destination name (must not include a "queue://" or "topic://" prefix)
+     * @param destinationName the ActiveMQ destination name
      * @return a new instance
      */
     public static ConsumerMessageListener createConsumerMessageListener(String destinationName) {
@@ -72,6 +72,11 @@ public class ActiveMqTestUtils {
 
     /**
      * Create a new {@link ConsumerMessageListener} for the given session and destination.
+     * <p>
+     * Uses the name of the {@link Destination} as the destination name.
+     * <p>
+     * If you need multiple listeners for the same destination, each with a different
+     * name, then use {@link #createConsumerMessageListener(Session, String, Destination)}.
      *
      * @param session     the JMS session that the consumer listener will be attached to
      * @param destination the JMS {@link Destination} for which to create the consumer and listener
@@ -88,7 +93,7 @@ public class ActiveMqTestUtils {
      * Create a new {@link ConsumerMessageListener} for the given session and destination.
      *
      * @param session         the JMS session that the consumer listener will be attached to
-     * @param destinationName the name of the JMS destination (must not include a "queue://" or "topic://" prefix)
+     * @param destinationName the name of the JMS destination
      * @param destination     the JMS {@link Destination} for which to create the consumer and listener
      * @return a new instance
      */
@@ -133,6 +138,22 @@ public class ActiveMqTestUtils {
     public static Queue createQueue(Session session, String name) {
         try {
             return session.createQueue(name);
+        } catch (JMSException e) {
+            throw new UncheckedJMSException(e);
+        }
+    }
+
+    /**
+     * Create a {@link MessageProducer} that can send messages to a {@link Topic} with the given name.
+     *
+     * @param session the JMS session
+     * @param name    the name of the JMS Topic
+     * @return a new MessageProducer instance
+     * @throws UncheckedJMSException that wraps a thrown JMSException
+     */
+    public static MessageProducer createTopicProducer(Session session, String name) {
+        try {
+            return session.createProducer(createTopic(session, name));
         } catch (JMSException e) {
             throw new UncheckedJMSException(e);
         }
