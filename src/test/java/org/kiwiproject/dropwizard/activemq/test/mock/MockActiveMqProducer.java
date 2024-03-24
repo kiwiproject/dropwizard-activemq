@@ -135,7 +135,7 @@ public class MockActiveMqProducer implements ActiveMqProducer {
     }
 
     /**
-     * @throws exception if no messages have been produced to destination
+     * @throws RuntimeException if no messages have been produced to destination
      */
     public String lastMessageProducedTo(String destination) {
         return last(history(destination));
@@ -155,7 +155,7 @@ public class MockActiveMqProducer implements ActiveMqProducer {
     }
 
     /**
-     * @throws exception if no messages have been produced to the all events queue
+     * @throws RuntimeException if no messages have been produced to the "All Events" queue
      */
     public String lastMessageProducedToAllEvents() {
         return last(allEventsHistory());
@@ -164,7 +164,7 @@ public class MockActiveMqProducer implements ActiveMqProducer {
     /**
      * Returns all bytes messages.
      * <p>
-     * The same caveats about ordering noted for {@link #history()} apply here as well.
+     * The same warnings about ordering noted for {@link #history()} apply here as well.
      */
     public List<String> bytesHistory() {
         return history(bytesMessages);

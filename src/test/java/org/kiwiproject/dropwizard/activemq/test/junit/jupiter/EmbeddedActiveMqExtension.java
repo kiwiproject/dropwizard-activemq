@@ -31,7 +31,7 @@ import java.time.Duration;
  * in the {@code beforeAll} and {@code afterAll} methods, respectively, did not work.
  * For some reason they "refused" to call the {@link BrokerService#start()} and
  * {@link BrokerService#stop()} methods. As far as we could tell, it seemed to have
- * something to do with the timing of registering the broker with ActiveMQ's interal
+ * something to do with the timing of registering the broker with the ActiveMQ internal
  * {@link org.apache.activemq.broker.BrokerRegistry}.
  * </li>
  * </ol>
@@ -55,7 +55,7 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
     }
 
     @Override
-    public void beforeEach(ExtensionContext context) throws Exception {
+    public void beforeEach(ExtensionContext context) {
         try {
             LOG.trace("starting embedded broker");
             service.start();
@@ -71,7 +71,7 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
     }
 
     @Override
-    public void afterEach(ExtensionContext context) throws Exception {
+    public void afterEach(ExtensionContext context) {
         if (!service.isStopped()) {
             try {
                 LOG.trace("stopping embedded broker");

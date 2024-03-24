@@ -22,7 +22,7 @@ public class DynamicDestinations {
 
     private static final String DYNAMIC_TOPIC_PREFIX = "";  // intentionally empty
 
-    private static final String DYNAMIC_QUEUE_PREFX = "queue://";
+    private static final String DYNAMIC_QUEUE_PREFIX = "queue://";
 
     /**
      * Builds the dynamic destination string for a list of topics.
@@ -43,7 +43,7 @@ public class DynamicDestinations {
      */
     public static String buildDynamicDestination(List<String> topicNames, List<String> queueNames) {
         var topics = joinNamesWithPrefix(topicNames, DYNAMIC_TOPIC_PREFIX);
-        var queues = joinNamesWithPrefix(queueNames, DYNAMIC_QUEUE_PREFX);
+        var queues = joinNamesWithPrefix(queueNames, DYNAMIC_QUEUE_PREFIX);
 
         var destinations = Stream.of(topics, queues)
                 .filter(StringUtils::isNotBlank)
@@ -58,7 +58,7 @@ public class DynamicDestinations {
 
     private static String joinNamesWithPrefix(List<String> names, String prefix) {
         return Optional.ofNullable(names)
-                .orElseGet(() -> new ArrayList<String>())
+                .orElseGet(ArrayList::new)
                 .stream()
                 .filter(Objects::nonNull)
                 .map(s -> prefix + s)

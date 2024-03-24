@@ -86,14 +86,7 @@ class ActiveMqProducerAndConsumerTest {
         //  Could add newPooledConnectionFactory method in the extension.
         //  Maybe a second extension that uses a broker URL with option to use pooled factory?
 
-        var brokerUrl = "vm://embedded?" +
-                "broker.brokerName=test-broker" +
-                "&broker.persistent=false" +
-                "&broker.useJmx=false" +
-                "&broker.useShutdownHook=false" +
-                "&broker.enableStatistics=false";
-
-        var amqFactory = new ActiveMQConnectionFactory(brokerUrl);
+        var amqFactory = buildActiveMQConnectionFactory();
         var pooledFactory = new ActiveMqHelper().newPooledConnectionFactory(amqFactory);
 
         connection = pooledFactory.createConnection();
@@ -104,6 +97,17 @@ class ActiveMqProducerAndConsumerTest {
         activeMqHelper = mock(ActiveMqHelper.class);
         when(activeMqHelper.newPooledConnectionFactory(any(ActiveMqConfig.class)))
                 .thenReturn(pooledFactory);
+    }
+
+    private static ActiveMQConnectionFactory buildActiveMQConnectionFactory() {
+        var brokerUrl = "vm://embedded?" +
+                "broker.brokerName=test-broker" +
+                "&broker.persistent=false" +
+                "&broker.useJmx=false" +
+                "&broker.useShutdownHook=false" +
+                "&broker.enableStatistics=false";
+
+        return new ActiveMQConnectionFactory(brokerUrl);
     }
 
     @AfterEach

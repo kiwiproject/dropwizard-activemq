@@ -35,7 +35,7 @@ class DestinationExtractorTest {
                 .isEqualTo("myQueue");
     }
 
-    @ParameterizedTest(name = "evaulating {0}")
+    @ParameterizedTest(name = "evaluating {0}")
     @MethodSource("queueAndTopicNames")
     void shouldSimplifyDestinationNames(String testCondition, Pair<String, String[]> testData) {
         var originalDestination = testData.getLeft();
@@ -79,13 +79,13 @@ class DestinationExtractorTest {
                 // Because we use createTopic to create dynamic destinations on ActiveMQ, "topicA" is not prefixed
                 // with "topic:", but "queueA" must be prefixed with "queue:"
                 //
-                // This is due to ActiveMQ's design in that there is not a generic createDestination() method
+                // This is due to ActiveMQ design, in that there is not a generic createDestination() method
                 //
                 // Also, see DynamicDestinations
 
                 Arguments.of("Multiple entries - sent to ActiveMQ", Pair.of("*:dynamicDestination,topicA,queue:queueA", new String[] { "dynamicDestination", "topicA", "queueA" })),
 
-                Arguments.of("Multiple entries - recevied from ActiveMQ", Pair.of("topic://topicA,queue://queueA", new String[] { "topicA", "queueA" }))
+                Arguments.of("Multiple entries - received from ActiveMQ", Pair.of("topic://topicA,queue://queueA", new String[] { "topicA", "queueA" }))
         );
     }
 }

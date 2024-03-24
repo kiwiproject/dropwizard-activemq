@@ -137,7 +137,6 @@ class MockActiveMqProducerTest {
     @Test
     void shouldClearAllMessages() {
         produceToDestinationAndAllEventsMessages();
-        ;
         produceBytesMessages();
 
         verifyExpectedNumberOfMessagesSent(producer.history(), 5);
@@ -156,7 +155,6 @@ class MockActiveMqProducerTest {
     @Test
     void shouldClearRegularMessages() {
         produceToDestinationAndAllEventsMessages();
-        ;
         produceBytesMessages();
 
         verifyExpectedNumberOfMessagesSent(producer.history(), 5);
@@ -175,7 +173,6 @@ class MockActiveMqProducerTest {
     @Test
     void shouldClearAllEventsMessages() {
         produceToDestinationAndAllEventsMessages();
-        ;
         produceBytesMessages();
 
         verifyExpectedNumberOfMessagesSent(producer.history(), 5);
@@ -194,7 +191,6 @@ class MockActiveMqProducerTest {
     @Test
     void shouldClearBytesMessages() {
         produceToDestinationAndAllEventsMessages();
-        ;
         produceBytesMessages();
 
         verifyExpectedNumberOfMessagesSent(producer.history(), 5);
@@ -334,9 +330,9 @@ class MockActiveMqProducerTest {
     }
 
     private void verifyExpectedNumberOfHeadersOnMessage(List<Pair<String, Map<String, Object>>> messagesAndHeaders,
-                                                        int expecteHeaderCount) {
+                                                        int expectedHeaderCount) {
 
         messagesAndHeaders.forEach(messageAndHeaders ->
-                assertThat(messageAndHeaders.getRight().values()).hasSize(expecteHeaderCount));
+                assertThat(messageAndHeaders.getRight().values()).hasSize(expectedHeaderCount));
     }
 }

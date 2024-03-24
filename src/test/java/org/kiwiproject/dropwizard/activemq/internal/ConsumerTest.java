@@ -76,7 +76,7 @@ class ConsumerTest {
         session = ActiveMqTestUtils.createNonTransactedSession(connection);
         producer = ActiveMqTestUtils.createQueueProducer(session, QUEUE_NAME);
 
-        // mock the ElucidationClient so we don't attempt to contact a (non-existent) elucidation server
+        // mock the ElucidationClient, so we don't attempt to contact a (non-existent) elucidation server
         elucidationClient = mockElucidationClient();
         var result = ElucidationResult.fromSkipMessage("Recorder not enabled");
         when(elucidationClient.recordNewEvent(anyString())).thenReturn(CompletableFuture.completedFuture(result));
@@ -107,7 +107,7 @@ class ConsumerTest {
         var textMessage = session.createTextMessage(JSON_HELPER.toJson(new InternalMessage()));
         producer.send(textMessage);
 
-        // Need minor wait to make sure the Consumer.loop ingests the message
+        // Need a minor wait to make sure the Consumer.loop ingests the message
         waitForSingleMessage(jmsConsumer);
 
         assertMessageWasConsumed(jmsConsumer);
@@ -125,7 +125,7 @@ class ConsumerTest {
         var textMessage = session.createTextMessage("this is not a valid message");
         producer.send(textMessage);
 
-        // Need minor wait to make sure the Consumer.loop ingests the message
+        // Need a minor wait to make sure the Consumer.loop ingests the message
         waitForSingleMessage(jmsConsumer);
 
         assertThat(jmsConsumer.consumedHistory()).isEmpty();
@@ -151,7 +151,7 @@ class ConsumerTest {
 
         producer.send(textMessage);
 
-        // Need minor wait to make sure the Consumer.loop ingests the message
+        // Need a minor wait to make sure the Consumer.loop ingests the message
         waitForSingleMessage(jmsConsumer);
 
         assertThat(consumer.getErrors()).hasValue(1);
@@ -175,7 +175,7 @@ class ConsumerTest {
 
         producer.send(textMessage);
 
-        // Need minor wait to make sure the Consumer.loop ingests the message
+        // Need a minor wait to make sure the Consumer.loop ingests the message
         waitForSingleMessage(jmsConsumer);
 
         assertThat(jmsConsumer.consumedHistory()).isEmpty();
@@ -200,7 +200,7 @@ class ConsumerTest {
 
         producer.send(textMessage);
 
-        // Need minor wait to make sure the Consumer.loop ingests the message
+        // Need a minor wait to make sure the Consumer.loop ingests the message
         waitForSingleMessage(jmsConsumer);
 
         await().atMost(Durations.ONE_SECOND).until(() -> consumer.getErrors().get() > 0);
@@ -221,7 +221,7 @@ class ConsumerTest {
         var textMessage = session.createTextMessage(KiwiXml.toXml(new InternalMessage()));
         producer.send(textMessage);
 
-        // Need minor wait to make sure the Consumer.loop ingests the message
+        // Need a minor wait to make sure the Consumer.loop ingests the message
         waitForSingleMessage(jmsConsumer);
 
         assertMessageWasConsumed(jmsConsumer);
@@ -241,7 +241,7 @@ class ConsumerTest {
 
         producer.send(bytesMessage);
 
-        // Need minor wait to make sure the Consumer.loop ingests the message
+        // Need a minor wait to make sure the Consumer.loop ingests the message
         waitForSingleMessage(jmsConsumer);
 
         assertMessageWasConsumed(jmsConsumer);
@@ -263,7 +263,7 @@ class ConsumerTest {
         var textMessage = session.createTextMessage(JSON_HELPER.toJson(new InternalMessage()));
         producer.send(textMessage);
 
-        // Need minor wait to make sure the Consumer.loop ingests the message
+        // Need a minor wait to make sure the Consumer.loop ingests the message
         waitForSingleMessage(jmsConsumer);
 
         assertThat(jmsConsumer.consumedHistory()).isEmpty();
@@ -402,12 +402,12 @@ class ConsumerTest {
 
         Optional<byte[]> correlationIDAsBytesOptional = message.getJMSCorrelationIDAsBytes();
         var correlationIdAsBytes = assertPresentAndGet(correlationIDAsBytesOptional);
-        var stringifiedCorrelationIdBytes = new String(correlationIdAsBytes, UTF_8);
+        var correlationIdBytesAsString = new String(correlationIdAsBytes, UTF_8);
 
         assertThat(correlationId)
                 .withFailMessage("Somehow the correlation ID [%s] and the UTF-7 string representation of the bytes [%s] don't match",
-                        correlationId, stringifiedCorrelationIdBytes)
-                .isEqualTo(stringifiedCorrelationIdBytes);
+                        correlationId, correlationIdBytesAsString)
+                .isEqualTo(correlationIdBytesAsString);
 
         validateOtherMessageFields(message);
     }

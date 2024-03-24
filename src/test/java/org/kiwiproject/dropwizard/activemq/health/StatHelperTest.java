@@ -189,7 +189,7 @@ class StatHelperTest {
         }
     }
 
-    // NOTE: Some of the values need single quotes around them, because they contain commas
+    // NOTE: Some values need single quotes around them, because they contain commas
     @ParameterizedTest
     @CsvSource(textBlock = """
             http://messages.acme.com/api/jolokia, http, http://messages.acme.com/api/jolokia/

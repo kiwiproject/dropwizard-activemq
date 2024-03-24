@@ -30,6 +30,7 @@ import org.apache.activemq.command.ActiveMQMessage;
 import org.apache.activemq.jms.pool.PooledMessageConsumer;
 import org.kiwiproject.base.DefaultEnvironment;
 import org.kiwiproject.base.KiwiEnvironment;
+import org.kiwiproject.base.UUIDs;
 import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer;
 import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer.Result;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
@@ -175,7 +176,7 @@ public class Consumer implements Managed, Runnable {
     private void delegate(ActiveMqMessage activeMqMessage) {
         try {
             // Due to the ensureCorrelationIdExists, the orElseGet path should never happen, but just in case...
-            Correlation.CORRELATION_ID.set(activeMqMessage.getJMSCorrelationID().orElseGet(() -> randomUUIDString()));
+            Correlation.CORRELATION_ID.set(activeMqMessage.getJMSCorrelationID().orElseGet(UUIDs::randomUUIDString));
 
             var consumptionResult = delegateConsumer.consume(activeMqMessage);
             Optional<String> activeMqMessageType = activeMqMessage.getMessageType();
@@ -239,7 +240,7 @@ public class Consumer implements Managed, Runnable {
     private static Map<String, Object> getPropertiesFrom(Message message) throws JMSException {
         Map<String, Object> properties = new HashMap<>();
 
-        // Most of the standard Message headers are also included in ActiveMQ's properties'
+        // Most of the standard Message headers are also included in ActiveMQ
         var enumeration = ((ActiveMQMessage) message).getAllPropertyNames();
         while (enumeration.hasMoreElements()) {
             var property = (String) enumeration.nextElement();
@@ -262,7 +263,7 @@ public class Consumer implements Managed, Runnable {
         LOG.trace("ActiveMQ property found: JMS_MESSAGE_ID -> {}", jmsMessageId);
         properties.put(JMS_MESSAGE_ID, jmsMessageId);
 
-        // Also add ActiveMQ's JMSXUserId, which inexplicably is *not* listed in ActiveMQ's getAllPropertyNames()
+        // Also add ActiveMQ JMSXUserId, which inexplicably is *not* listed in ActiveMQ getAllPropertyNames()
         var jmsXUserId = message.getObjectProperty(JMS_X_USER_ID);
         LOG.trace("ActiveMQ JMS property: JMS_X_USER_ID -> {}", jmsXUserId);
         properties.put(JMS_X_USER_ID, jmsXUserId);
@@ -353,7 +354,7 @@ public class Consumer implements Managed, Runnable {
         }
 
         @Getter
-        private MessageConsumer consumer;
+        private final MessageConsumer consumer;
 
         ConsumerProvider(ConnectionFactory factory, String destination, String serviceName) throws JMSException {
             super(factory, serviceName);

@@ -76,7 +76,7 @@ class ProducerTest {
         var provider = spy(new Producer.ProducerProvider(connectionFactory, QUEUE, TIME_TO_LIVE, serviceName));
         when(provider.getSession()).thenReturn(session);
         when(provider.getMessageProducer()).thenReturn(jmsProducer);
-        Correlation.CORRELATION_ID.set(null);
+        Correlation.CORRELATION_ID.remove();
     }
 
     @AfterEach
@@ -282,7 +282,7 @@ class ProducerTest {
 
     @Test
     void shouldNotSetJMSCorrelationId_whenMessageHasNoCorrelationId_AndCorrelationIdThreadLocalDoesNotExist() throws JMSException {
-        Correlation.CORRELATION_ID.set(null);
+        Correlation.CORRELATION_ID.remove();
 
         var message = mock(Message.class);
         when(message.getJMSCorrelationID()).thenReturn(null);
