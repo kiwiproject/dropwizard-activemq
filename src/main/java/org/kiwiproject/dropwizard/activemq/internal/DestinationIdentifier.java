@@ -1,11 +1,13 @@
 package org.kiwiproject.dropwizard.activemq.internal;
 
+import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.base.KiwiStrings.f;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
@@ -38,52 +40,64 @@ public class DestinationIdentifier {
         QUEUE, TOPIC
     }
 
+    /**
+     * Evaluate a destination name and return a {@link DestinationInfo}.
+     * <p>
+     * Note that {@code isProducer} and {@code serviceName} are only used for virtual topics (the name
+     * starts with {@code "topic:"}). The {@code serviceName} is only required in that case.
+     *
+     * @param name        the destination name to evaluate
+     * @param isProducer  true, if the evaluation should be performed from a Producer's perspective, otherwise the
+     *                    evaluation is performed from a Consumer's perspective
+     * @param serviceName the service/application name
+     * @return an Optional that may contain a DestinationInfo
+     */
     public static Optional<DestinationInfo> evaluateDestinationName(String name, boolean isProducer, String serviceName) {
-        DestinationInfo dest;
+        // TODO Consider replacing boolean isProducer with ActorType enum (CONSUMER, PRODUCER)or similarly named enum
+
+        checkArgumentNotBlank(name, "destination name must not be blank");
 
         if (name.startsWith(FIXED_TOPIC_PREFIX)) {  // normal JMS topic
-
             var trimmedName = trimPrefix(name, FIXED_TOPIC_PREFIX);
-            dest = new DestinationInfo(DestinationType.TOPIC, trimmedName);
+            return Optional.of(new DestinationInfo(DestinationType.TOPIC, trimmedName));
+        }
 
-        } else if (name.startsWith(TOPIC_PREFIX)) {  // this is an ActiveMQ virtual topic
+        if (name.startsWith(TOPIC_PREFIX)) {  // this is an ActiveMQ virtual topic
+            checkArgumentNotBlank(serviceName, "serviceName must not be blank for virtual topics ('topic:' prefix)");
 
             // Producers produce to VirtualTopic.<name> while consumers
             // consume from a queue named Consumer.<serviceName>.VirtualTopic.<name>
 
             var trimmedName = trimPrefix(name, TOPIC_PREFIX);
-            dest = isProducer ?
+            var dest = isProducer ?
                     new DestinationInfo(DestinationType.TOPIC, f("VirtualTopic.{}", trimmedName)) :
                     new DestinationInfo(DestinationType.QUEUE, f("Consumer.{}.VirtualTopic.{}", serviceName, trimmedName));
+            return Optional.of(dest);
+        }
 
-        } else if (name.startsWith(QUEUE_PREFIX)) {
-
+        if (name.startsWith(QUEUE_PREFIX)) {
             var trimmedName = trimPrefix(name, QUEUE_PREFIX);
-            dest = new DestinationInfo(DestinationType.QUEUE, trimmedName);
+            return Optional.of(new DestinationInfo(DestinationType.QUEUE, trimmedName));
+        }
 
-        } else if (name.startsWith(DYNAMIC_PREFIX)) {
-
+        if (name.startsWith(DYNAMIC_PREFIX)) {
             var trimmedName = trimPrefix(name, DYNAMIC_PREFIX);
 
             // Note we use a topic here! This means that dynamic destination
             // strings can omit the "topic://" prefix for topics, but they
             // must always include the "queue://" prefix for queues.
 
-            dest = new DestinationInfo(DestinationType.TOPIC, trimmedName);
-
-        } else {
-
-            LOG.error("Unexpected JMS configuration. A {} destination should start with '{}', '{}', '{}', or '{}' but was: '{}'",
-                    isProducer ? "producer" : "consumer",
-                    DestinationIdentifier.FIXED_TOPIC_PREFIX,
-                    DestinationIdentifier.TOPIC_PREFIX,
-                    DestinationIdentifier.QUEUE_PREFIX,
-                    DestinationIdentifier.DYNAMIC_PREFIX,
-                    name);
-            return Optional.empty();
+            return Optional.of(new DestinationInfo(DestinationType.TOPIC, trimmedName));
         }
 
-        return Optional.of(dest);
+        LOG.error("Unexpected JMS configuration. A {} destination should start with '{}', '{}', '{}', or '{}' but was: '{}'",
+                isProducer ? "producer" : "consumer",
+                DestinationIdentifier.FIXED_TOPIC_PREFIX,
+                DestinationIdentifier.TOPIC_PREFIX,
+                DestinationIdentifier.QUEUE_PREFIX,
+                DestinationIdentifier.DYNAMIC_PREFIX,
+                name);
+        return Optional.empty();
     }
 
     private static String trimPrefix(String name, String prefix) {
@@ -92,6 +106,7 @@ public class DestinationIdentifier {
 
     @Getter
     @Setter
+    @ToString
     public static class DestinationInfo {
         private DestinationType type;
         private String name;
