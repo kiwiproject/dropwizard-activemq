@@ -1,7 +1,9 @@
 package org.kiwiproject.dropwizard.activemq.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.newTlsContextConfiguration;
+import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.setTlsConfigSystemProperties;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,7 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junitpioneer.jupiter.RestoreSystemProperties;
 import org.kiwiproject.config.TlsContextConfiguration;
+import org.kiwiproject.config.provider.TlsConfigProvider;
+import org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory;
 
 import java.util.stream.Stream;
 
@@ -22,6 +27,42 @@ class ActiveMqConfigTest {
     @BeforeEach
     void setUp() {
         config = new ActiveMqConfig();
+    }
+
+    @Test
+    void shouldProvideNonNull_ButDefault_TlsContextConfiguration_WhenProviderCannotProvide() {
+        assertThat(TlsConfigProvider.builder().build().canProvide())
+                .describedAs("precondition failed: expected TlsConfigProvider not to able able to provide")
+                .isFalse();
+
+        var tlsConfiguration = config.getTlsConfiguration();
+        assertThat(tlsConfiguration).isNotNull();
+
+        assertAll(
+                () -> assertThat(tlsConfiguration.getKeyStorePath()).isNull(),
+                () -> assertThat(tlsConfiguration.getKeyStorePassword()).isNull(),
+                () -> assertThat(tlsConfiguration.getTrustStorePath()).isNull(),
+                () -> assertThat(tlsConfiguration.getTrustStorePassword()).isNull()
+        );
+    }
+
+    @Test
+    @RestoreSystemProperties
+    void shouldProvideValid_TlsConfiguration_WhenProviderCanProvide() {
+        setTlsConfigSystemProperties();
+
+        assertThat(TlsConfigProvider.builder().build().canProvide())
+                .describedAs("precondition failed: expected TlsConfigProvider to able able to provide")
+                .isTrue();
+
+        // Create a new instance which will initialize using the provider.
+        config = new ActiveMqConfig();
+
+        var tlsConfiguration = config.getTlsConfiguration();
+        assertThat(tlsConfiguration).isNotNull();
+
+        var expectedTlsConfiguration = TestObjectFactory.newTlsContextConfiguration();
+        assertThat(tlsConfiguration).usingRecursiveComparison().isEqualTo(expectedTlsConfiguration);
     }
 
     @Nested
