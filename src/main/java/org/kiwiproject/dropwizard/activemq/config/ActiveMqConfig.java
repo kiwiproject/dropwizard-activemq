@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.kiwiproject.config.TlsContextConfiguration;
+import org.kiwiproject.config.provider.TlsConfigProvider;
 import org.kiwiproject.validation.KiwiConstraintViolations;
 import org.kiwiproject.validation.KiwiValidations;
 
@@ -131,8 +132,12 @@ public class ActiveMqConfig {
      * the ActiveMQ REST API.
      * <p>
      * Required only when using secure connections.
+     * <p>
+     * Uses {@link TlsConfigProvider} to provide a default {@link TlsContextConfiguration}, so it
+     * will automatically use environment variables, system properties, or external configuration.
      */
-    private TlsContextConfiguration tlsConfiguration = TlsContextConfiguration.builder().build();
+    private TlsContextConfiguration tlsConfiguration =
+            TlsConfigProvider.builder().build().getTlsContextConfiguration();
 
     /**
      * This is a validation method that checks that the configuration contains a TLS configuration if either

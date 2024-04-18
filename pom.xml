@@ -28,6 +28,7 @@
     <properties>
         <!-- required dependency versions -->
         <activemq.version>5.18.3</activemq.version>
+        <dropwizard-config-providers.version>2.2.2</dropwizard-config-providers.version>
         <elucidation.version>5.0.0</elucidation.version>
         <kiwi-bom.version>2.0.10</kiwi-bom.version>
         <kiwi.version>3.3.0</kiwi.version>
@@ -93,6 +94,12 @@
             <groupId>org.kiwiproject</groupId>
             <artifactId>kiwi</artifactId>
             <version>${kiwi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kiwiproject</groupId>
+            <artifactId>dropwizard-config-providers</artifactId>
+            <version>${dropwizard-config-providers.version}</version>
         </dependency>
 
         <dependency>

@@ -49,4 +49,15 @@ public class TestObjectFactory {
                 .verifyHostname(hostnameVerification.verifyHostname)
                 .build();
     }
+
+    /**
+     * When using this in a test, make sure the annotate the test method
+     * or class with {@link org.junitpioneer.jupiter.RestoreSystemProperties}.
+     */
+    public static void setTlsConfigSystemProperties() {
+        System.setProperty("kiwi.tls.keyStorePath", keyStorePath());
+        System.setProperty("kiwi.tls.keyStorePassword", "password");
+        System.setProperty("kiwi.tls.trustStorePath", trustStorePath());
+        System.setProperty("kiwi.tls.trustStorePassword", "password");
+    }
 }
