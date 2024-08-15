@@ -370,25 +370,19 @@ class ConsumerTest {
         String messageType = assertPresentAndGet(messageTypeOptional);
         assertThat(messageType).isEqualTo(expectedMessageType);
 
-        // TODO Why does the following switch expression blow up with a "Bad operand in call stack" in Gitpod ???
+        // TODO Why does the following switch expression blow up with a "Bad operand in call stack" in Gitpod when using 'var' ???
+        //  It works fine using Maven at the command line, only fails when using RedHat Java language support plugin to compile.
+        //  It also works fine in Gitpod when declaring the type explicitly as String.
+        //  I found this: https://github.com/eclipse-jdt/eclipse.jdt.core/issues/2476
+        //  and this: https://stackoverflow.com/questions/69197046/jdk-17-switch-statement-causes-java-lang-verifyerror-bad-type-on-operand-stack
+        //  So, it seems to be a problem with the Eclipse compiler.
 
-        var payload = switch (messageType) {
+        String payload = switch (messageType) {
             case SPECIFIC_TEXT_MESSAGE_TYPE -> JSON_HELPER.getPath(body, "payload", String.class);
             case GENERIC_TEXT_MESSAGE_TYPE -> KiwiXml.toObject(body, InternalMessage.class).getPayload();
             case BYTES_MESSAGE_TYPE -> new String(Base64.getDecoder().decode(body), UTF_8);
             default -> throw new IllegalStateException(f("Received an unexpected type: {}", messageType));
         };
-
-//        String payload;
-//        if (SPECIFIC_TEXT_MESSAGE_TYPE.equals(messageType)) {
-//            payload = JSON_HELPER.getPath(body, "payload", String.class);
-//        } else if (GENERIC_TEXT_MESSAGE_TYPE.equals(messageType)) {
-//            payload = KiwiXml.toObject(body, InternalMessage.class).getPayload();
-//        } else if (BYTES_MESSAGE_TYPE.equals(messageType)) {
-//            payload = new String(Base64.getDecoder().decode(body), UTF_8);
-//        } else {
-//            throw new IllegalStateException(f("Received an unexpected type: {}", messageType));
-//        }
 
         assertThat(payload)
                 .withFailMessage("For type [%s], the payload [%s] did not match expected value [%s]",
