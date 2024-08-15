@@ -114,13 +114,18 @@ public class ActiveMqConfig {
     private boolean useSecureActiveMQConnections = true;
 
     /**
-     * Should DropwizardActiveMq connect to the ActiveMQ REST API only via secure connections, e.g., TLS,
+     * The port to use when connecting to the ActiveMQ Jolokia REST API.
+     */
+    private int jolokiaPort = 8161;
+
+    /**
+     * Should DropwizardActiveMq connect to the ActiveMQ Jolokia REST API only via secure connections, e.g., TLS,
      * to gather statistics?
      */
     private boolean useSecureRestConnections = true;
 
     /**
-     * Should DropwizardActiveMq verify host names when using REST secure connections?
+     * Should DropwizardActiveMq verify host names when using Jolokia REST secure connections?
      * <p>
      * The value of this option only matters if {@link #isUseSecureRestConnections()} is {@code true}.
      * Otherwise, it is ignored (because it won't be used).
@@ -129,7 +134,7 @@ public class ActiveMqConfig {
 
     /**
      * TLS configuration to use when connecting to the ActiveMQ message broker and/or to
-     * the ActiveMQ REST API.
+     * the ActiveMQ Jolokia REST API.
      * <p>
      * Required only when using secure connections.
      * <p>
@@ -148,7 +153,7 @@ public class ActiveMqConfig {
      * <p>
      * Note that if both "useSecureXxxConnections" properties are true, they both use the same tlsConfiguration.
      * This should be fine in most circumstances. If at some point we find this assumption no longer holds,
-     * we would need to permit separate TLS configuration for the broker versus the REST APIs.
+     * we would need to permit separate TLS configuration for the broker versus the Jolokia REST APIs.
      */
     @ValidationMethod(message = "tlsConfiguration must exist and be valid when using secure connections")
     public boolean isTlsConfigurationValid() {

@@ -45,7 +45,7 @@ class StatsHealthCheckTest {
     @BeforeEach
     void setUp() {
         var client = mock(Client.class);
-        statHelper = spy(new StatHelper(DEVELOPMENT_SERVERS, "http", client, JSON_HELPER));
+        statHelper = spy(new StatHelper(DEVELOPMENT_SERVERS, "http", 8011, client, JSON_HELPER));
         appConfig = TestAppConfig.builder().build();
     }
 
@@ -56,7 +56,7 @@ class StatsHealthCheckTest {
 
         assertAll(
                 () -> assertThat(urlCaptor.getValue())
-                        .isEqualTo("http://unit-test-1/api/jolokia/read/org.apache.activemq:type=Broker,brokerName=*,destinationType=*,destinationName=test"),
+                        .isEqualTo("http://unit-test-1:8011/api/jolokia/read/org.apache.activemq:type=Broker,brokerName=*,destinationType=*,destinationName=test"),
                 () -> assertThat(statResults).hasSize(1)
         );
 

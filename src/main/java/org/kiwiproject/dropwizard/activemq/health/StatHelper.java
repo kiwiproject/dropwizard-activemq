@@ -60,18 +60,22 @@ class StatHelper {
     private final JsonHelper jsonHelper;
 
     StatHelper(ActiveMqConfig config) {
-        this(config.getBrokerUri(), getUriScheme(config), buildClient(config), JsonHelper.newDropwizardJsonHelper());
+        this(config.getBrokerUri(),
+                getUriScheme(config),
+                config.getJolokiaPort(),
+                buildClient(config),
+                JsonHelper.newDropwizardJsonHelper());
     }
 
     @VisibleForTesting
-    StatHelper(String brokerUri, String uriScheme, Client client, JsonHelper jsonHelper) {
+    StatHelper(String brokerUri, String uriScheme, int port, Client client, JsonHelper jsonHelper) {
         this.client = requireNotNull(client);
         this.currentUrlIndex = new AtomicLong();
         this.jsonHelper = requireNotNull(jsonHelper);
 
         checkArgumentNotBlank(brokerUri);
         checkArgumentNotBlank(uriScheme);
-        this.baseUrlQueue = List.copyOf(buildJolokiaUrls(brokerUri, uriScheme));
+        this.baseUrlQueue = List.copyOf(buildJolokiaUrls(brokerUri, uriScheme, port));
         checkArgument(!this.baseUrlQueue.isEmpty(),
                 f("Must be able to extract at least 1 base url from: {}", brokerUri));
         this.baseUrlCount = this.baseUrlQueue.size();
@@ -108,11 +112,11 @@ class StatHelper {
     }
 
     @VisibleForTesting
-    static List<String> buildJolokiaUrls(String brokerUri, String uriScheme) {
+    static List<String> buildJolokiaUrls(String brokerUri, String uriScheme, int port) {
         return Stream.of(BROKER_URI_SPLIT_PATTERN.split(brokerUri))
                 .map(StatHelper::matchingHostOrNull)
                 .filter(Objects::nonNull)
-                .map(hostname -> buildJolokiaUrl(uriScheme, hostname))
+                .map(hostname -> buildJolokiaUrl(uriScheme, hostname, port))
                 .toList();
     }
 
@@ -124,8 +128,10 @@ class StatHelper {
         return null;
     }
 
-    private static String buildJolokiaUrl(String scheme, String hostname) {
-        return f("{}://{}{}", scheme, hostname, JOLOKIA_API_PATH);
+    private static String buildJolokiaUrl(String scheme, String hostname, int port) {
+        var validHostname = "embedded".equals(hostname) ? "localhost" : hostname;
+
+        return f("{}://{}:{}{}", scheme, validHostname, port, JOLOKIA_API_PATH);
     }
 
     /**
