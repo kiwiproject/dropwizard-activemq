@@ -38,6 +38,8 @@ import org.kiwiproject.dropwizard.activemq.test.util.HostnameVerification;
 import org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory;
 import org.kiwiproject.jaxrs.KiwiResponses;
 import org.kiwiproject.jaxrs.exception.JaxrsNotFoundException;
+import org.kiwiproject.net.KiwiUrls;
+import org.kiwiproject.test.junit.jupiter.ResetLogbackLoggingExtension;
 import org.kiwiproject.test.util.Fixtures;
 
 import java.net.URI;
@@ -47,11 +49,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
 @DisplayName("StatHelper")
+@ExtendWith(ResetLogbackLoggingExtension.class)
 class StatHelperTest {
 
-    private static final String BASE_HTTP_URL_1 = "http://host1/api/jolokia/";
-    private static final String BASE_HTTP_URL_2 = "http://host2/api/jolokia/";
-    private static final String BASE_HTTP_URL_3 = "http://host3/api/jolokia/";
+    private static final String BASE_HTTP_URL_1 = "http://host1:8011/api/jolokia/";
+    private static final String BASE_HTTP_URL_2 = "http://host2:8011/api/jolokia/";
+    private static final String BASE_HTTP_URL_3 = "http://host3:8011/api/jolokia/";
     private static final String DESTINATION_URL_FOO =
             "read/org.apache.activemq:type=Broker,brokerName=*,destinationType=*,destinationName=foo";
 
@@ -71,6 +74,7 @@ class StatHelperTest {
             SIMULATE_ERROR.set(true);
         }
 
+        @SuppressWarnings("unused")
         @GET
         @Path("/read/{details}")
         public Response getStats(@PathParam("details") String details) {
@@ -82,7 +86,6 @@ class StatHelperTest {
         }
     }
 
-    // TODO After kiwi-test 3.3.0 is released, add ResetLogbackLoggingExtension to reset Logback
     private static final DropwizardClientExtension CLIENT = new DropwizardClientExtension(new StatsStubResource());
 
     @Nested
@@ -98,7 +101,8 @@ class StatHelperTest {
             client = ClientBuilder.newClient();
             baseUri = CLIENT.baseUri();
 
-            statHelper = new StatHelper("tcp://host1:61616,tcp://host2:61616", "http", client, JSON_HELPER);
+            statHelper = new StatHelper(
+                "tcp://host1:61616,tcp://host2:61616", "http", 8011, client, JSON_HELPER);
         }
 
         @AfterEach
@@ -192,15 +196,15 @@ class StatHelperTest {
     // NOTE: Some values need single quotes around them, because they contain commas
     @ParameterizedTest
     @CsvSource(textBlock = """
-            http://messages.acme.com/api/jolokia, http, http://messages.acme.com/api/jolokia/
-            tcp://localhost:61616, http, http://localhost/api/jolokia/
-            ssl://localhost:61617, https, https://localhost/api/jolokia/
-            vm://embedded?, http, http://embedded/api/jolokia/
-            tcp://msg1.acme.com:61616?randomize=false&verifyHostName=false, http, http://msg1.acme.com/api/jolokia/
-            'failover:(ssl://msg1.acme.com:61617,ssl://msg2.acme.com:61617)?randomize=false&nested.verifyHostName=false', https, 'https://msg1.acme.com/api/jolokia/,https://msg2.acme.com/api/jolokia/'
+            http://messages.acme.com/api/jolokia, http, 8161, http://messages.acme.com:8161/api/jolokia/
+            tcp://localhost:61616, http, 8011, http://localhost:8011/api/jolokia/
+            ssl://localhost:61617, https, 8001, https://localhost:8001/api/jolokia/
+            vm://embedded?, http, 8042, http://localhost:8042/api/jolokia/
+            tcp://msg1.acme.com:61616?randomize=false&verifyHostName=false, http, 8042, http://msg1.acme.com:8042/api/jolokia/
+            'failover:(ssl://msg1.acme.com:61617,ssl://msg2.acme.com:61617)?randomize=false&nested.verifyHostName=false', https, 8142, 'https://msg1.acme.com:8142/api/jolokia/,https://msg2.acme.com:8142/api/jolokia/'
             """)
-    void shouldBuildJolokiaUrls(String brokerUri, String uriScheme, String expectedJolokiaUrlCsv) {
-        List<String> jolokiaUrls = StatHelper.buildJolokiaUrls(brokerUri, uriScheme);
+    void shouldBuildJolokiaUrls(String brokerUri, String uriScheme, int port, String expectedJolokiaUrlCsv) {
+        List<String> jolokiaUrls = StatHelper.buildJolokiaUrls(brokerUri, uriScheme, port);
 
         var expectedJolokiaUrls = KiwiStrings.splitOnCommas(expectedJolokiaUrlCsv);
         assertThat(jolokiaUrls).isEqualTo(expectedJolokiaUrls);
@@ -219,7 +223,7 @@ class StatHelperTest {
         @Test
         void shouldGetUrlsForDestination() {
             var statHelper = new StatHelper(
-                    "tcp://host1:61616,tcp://host2:61616", "http", client, JSON_HELPER);
+                    "tcp://host1:61616,tcp://host2:61616", "http", 8011, client, JSON_HELPER);
             assertThat(statHelper.getUrlsForDestination("foo")).containsExactly(
                     STATS_URL_1,
                     STATS_URL_2);
@@ -228,7 +232,7 @@ class StatHelperTest {
         @Test
         void shouldWrapAroundToFirstOfTwoUrls_AfterIncrementingLastUrl() {
             var statHelper = new StatHelper(
-                    "tcp://host1:61616,tcp://host2:61616", "http", client, JSON_HELPER);
+                    "tcp://host1:61616,tcp://host2:61616", "http", 8011, client, JSON_HELPER);
 
             // Start at base URL 1
             assertThat(statHelper.getCurrentBaseUrl()).isEqualTo(BASE_HTTP_URL_1);
@@ -259,7 +263,7 @@ class StatHelperTest {
         @Test
         void shouldWrapAroundToFirstOfThreeUrls_AfterIncrementingLastUrl() {
             var statHelper = new StatHelper(
-                    "tcp://host1:61616,tcp://host2:61616,tcp://host3:61616", "http", client, JSON_HELPER);
+                    "tcp://host1:61616,tcp://host2:61616,tcp://host3:61616", "http", 8011, client, JSON_HELPER);
 
             // Test incrementing 30 times, starting at base URL 1
             IntStream.rangeClosed(1, 10).forEach(ignored -> {
@@ -291,7 +295,7 @@ class StatHelperTest {
         @Test
         void shouldNotIncrementWhenCurrentUrlDoesNotMatch() {
             var statHelper = new StatHelper(
-                    "tcp://host1:61616,tcp://host2:61616", "http", client, JSON_HELPER);
+                    "tcp://host1:61616,tcp://host2:61616", "http", 8011, client, JSON_HELPER);
 
             assertThat(statHelper.getCurrentBaseUrl()).isEqualTo(BASE_HTTP_URL_1);
 
@@ -314,6 +318,8 @@ class StatHelperTest {
         var config = new ActiveMqConfig();
         config.setBrokerUri("failover:(ssl://host1:61617,ssl://host2:61617,ssl://host3:61617)?randomize=false");
         config.setHealthConfig(new ActiveMqHealthConfig());
+        var jolokiaPort = 8142;
+        config.setJolokiaPort(jolokiaPort);
         config.setUseSecureRestConnections(true);
         config.setVerifyRestConnectionHostnames(hostnameVerification.verifyHostname);
         config.setTlsConfiguration(TestObjectFactory.newTlsContextConfiguration());
@@ -330,15 +336,16 @@ class StatHelperTest {
 
         var urls = statHelper.getUrlsForDestination("foo");
         assertThat(urls).containsOnly(
-                httpUrlAsHttps(STATS_URL_1),
-                httpUrlAsHttps(STATS_URL_2),
-                httpUrlAsHttps(STATS_URL_3)
+                httpUrlAsHttpsWithPort(STATS_URL_1, jolokiaPort),
+                httpUrlAsHttpsWithPort(STATS_URL_2, jolokiaPort),
+                httpUrlAsHttpsWithPort(STATS_URL_3, jolokiaPort)
         );
     }
 
-    private static String httpUrlAsHttps(String httpUrl) {
+    private static String httpUrlAsHttpsWithPort(String httpUrl, int newPort) {
         checkArgument(httpUrl.startsWith("http://"));
-        return httpUrl.replace("http", "https");
+        var components = KiwiUrls.extractAllFrom(httpUrl);
+        return KiwiUrls.createHttpsUrl(components.getCanonicalName(), newPort, components.getPath().orElseThrow());
     }
 
     @Test
@@ -346,6 +353,7 @@ class StatHelperTest {
         var config = new ActiveMqConfig();
         config.setBrokerUri("failover:(ssl://host1:61617,ssl://host2:61617,ssl://host3:61617)?randomize=false");
         config.setHealthConfig(new ActiveMqHealthConfig());
+        config.setJolokiaPort(8011);
         config.setUseSecureRestConnections(false);
 
         var statHelper = new StatHelper(config);
