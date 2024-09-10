@@ -27,13 +27,13 @@
 
     <properties>
         <!-- required dependency versions -->
-        <activemq.version>5.18.3</activemq.version>
-        <dropwizard-config-providers.version>2.3.2</dropwizard-config-providers.version>
+        <activemq.version>5.18.5</activemq.version>
+        <dropwizard-config-providers.version>2.3.3</dropwizard-config-providers.version>
         <elucidation.version>5.0.1</elucidation.version>
         <kiwi-bom.version>2.0.15</kiwi-bom.version>
         <kiwi.version>4.4.0</kiwi.version>
         <metrics-healthchecks-severity.version>2.0.6</metrics-healthchecks-severity.version>
-        <registry-aware-jersey-client.version>2.0.7</registry-aware-jersey-client.version>
+        <registry-aware-jersey-client.version>2.1.0</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
         <commons-collections4.version>4.4</commons-collections4.version>
@@ -53,6 +53,12 @@
 
             <dependency>
                 <groupId>org.kiwiproject</groupId>
+                <artifactId>dropwizard-config-providers</artifactId>
+                <version>${dropwizard-config-providers.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.kiwiproject</groupId>
                 <artifactId>kiwi</artifactId>
                 <version>${kiwi.version}</version>
             </dependency>
@@ -61,6 +67,18 @@
                 <groupId>org.kiwiproject</groupId>
                 <artifactId>kiwi-test</artifactId>
                 <version>${kiwi-test.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.kiwiproject</groupId>
+                <artifactId>metrics-healthchecks-severity</artifactId>
+                <version>${metrics-healthchecks-severity.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.kiwiproject</groupId>
+                <artifactId>registry-aware-jersey-client</artifactId>
+                <version>${registry-aware-jersey-client.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -110,19 +128,16 @@
         <dependency>
             <groupId>org.kiwiproject</groupId>
             <artifactId>dropwizard-config-providers</artifactId>
-            <version>${dropwizard-config-providers.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.kiwiproject</groupId>
             <artifactId>metrics-healthchecks-severity</artifactId>
-            <version>${metrics-healthchecks-severity.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.kiwiproject</groupId>
             <artifactId>registry-aware-jersey-client</artifactId>
-            <version>${registry-aware-jersey-client.version}</version>
         </dependency>
 
         <dependency>
