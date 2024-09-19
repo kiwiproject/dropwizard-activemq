@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  * start consumers and/or producers.
  */
 @Slf4j
-public class DropwizardActiveMq<C extends ActiveMqConfigured> {
+public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveMqProducersAndConsumers {
 
     private final Environment environment;
     private final C configuration;
@@ -155,15 +155,7 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
         KiwiDropwizardLifecycles.manage(environment.lifecycle(), factory::start, factory::stop);
     }
 
-    /**
-     * Starts consuming from configured consumer destinations when {@link ActiveMqConfig#isAutoRegisterConsumers()}
-     * is {@code true}.
-     * <p>
-     * Incoming messages will be passed to the consumer delegate.
-     *
-     * @param consumerDelegate the consumer that should process received messages
-     * @return this instance, for fluent method-chaining
-     */
+    @Override
     public DropwizardActiveMq<C> startConsumers(ActiveMqConsumer consumerDelegate) {
         checkArgumentNotNull(consumerDelegate);
         requireNonNull(consumerDestinations);
@@ -175,16 +167,7 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
         return this;
     }
 
-    /**
-     * Starts consuming from the given destinations.
-     * <p>
-     * Incoming messages will be passed to the consumer delegate.
-     *
-     * @param consumerDelegate the consumer that should process received messages
-     * @param destinations     the explicit destinations to consume
-     * @return this instance, for fluent method-chaining
-     * @throws IllegalArgumentException if no destinations are specified
-     */
+    @Override
     public DropwizardActiveMq<C> startConsumer(ActiveMqConsumer consumerDelegate, String... destinations) {
         checkArgument(isNotNullOrEmpty(destinations),
                 "No destinations specified, which would result in no messages being consumed!");
@@ -230,15 +213,7 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
         initializedConsumers.add(destination);
     }
 
-    /**
-     * Instantiates a producer for the configured destination(s).
-     * <p>
-     * Note that if you are using fluent method-chaining, this is a terminal method since it
-     * must return the {@link ActiveMqProducer} for use by the caller.
-     *
-     * @return a new producer instance
-     * @see ProducerDelegate
-     */
+    @Override
     public ActiveMqProducer startProducers() {
         requireNonNull(factory);
         requireNonNull(producerDestinations);
@@ -255,18 +230,12 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> {
         return activeMqProducer;
     }
 
-    /**
-     * @return a set containing the names of the destinations that were initialized for consumers
-     */
+    @Override
     public Set<String> getInitializedConsumers() {
         return Set.copyOf(initializedConsumers);
     }
 
-    /**
-     * @return an Optional that will contain the {@link ActiveMqProducer} returned by {@link #startProducers()}, or
-     * an empty Optional if no producer has been started. Generally you won't need this since {@link #startProducers()}
-     * returns the producer instance.
-     */
+    @Override
     public Optional<ActiveMqProducer> getActiveMqProducer() {
         return Optional.ofNullable(activeMqProducer);
     }
