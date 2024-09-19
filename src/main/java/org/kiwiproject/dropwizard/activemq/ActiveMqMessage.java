@@ -8,10 +8,11 @@ import lombok.Value;
 import lombok.experimental.Accessors;
 import org.apache.activemq.command.ActiveMQDestination;
 
-import javax.jms.Queue;
-import javax.jms.Topic;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.jms.Queue;
+import javax.jms.Topic;
 
 @Value
 @Builder

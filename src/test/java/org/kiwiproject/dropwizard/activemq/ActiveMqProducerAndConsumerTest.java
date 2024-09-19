@@ -43,10 +43,11 @@ import org.kiwiproject.dropwizard.activemq.test.mock.MockActiveMqConsumer;
 import org.kiwiproject.jersey.client.RegistryAwareClient;
 import org.kiwiproject.test.dropwizard.mockito.DropwizardMockitoMocks;
 
+import java.util.List;
+
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
-import java.util.List;
 
 @DisplayName("ActiveMqProducerAndConsumer")
 class ActiveMqProducerAndConsumerTest {

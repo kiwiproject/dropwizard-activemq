@@ -23,13 +23,14 @@ import org.kiwiproject.base.DefaultEnvironment;
 import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqExtension;
 import org.mockito.Mockito;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.TextMessage;
-import java.util.concurrent.TimeUnit;
 
 @DisplayName("BrokerHealthCheck")
 class BrokerHealthCheckTest {

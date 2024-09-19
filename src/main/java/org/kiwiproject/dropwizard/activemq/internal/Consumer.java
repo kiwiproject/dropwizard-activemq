@@ -39,12 +39,6 @@ import org.kiwiproject.dropwizard.activemq.util.Utils;
 import org.kiwiproject.elucidation.client.ElucidationClient;
 import org.kiwiproject.metrics.health.HealthStatus;
 
-import javax.jms.BytesMessage;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.TextMessage;
 import java.lang.reflect.Field;
 import java.util.Base64;
 import java.util.HashMap;
@@ -54,6 +48,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.jms.BytesMessage;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.TextMessage;
 
 /**
  * This is an internal class that instantiates and manages an {@link ActiveMQMessageConsumer}.

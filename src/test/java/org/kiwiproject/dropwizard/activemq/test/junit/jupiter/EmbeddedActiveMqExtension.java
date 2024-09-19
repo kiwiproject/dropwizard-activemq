@@ -8,8 +8,9 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import javax.jms.ConnectionFactory;
 import java.time.Duration;
+
+import javax.jms.ConnectionFactory;
 
 /**
  * Creates an embedded ActiveMQ broker for use in JUnit 5 tests.

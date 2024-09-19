@@ -28,7 +28,6 @@ import org.kiwiproject.jaxrs.KiwiResponses;
 import org.kiwiproject.jaxrs.exception.JaxrsNotFoundException;
 import org.kiwiproject.json.JsonHelper;
 
-import javax.net.ssl.HostnameVerifier;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +36,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import javax.net.ssl.HostnameVerifier;
 
 @Slf4j
 class StatHelper {

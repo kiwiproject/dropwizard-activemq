@@ -6,12 +6,13 @@ import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.TextMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.TextMessage;
 
 @Slf4j
 public class ConsumerMessageListener implements MessageListener {

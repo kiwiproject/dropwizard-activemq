@@ -26,6 +26,9 @@ import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.mockito.ArgumentCaptor;
 import org.mockito.verification.VerificationMode;
 
+import java.time.Duration;
+import java.util.Map;
+
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -35,8 +38,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import java.time.Duration;
-import java.util.Map;
 
 @DisplayName("Producer")
 class ProducerTest {

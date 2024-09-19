@@ -13,12 +13,13 @@ import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageException;
 import org.kiwiproject.dropwizard.activemq.util.UncheckedJMSException;
 
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.Topic;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+
+import javax.jms.JMSException;
+import javax.jms.Queue;
+import javax.jms.Topic;
 
 @Slf4j
 public class MockActiveMqConsumer implements ActiveMqConsumer {

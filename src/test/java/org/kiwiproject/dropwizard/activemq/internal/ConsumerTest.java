@@ -36,14 +36,15 @@ import org.kiwiproject.metrics.health.HealthCheckResults;
 import org.kiwiproject.metrics.health.HealthStatus;
 import org.kiwiproject.xml.KiwiXml;
 
+import java.util.Base64;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @DisplayName("Consumer")
 class ConsumerTest {

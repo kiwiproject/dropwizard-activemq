@@ -22,12 +22,13 @@ import org.junit.jupiter.api.Test;
 import org.kiwiproject.elucidation.client.ElucidationClient;
 import org.kiwiproject.elucidation.client.ElucidationResult;
 
-import javax.jms.ConnectionFactory;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+
+import javax.jms.ConnectionFactory;
 
 @DisplayName("ProducerDelegate")
 class ProducerDelegateTest {

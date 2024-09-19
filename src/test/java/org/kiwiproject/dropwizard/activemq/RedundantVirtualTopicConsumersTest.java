@@ -16,11 +16,12 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.kiwiproject.base.DefaultEnvironment;
 import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqExtension;
 
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Session;
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 @DisplayName("RedundantVirtualTopicConsumers")
 class RedundantVirtualTopicConsumersTest {

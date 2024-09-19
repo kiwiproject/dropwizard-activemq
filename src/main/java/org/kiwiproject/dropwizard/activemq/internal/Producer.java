@@ -17,13 +17,14 @@ import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageHeaderExcept
 import org.kiwiproject.dropwizard.activemq.util.Utils;
 import org.kiwiproject.dropwizard.activemq.util.Utils.FunctionThrowsException;
 
+import java.time.Duration;
+import java.util.Map;
+
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
-import java.time.Duration;
-import java.util.Map;
 
 /**
  * This internal class uses JMS {@link javax.jms.MessageProducer} instances to send messages.
