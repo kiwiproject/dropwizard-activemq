@@ -30,7 +30,7 @@
         <activemq.version>5.18.5</activemq.version>
         <dropwizard-config-providers.version>2.3.3</dropwizard-config-providers.version>
         <elucidation.version>5.0.1</elucidation.version>
-        <kiwi-bom.version>2.0.15</kiwi-bom.version>
+        <kiwi-bom.version>2.0.17</kiwi-bom.version>
         <kiwi.version>4.4.0</kiwi.version>
         <metrics-healthchecks-severity.version>2.0.6</metrics-healthchecks-severity.version>
         <registry-aware-jersey-client.version>2.1.0</registry-aware-jersey-client.version>
