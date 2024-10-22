@@ -32,7 +32,7 @@
         <elucidation.version>5.0.1</elucidation.version>
         <kiwi-bom.version>2.0.17</kiwi-bom.version>
         <kiwi.version>4.5.0</kiwi.version>
-        <metrics-healthchecks-severity.version>2.0.6</metrics-healthchecks-severity.version>
+        <metrics-healthchecks-severity.version>2.0.7</metrics-healthchecks-severity.version>
         <registry-aware-jersey-client.version>2.1.0</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
