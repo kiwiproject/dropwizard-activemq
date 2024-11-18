@@ -27,7 +27,7 @@
 
     <properties>
         <!-- required dependency versions -->
-        <activemq.version>5.18.5</activemq.version>
+        <activemq.version>6.1.4</activemq.version>
         <dropwizard-config-providers.version>2.3.4</dropwizard-config-providers.version>
         <elucidation.version>5.0.1</elucidation.version>
         <kiwi-bom.version>2.0.18</kiwi-bom.version>
