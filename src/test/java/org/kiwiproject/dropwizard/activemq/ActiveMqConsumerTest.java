@@ -38,6 +38,13 @@ class ActiveMqConsumerTest {
         assertThatCode(() -> consumer.handleException(message, ex)).doesNotThrowAnyException();
     }
 
+    @Test
+    void shouldConsumeMessagesByDefault() {
+        var message = ActiveMqMessage.builder().build();
+
+        assertThat(consumer.shouldConsume(message)).isTrue();
+    }
+
     @Nested
     class RequireValidBody {
 

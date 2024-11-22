@@ -24,6 +24,20 @@ public interface ActiveMqConsumer {
     Result consume(ActiveMqMessage message);
 
     /**
+     * This method can be overridden to provide custom logic that determines whether an incoming
+     * message should be consumed. If this method returns false, the message is effectively ignored
+     * because {@link #consume(ActiveMqMessage)} won't be called.
+     * <p>
+     * The default is {@code true}, meaning all messages will be consumed.
+     *
+     * @param message the incoming {@link ActiveMqMessage}
+     * @return {@code true} if the message should be consumed, otherwise {@code false}
+     */
+    default boolean shouldConsume(ActiveMqMessage message) {
+        return true;
+    }
+
+    /**
      * Validate that the {@link ActiveMqMessage} has a non-empty body
      * or throw a {@link ActiveMqMessageMissingBodyException}.
      *
