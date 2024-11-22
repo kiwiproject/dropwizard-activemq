@@ -19,6 +19,7 @@ import org.kiwiproject.dropwizard.activemq.test.util.ActiveMqMessages;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 @DisplayName("MockActiveMqConsumer")
@@ -47,6 +48,74 @@ class MockActiveMqConsumerTest {
     private static final ActiveMQTopic UNNAMED_TOPIC = new ActiveMQTopic();
     private static final ActiveMQTopic TARGET_TOPIC_1 = new ActiveMQTopic(TARGET_TOPIC_1_NAME);
     private static final ActiveMQTopic TARGET_TOPIC_2 = new ActiveMQTopic(TARGET_TOPIC_2_NAME);
+
+    // shouldConsume() tests
+
+    @Test
+    void shouldConsume_ShouldReturnTrue_WhenTheFunctionReturnsTrue() {
+        var consumer = MockActiveMqConsumer.builder()
+                .withShouldConsume(activeMqMessage -> true)
+                .buildConsumer();
+
+        var result1 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1));
+        assertThat(result1).isTrue();
+
+        var result2 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_2, TARGET_QUEUE_2));
+        assertThat(result2).isTrue();
+
+        var result3 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1));
+        assertThat(result3).isTrue();
+
+        assertThat(consumer.getShouldConsumeCount()).isEqualTo(3);
+    }
+
+    @Test
+    void shouldConsume_ShouldReturnFalse_WhenTheFunctionReturnsFalse() {
+        var consumer = MockActiveMqConsumer.builder()
+                .withShouldConsume(activeMqMessage -> false)
+                .buildConsumer();
+
+        var result1 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1));
+        assertThat(result1).isFalse();
+
+        var result2 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_2, TARGET_QUEUE_2));
+        assertThat(result2).isFalse();
+
+        var result3 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_2, UNNAMED_QUEUE));
+        assertThat(result3).isFalse();
+
+        var result4 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_2, TARGET_TOPIC_2));
+        assertThat(result4).isFalse();
+
+        assertThat(consumer.getShouldConsumeCount()).isEqualTo(4);
+    }
+
+    @Test
+    void shouldConsume_ShouldReturn_TheExpectedValue() {
+        Function<ActiveMqMessage, Boolean> processOnlyType1 =
+                activeMqMessage -> activeMqMessage.getMessageType().orElse("").equals(TARGET_MESSAGE_TYPE_1);
+
+        var consumer = MockActiveMqConsumer.builder()
+                .withShouldConsume(processOnlyType1)
+                .buildConsumer();
+
+        var result1 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1));
+        assertThat(result1).isTrue();
+
+        var result2 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_2, TARGET_QUEUE_2));
+        assertThat(result2).isFalse();
+
+        var result3 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_2, TARGET_QUEUE_2));
+        assertThat(result3).isFalse();
+
+        var result4 = consumer.shouldConsume(createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1));
+        assertThat(result4).isTrue();
+
+        var result5 = consumer.shouldConsume(createMessageFrom("RandomType", UNNAMED_QUEUE));
+        assertThat(result5).isFalse();
+
+        assertThat(consumer.getShouldConsumeCount()).isEqualTo(5);
+    }
 
     // consume() tests: broken message
 

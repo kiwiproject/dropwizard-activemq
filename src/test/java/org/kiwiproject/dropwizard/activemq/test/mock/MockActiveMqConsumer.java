@@ -16,6 +16,7 @@ import org.kiwiproject.dropwizard.activemq.util.UncheckedJMSException;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 import javax.jms.JMSException;
 import javax.jms.Queue;
@@ -35,6 +36,7 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
         private Error error;
         private boolean validateBodyIsPresentOrThrowException;
         private boolean validateMessageTypeIsPresentOrThrowException;
+        private Function<ActiveMqMessage, Boolean> shouldConsumeFunction = message -> true;
 
         public Builder consumeMessagesOfType(String destination, String... types) {
             return consumeMessagesOfType(destination, List.of(types));
@@ -68,6 +70,11 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
             return this;
         }
 
+        public Builder withShouldConsume(Function<ActiveMqMessage, Boolean> shouldConsumeFunction) {
+            this.shouldConsumeFunction = shouldConsumeFunction;
+            return this;
+        }
+
         /**
          * Allows simulation of an uncaught exception. If set, the consumer will stop consuming.
          */
@@ -82,7 +89,8 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
                     ignoring,
                     error,
                     validateBodyIsPresentOrThrowException,
-                    validateMessageTypeIsPresentOrThrowException
+                    validateMessageTypeIsPresentOrThrowException,
+                    shouldConsumeFunction
             );
         }
     }
@@ -95,20 +103,34 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
     private final Error error;
     private final boolean validateBodyIsPresentOrThrowException;
     private final boolean validateMessageTypeIsPresentOrThrowException;
+    private final Function<ActiveMqMessage, Boolean> shouldConsumeFunction;
 
+    private final AtomicLong shouldConsumeCount = new AtomicLong();
     private final AtomicLong receivedCount = new AtomicLong();
 
     private MockActiveMqConsumer(Multimap<String, String> consuming,
                                  Multimap<String, String> ignoring,
                                  Error error,
                                  boolean validateBodyIsPresentOrThrowException,
-                                 boolean validateMessageTypeIsPresentOrThrowException) {
+                                 boolean validateMessageTypeIsPresentOrThrowException,
+                                 Function<ActiveMqMessage, Boolean> shouldConsumeFunction) {
 
         this.consuming.putAll(consuming);
         this.ignoring.putAll(ignoring);
         this.error = error;
         this.validateBodyIsPresentOrThrowException = validateBodyIsPresentOrThrowException;
         this.validateMessageTypeIsPresentOrThrowException = validateMessageTypeIsPresentOrThrowException;
+        this.shouldConsumeFunction = shouldConsumeFunction;
+    }
+
+    @Override
+    public boolean shouldConsume(ActiveMqMessage message) {
+        shouldConsumeCount.incrementAndGet();
+
+        var shouldConsume = shouldConsumeFunction.apply(message);
+        LOG.trace("shouldConsume returned {} for message of type {}", shouldConsume, message.getMessageType());
+
+        return shouldConsume;
     }
 
     @Override
@@ -238,6 +260,10 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
     private List<ActiveMqMessage> history(String destination, Multimap<String, ActiveMqMessage> messages) {
         checkArgumentNotBlank(destination);
         return List.copyOf(messages.get(destination));
+    }
+
+    public long getShouldConsumeCount() {
+        return shouldConsumeCount.get();
     }
 
     public long getReceivedCount() {

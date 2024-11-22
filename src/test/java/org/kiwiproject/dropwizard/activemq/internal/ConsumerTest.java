@@ -120,6 +120,24 @@ class ConsumerTest {
     }
 
     @Test
+    void shouldNotConsume_TextMessage_whenShouldConsumeReturnsFalse() throws JMSException {
+        var jmsConsumer = createMockActiveMqConsumerThatWillNotConsume();
+
+        var textMessage = session.createTextMessage(JSON_HELPER.toJson(new InternalMessage()));
+        producer.send(textMessage);
+
+        await().atMost(Durations.FIVE_SECONDS).until(() -> jmsConsumer.getShouldConsumeCount() > 0);
+
+        assertThat(jmsConsumer.consumedHistory()).isEmpty();
+        assertThat(jmsConsumer.consumedHistory(QUEUE_NAME)).isEmpty();
+        assertThat(jmsConsumer.ignoredHistory()).isEmpty();
+
+        assertConsumerIsHealthy();
+
+        verifyNoInteractions(elucidationClient);
+    }
+
+    @Test
     void shouldIgnoreTextMessage_withBareText() throws JMSException {
         var jmsConsumer = createMockActiveMqConsumer();
 
@@ -337,6 +355,17 @@ class ConsumerTest {
                 .consumeMessagesOfType(QUEUE_NAME, SPECIFIC_TEXT_MESSAGE_TYPE)
                 .validateBodyIsPresentOrThrowException()
                 .validateMessageTypeIsPresentOrThrowException()
+                .buildConsumer();
+
+        createAndStartConsumerWith(jmsConsumer);
+
+        return jmsConsumer;
+    }
+
+    private MockActiveMqConsumer createMockActiveMqConsumerThatWillNotConsume() {
+        var jmsConsumer = MockActiveMqConsumer.builder()
+                .consumeMessagesOfType(QUEUE_NAME, SPECIFIC_TEXT_MESSAGE_TYPE)
+                .withShouldConsume(acttiveMqMessage -> false)
                 .buildConsumer();
 
         createAndStartConsumerWith(jmsConsumer);

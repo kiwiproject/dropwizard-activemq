@@ -2,7 +2,6 @@ package org.kiwiproject.dropwizard.activemq.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
@@ -159,9 +158,12 @@ public class Consumer implements Managed, Runnable {
                 LOG.trace("Received a message or 'receive' timed out; reset errors to zero");
                 errors.set(0);
 
-                if (nonNull(message)) {
-                    delegate(createActiveMqMessageFrom(message));
+                if (isNull(message)) {
+                    // timeout expired, so no message to process
+                    continue;
                 }
+
+                consumeOrSkip(message);
 
             } catch (UnknownMessageTypeException e) {
                 LOG.error("Unknown message type", e);
@@ -172,6 +174,17 @@ public class Consumer implements Managed, Runnable {
         }
 
         LOG.trace("Exiting loop...");
+    }
+
+    private void consumeOrSkip(Message message) throws JMSException {
+        var activeMqMessage = createActiveMqMessageFrom(message);
+
+        if (delegateConsumer.shouldConsume(activeMqMessage)) {
+            LOG.trace("Consuming {} message because shouldConsume returned true", activeMqMessage.getMessageType());
+            delegate(activeMqMessage);
+        } else {
+            LOG.trace("Not consuming {} message because shouldConsume returned false", activeMqMessage.getMessageType());
+        }
     }
 
     private void delegate(ActiveMqMessage activeMqMessage) {
