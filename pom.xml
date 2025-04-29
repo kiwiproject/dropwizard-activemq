@@ -37,7 +37,7 @@
         <registry-aware-jersey-client.version>2.1.3</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
-        <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-collections4.version>4.5.0</commons-collections4.version>
         <jaxb-runtime.version>4.0.5 </jaxb-runtime.version>
         <kiwi-test.version>3.9.0</kiwi-test.version>
     </properties>
