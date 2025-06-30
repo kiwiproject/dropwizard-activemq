@@ -39,7 +39,7 @@
         <!-- test dependency versions -->
         <commons-collections4.version>4.5.0</commons-collections4.version>
         <jaxb-runtime.version>4.0.5 </jaxb-runtime.version>
-        <kiwi-test.version>3.10.0</kiwi-test.version>
+        <kiwi-test.version>3.11.0</kiwi-test.version>
     </properties>
 
     <dependencyManagement>
