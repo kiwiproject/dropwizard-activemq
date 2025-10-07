@@ -37,8 +37,6 @@
         <registry-aware-jersey-client.version>2.4.0</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
-        <commons-collections4.version>4.5.0</commons-collections4.version>
-        <jaxb-runtime.version>4.0.6</jaxb-runtime.version>
         <kiwi-test.version>3.12.0</kiwi-test.version>
     </properties>
 
@@ -169,7 +167,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>${commons-collections4.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -188,7 +185,6 @@
 
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
-            <version>${jaxb-runtime.version}</version>
             <artifactId>jaxb-runtime</artifactId>
             <scope>test</scope>
         </dependency>
