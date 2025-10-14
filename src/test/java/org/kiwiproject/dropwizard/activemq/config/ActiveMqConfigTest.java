@@ -120,7 +120,7 @@ class ActiveMqConfigTest {
 
                 true, tcp://host1.prod:61616, false
                 true, 'failover:(tcp://host1.prod:61616,tcp://host2.prod:61616)?randomize=false', false
-                true, 'ssl://host1.prod:61617, true
+                true, 'ssl://host1.prod:61617', true
                 true, 'ssl://host1.prod:61617?verifyHostName=false', true
                 true, 'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?randomize=false&nested.verifyHostName=false', true
                 """)
