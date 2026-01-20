@@ -332,7 +332,7 @@ class StatHelperTest {
         assertThat(client.getConfiguration().isRegistered(HttpAuthenticationFeature.class)).isTrue();
 
         var sslContext = client.getSslContext();
-        assertThat(sslContext.getProtocol()).isEqualTo("TLSv1.2");
+        assertThat(sslContext.getProtocol()).isEqualTo(config.getTlsConfiguration().getProtocol());
 
         var urls = statHelper.getUrlsForDestination("foo");
         assertThat(urls).containsOnly(

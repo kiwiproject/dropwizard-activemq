@@ -3,6 +3,7 @@ package org.kiwiproject.dropwizard.activemq.test.util;
 import lombok.experimental.UtilityClass;
 import org.kiwiproject.config.TlsContextConfiguration;
 import org.kiwiproject.io.KiwiPaths;
+import org.kiwiproject.security.SSLContextProtocol;
 
 @UtilityClass
 public class TestObjectFactory {
@@ -41,7 +42,7 @@ public class TestObjectFactory {
 
     public static TlsContextConfiguration newTlsContextConfiguration(HostnameVerification hostnameVerification) {
         return TlsContextConfiguration.builder()
-                .protocol("TLSv1.2")
+                .protocol(SSLContextProtocol.TLS_1_3.value)
                 .keyStorePath(keyStorePath())
                 .keyStorePassword("password")
                 .trustStorePath(trustStorePath())
