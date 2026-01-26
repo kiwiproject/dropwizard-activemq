@@ -30,7 +30,7 @@
         <activemq.version>5.19.0</activemq.version>
         <dropwizard-config-providers.version>3.0.0</dropwizard-config-providers.version>
         <dropwizard-leader-latch.version>2.3.8</dropwizard-leader-latch.version>
-        <elucidation.version>5.0.7</elucidation.version>
+        <elucidation.version>6.0.0</elucidation.version>
         <kiwi-bom.version>3.0.1</kiwi-bom.version>
         <kiwi.version>5.0.0</kiwi.version>
         <metrics-healthchecks-severity.version>3.0.0</metrics-healthchecks-severity.version>
