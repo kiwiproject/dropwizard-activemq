@@ -34,7 +34,7 @@
         <kiwi-bom.version>3.0.1</kiwi-bom.version>
         <kiwi.version>5.0.0</kiwi.version>
         <metrics-healthchecks-severity.version>3.0.0</metrics-healthchecks-severity.version>
-        <registry-aware-jersey-client.version>2.4.2</registry-aware-jersey-client.version>
+        <registry-aware-jersey-client.version>3.0.0</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
         <kiwi-test.version>4.0.0</kiwi-test.version>
