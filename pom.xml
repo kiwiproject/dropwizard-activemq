@@ -32,7 +32,7 @@
         <dropwizard-leader-latch.version>3.0.0</dropwizard-leader-latch.version>
         <elucidation.version>6.0.0</elucidation.version>
         <kiwi-bom.version>3.0.1</kiwi-bom.version>
-        <kiwi.version>5.0.0</kiwi.version>
+        <kiwi.version>5.1.0</kiwi.version>
         <metrics-healthchecks-severity.version>3.0.0</metrics-healthchecks-severity.version>
         <registry-aware-jersey-client.version>3.0.0</registry-aware-jersey-client.version>
 
