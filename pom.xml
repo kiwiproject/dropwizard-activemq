@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kiwiproject</groupId>
         <artifactId>kiwi-parent</artifactId>
-        <version>3.0.37</version>
+        <version>3.0.38</version>
     </parent>
 
     <artifactId>dropwizard-activemq</artifactId>
@@ -28,13 +28,13 @@
     <properties>
         <!-- required dependency versions -->
         <activemq.version>5.19.0</activemq.version>
-        <dropwizard-config-providers.version>3.0.1</dropwizard-config-providers.version>
-        <dropwizard-leader-latch.version>3.0.1</dropwizard-leader-latch.version>
-        <elucidation.version>7.0.0</elucidation.version>
-        <kiwi-bom.version>3.0.3</kiwi-bom.version>
-        <kiwi.version>5.1.1</kiwi.version>
-        <metrics-healthchecks-severity.version>3.0.1</metrics-healthchecks-severity.version>
-        <registry-aware-jersey-client.version>3.0.1</registry-aware-jersey-client.version>
+        <dropwizard-config-providers.version>3.0.2</dropwizard-config-providers.version>
+        <dropwizard-leader-latch.version>3.0.2</dropwizard-leader-latch.version>
+        <elucidation.version>7.0.1</elucidation.version>
+        <kiwi-bom.version>3.0.4</kiwi-bom.version>
+        <kiwi.version>5.2.0</kiwi.version>
+        <metrics-healthchecks-severity.version>3.0.2</metrics-healthchecks-severity.version>
+        <registry-aware-jersey-client.version>3.0.2</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
         <kiwi-test.version>4.0.1</kiwi-test.version>
