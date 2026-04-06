@@ -37,7 +37,7 @@
         <registry-aware-jersey-client.version>3.0.1</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
-        <kiwi-test.version>4.0.1</kiwi-test.version>
+        <kiwi-test.version>4.0.2</kiwi-test.version>
     </properties>
 
     <dependencyManagement>
