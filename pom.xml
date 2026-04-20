@@ -31,8 +31,8 @@
         <dropwizard-config-providers.version>3.0.2</dropwizard-config-providers.version>
         <dropwizard-leader-latch.version>3.0.2</dropwizard-leader-latch.version>
         <elucidation.version>7.0.1</elucidation.version>
-        <kiwi-bom.version>3.0.4</kiwi-bom.version>
-        <kiwi.version>5.2.0</kiwi.version>
+        <kiwi-bom.version>3.1.0</kiwi-bom.version>
+        <kiwi.version>5.3.1</kiwi.version>
         <metrics-healthchecks-severity.version>3.0.2</metrics-healthchecks-severity.version>
         <registry-aware-jersey-client.version>3.0.2</registry-aware-jersey-client.version>
 
