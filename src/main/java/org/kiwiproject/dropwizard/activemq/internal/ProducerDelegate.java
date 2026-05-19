@@ -1,6 +1,5 @@
 package org.kiwiproject.dropwizard.activemq.internal;
 
-import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
@@ -13,6 +12,7 @@ import static org.kiwiproject.dropwizard.activemq.util.DynamicDestinations.DYNAM
 
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
 import org.kiwiproject.dropwizard.activemq.ActiveMqProducer;
 import org.kiwiproject.elucidation.client.ElucidationClient;
 
@@ -119,7 +119,7 @@ public class ProducerDelegate implements ActiveMqProducer {
     }
 
     private boolean isDynamicDestination(String destination) {
-        return allowDynamicDestinations && startsWith(destination, DYNAMIC_DESTINATION_ID + ":");
+        return allowDynamicDestinations && Strings.CS.startsWith(destination, DYNAMIC_DESTINATION_ID + ":");
     }
 
     private void produceToDynamicDestination(String destination,

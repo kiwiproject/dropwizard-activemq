@@ -19,7 +19,7 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
@@ -244,7 +244,7 @@ class StatHelper {
         currentUrlIndex.updateAndGet(currIndex -> {
             var urlPrefix = baseUrlQueue.get((int) currIndex % baseUrlCount);
 
-            if (StringUtils.startsWith(url, urlPrefix)) {
+            if (Strings.CS.startsWith(url, urlPrefix)) {
                 long nextIndex = currIndex + 1;
                 LOG.trace("Incrementing current url index {} to: {}", currIndex, nextIndex);
                 return nextIndex;
