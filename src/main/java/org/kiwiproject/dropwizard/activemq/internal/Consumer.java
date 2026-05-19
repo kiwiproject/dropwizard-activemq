@@ -83,7 +83,7 @@ public class Consumer implements Managed, Runnable {
     private final AtomicReference<Throwable> uncaughtExceptionRef = new AtomicReference<>();
 
     @VisibleForTesting
-    @Getter(AccessLevel.MODULE)
+    @Getter(AccessLevel.PACKAGE)
     private final AtomicInteger errors = new AtomicInteger(0);
 
     public Consumer(ConnectionFactory factory,
