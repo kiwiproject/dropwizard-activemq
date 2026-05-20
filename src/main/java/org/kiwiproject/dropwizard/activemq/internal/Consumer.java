@@ -62,6 +62,11 @@ import javax.jms.TextMessage;
  * <p>
  * It receives messages from the {@link ActiveMQMessageConsumer} and delegates them to
  * an {@link ActiveMqConsumer}.
+ * 
+ * @implNote This implements {@link Managed} to align with the Dropwizard lifecycle, and
+ * {@link Runnable} because it manages a single dedicated {@link Thread} internally. A raw
+ * thread is used intentionally: one consumer, one thread, with explicit naming, an uncaught
+ * exception handler, and a cooperative shutdown via a stopping flag and timed join.
  */
 @Slf4j
 public class Consumer implements Managed, Runnable {
@@ -81,6 +86,7 @@ public class Consumer implements Managed, Runnable {
     private final String threadName;
     private final Thread thread;
 
+    // Signals the consumer loop to exit; see stop() and run()
     private final AtomicBoolean stopping = new AtomicBoolean(false);
     private final AtomicBoolean consuming = new AtomicBoolean(false);
     private final AtomicReference<Throwable> uncaughtExceptionRef = new AtomicReference<>();
@@ -316,15 +322,24 @@ public class Consumer implements Managed, Runnable {
         LOG.info("Waiting until thread '{}' is stopped... (is currently alive? {})",
                 threadName, thread.isAlive());
 
+        // Do NOT cache the result of Thread#isAlive in a local variable; its state is
+        // expected to change from alive to terminated in this method.
+        
         if (thread.isAlive()) {
+
+            // Signal the consumer loop to exit. The thread may be blocked in consumer.receive()
+            // for up to receiveTimeoutMillis before it checks this flag, so termination is not
+            // instantaneous but will happen naturally without interruption.
             stopping.set(true);
 
             LOG.trace("Wait up to {} seconds for thread '{}' to die", TEN, threadName);
             thread.join(TEN_SECONDS_IN_MILLIS);
 
-            // TODO Maybe split into INFO and WARN level based on whether is still alive or not (WARN if still alive)
-            LOG.info("Thread '{}' is stopped or we timed out waiting for it to die (is still alive? {})",
-                    threadName, thread.isAlive());
+            if (thread.isAlive()) {
+                LOG.warn("Thread '{}' is still alive after waiting {} seconds for it to die", threadName, TEN);
+            } else {
+                LOG.info("Thread '{}' is terminated", threadName);
+            }
         }
     }
 
