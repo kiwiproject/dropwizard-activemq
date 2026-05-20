@@ -261,7 +261,7 @@ class StatHelper {
 
     private void logWarningsIfNotDLQ(String json, JolokiaResponse jolokiaResponse) {
         if (json.contains(dlqName)) {
-            LOG.trace("DLQ ({}) was not found; this is not a problem (since it means we do NOT have dead messages)", dlqName);
+            LOG.trace("Response is for DLQ ({}); no value set is expected since it means we do NOT have dead messages", dlqName);
             return;
         }
 
