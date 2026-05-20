@@ -156,6 +156,7 @@ public class Producer {
         } catch (Exception e) {
             LOG.error("Error sending message via JMS to {}", destination, e);
             // TODO Should this throw an exception? It never did (and it's been like this since 2016...)
+            //  At the least, it should have a "handler" that can be configured. The default one can just log
         }
     }
 

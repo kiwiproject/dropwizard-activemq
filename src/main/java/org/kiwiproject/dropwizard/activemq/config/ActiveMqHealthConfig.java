@@ -40,5 +40,6 @@ public class ActiveMqHealthConfig {
 
     private boolean ignoreEmptyQueuesWithNoConsumers = true;
 
+    // TODO Change to a Duration
     private long statsTimeoutMillis = 10_000;  // 10 seconds
 }
