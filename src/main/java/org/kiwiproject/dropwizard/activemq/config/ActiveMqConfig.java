@@ -5,8 +5,10 @@ import static java.util.Objects.isNull;
 import io.dropwizard.util.Duration;
 import io.dropwizard.validation.MinDuration;
 import io.dropwizard.validation.ValidationMethod;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +79,7 @@ public class ActiveMqConfig {
     /**
      * List of consumer destinations, e.g., topics, queues.
      */
+    @NotNull
     private List<String> consumers = new ArrayList<>();
 
     /**
@@ -91,6 +94,7 @@ public class ActiveMqConfig {
     /**
      * List of producer destinations, e.g., topics, queues.
      */
+    @NotNull
     private List<String> producers = new ArrayList<>();
 
     /**
@@ -99,6 +103,7 @@ public class ActiveMqConfig {
      * If none set this will be defaulted to a list containing
      * {@link org.kiwiproject.dropwizard.activemq.ActiveMqConstants#ALL_EVENTS_QUEUE ALL_EVENTS_QUEUE}.
      */
+    @NotNull
     private List<String> defaultProducers = new ArrayList<>();
 
     /**
@@ -119,15 +124,22 @@ public class ActiveMqConfig {
 
     /**
      * Timeout that applies to produced messages.
+     * <p>
+     * Defaults to {@code 1 hour}. The JMS specification default is {@code 0} (unlimited),
+     * but an unlimited TTL means expired messages will never appear in the DLQ, making
+     * consumer failures invisible until manually investigated. A shorter TTL ensures
+     * problems surface quickly. Set to {@code 0} to disable expiry entirely.
      *
      * @see javax.jms.MessageProducer#setTimeToLive(long)
      */
-    private Duration timeToLive = Duration.days(7);
+    @NotNull
+    private Duration timeToLive = Duration.hours(1);
 
     /**
      * Configuration used to retrieve health statistics via REST (using Jolokia) from the ActiveMQ server.
      */
     @NotNull
+    @Valid
     private ActiveMqHealthConfig healthConfig = new ActiveMqHealthConfig();
 
     /**
@@ -138,6 +150,7 @@ public class ActiveMqConfig {
     /**
      * The port to use when connecting to the ActiveMQ Jolokia REST API.
      */
+    @PositiveOrZero
     private int jolokiaPort = 8161;
 
     /**

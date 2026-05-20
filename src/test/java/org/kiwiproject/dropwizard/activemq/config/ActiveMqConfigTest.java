@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.newTlsContextConfiguration;
 import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.setTlsConfigSystemProperties;
+import static org.kiwiproject.test.validation.ValidationTestHelper.assertNoPropertyViolations;
+import static org.kiwiproject.test.validation.ValidationTestHelper.assertOnePropertyViolation;
 
+import io.dropwizard.util.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,10 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junitpioneer.jupiter.RestoreSystemProperties;
 import org.kiwiproject.config.TlsContextConfiguration;
 import org.kiwiproject.config.provider.TlsConfigProvider;
 import org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory;
+import org.kiwiproject.validation.KiwiValidations;
 
 import java.util.stream.Stream;
 
@@ -28,6 +34,227 @@ class ActiveMqConfigTest {
     void setUp() {
         config = new ActiveMqConfig();
     }
+
+    @Nested
+class DefaultValues {
+
+    @Test
+    void shouldHaveExpectedDefaults() {
+        assertAll(
+                () -> assertThat(config.getBrokerUri()).isEqualTo(ActiveMqConfig.DEFAULT_BROKER_URI),
+                () -> assertThat(config.isRegisterBrokerHealthCheck()).isTrue(),
+                () -> assertThat(config.getBrokerHealthCheckConsumerReceiveTimeout()).isEqualTo(Duration.milliseconds(400)),
+                () -> assertThat(config.getHealthCheckNamePrefix()).isNull(),
+                () -> assertThat(config.isEnableStatsHealthChecks()).isTrue(),
+                () -> assertThat(config.isEnableElucidation()).isFalse(),
+                () -> assertThat(config.isAutoRegisterConsumers()).isTrue(),
+                () -> assertThat(config.getConsumers()).isEmpty(),
+                () -> assertThat(config.getConsumerReceiveTimeout()).isEqualTo(Duration.milliseconds(400)),
+                () -> assertThat(config.getProducers()).isEmpty(),
+                () -> assertThat(config.getDefaultProducers()).isEmpty(),
+                () -> assertThat(config.isAllowDynamicDestinations()).isFalse(),
+                () -> assertThat(config.isAllowMultipleConsumersPerDestination()).isFalse(),
+                () -> assertThat(config.getTimeToLive()).isEqualTo(Duration.hours(1)),
+                () -> assertThat(config.getHealthConfig()).isNotNull(),
+                () -> assertThat(config.isUseSecureActiveMQConnections()).isTrue(),
+                () -> assertThat(config.getJolokiaPort()).isEqualTo(8161),
+                () -> assertThat(config.isUseSecureRestConnections()).isTrue(),
+                () -> assertThat(config.isVerifyRestConnectionHostnames()).isFalse()
+        );
+    }
+}
+
+@Nested
+class Validation {
+
+    @Nested
+    class BrokerUri {
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  ", "\t"})
+        void shouldFailValidation_WhenBlankOrNull(String value) {
+            config.setBrokerUri(value);
+
+            assertOnePropertyViolation(config, "brokerUri");
+        }
+
+        @Test
+        void shouldPassValidation_WhenNotBlank() {
+            assertNoPropertyViolations(config, "brokerUri");
+        }
+    }
+
+    @Nested
+    class BrokerHealthCheckConsumerReceiveTimeout {
+
+        @Test
+        void shouldFailValidation_WhenNull() {
+            config.setBrokerHealthCheckConsumerReceiveTimeout(null);
+
+            assertOnePropertyViolation(config, "brokerHealthCheckConsumerReceiveTimeout");
+        }
+
+        @Test
+        void shouldFailValidation_WhenBelowMinimum() {
+            config.setBrokerHealthCheckConsumerReceiveTimeout(Duration.milliseconds(9));
+
+            assertOnePropertyViolation(config, "brokerHealthCheckConsumerReceiveTimeout");
+        }
+
+        @Test
+        void shouldPassValidation_WhenAtMinimum() {
+            config.setBrokerHealthCheckConsumerReceiveTimeout(Duration.milliseconds(10));
+
+            assertNoPropertyViolations(config, "brokerHealthCheckConsumerReceiveTimeout");
+        }
+    }
+
+    @Nested
+    class ConsumerReceiveTimeout {
+
+        @Test
+        void shouldFailValidation_WhenNull() {
+            config.setConsumerReceiveTimeout(null);
+
+            assertOnePropertyViolation(config, "consumerReceiveTimeout");
+        }
+
+        @Test
+        void shouldFailValidation_WhenBelowMinimum() {
+            config.setConsumerReceiveTimeout(Duration.milliseconds(9));
+
+            assertOnePropertyViolation(config, "consumerReceiveTimeout");
+        }
+
+        @Test
+        void shouldPassValidation_WhenAtMinimum() {
+            config.setConsumerReceiveTimeout(Duration.milliseconds(10));
+
+            assertNoPropertyViolations(config, "consumerReceiveTimeout");
+        }
+    }
+
+    @Nested
+    class Consumers {
+
+        @Test
+        void shouldFailValidation_WhenNull() {
+            config.setConsumers(null);
+
+            assertOnePropertyViolation(config, "consumers");
+        }
+
+        @Test
+        void shouldPassValidation_WhenEmpty() {
+            assertNoPropertyViolations(config, "consumers");
+        }
+    }
+
+    @Nested
+    class Producers {
+
+        @Test
+        void shouldFailValidation_WhenNull() {
+            config.setProducers(null);
+
+            assertOnePropertyViolation(config, "producers");
+        }
+
+        @Test
+        void shouldPassValidation_WhenEmpty() {
+            assertNoPropertyViolations(config, "producers");
+        }
+    }
+
+    @Nested
+    class DefaultProducers {
+
+        @Test
+        void shouldFailValidation_WhenNull() {
+            config.setDefaultProducers(null);
+
+            assertOnePropertyViolation(config, "defaultProducers");
+        }
+
+        @Test
+        void shouldPassValidation_WhenEmpty() {
+            assertNoPropertyViolations(config, "defaultProducers");
+        }
+    }
+
+    @Nested
+    class TimeToLive {
+
+        @Test
+        void shouldFailValidation_WhenNull() {
+            config.setTimeToLive(null);
+
+            assertOnePropertyViolation(config, "timeToLive");
+        }
+
+        @Test
+        void shouldPassValidation_WhenDefault() {
+            assertNoPropertyViolations(config, "timeToLive");
+        }
+
+        @Test
+        void shouldPassValidation_WhenZero() {
+            config.setTimeToLive(Duration.milliseconds(0));
+
+            assertNoPropertyViolations(config, "timeToLive");
+        }
+    }
+
+    @Nested
+    class HealthConfig {
+
+        @Test
+        void shouldFailValidation_WhenNull() {
+            config.setHealthConfig(null);
+
+            assertOnePropertyViolation(config, "healthConfig");
+        }
+
+        @Test
+        void shouldPassValidation_WhenNotNull() {
+            assertNoPropertyViolations(config, "healthConfig");
+        }
+
+        @Test
+        void shouldCascadeValidation_WhenHealthConfig_HasViolations() {
+            config.getHealthConfig().setDlqName(null);
+
+            var violations = KiwiValidations.validate(config);
+            assertThat(violations)
+                    .extracting(v -> v.getPropertyPath().toString())
+                    .contains("healthConfig.dlqName");
+        }
+    }
+
+    @Nested
+    class JolokiaPort {
+
+        @Test
+        void shouldFailValidation_WhenNegative() {
+            config.setJolokiaPort(-1);
+
+            assertOnePropertyViolation(config, "jolokiaPort");
+        }
+
+        @Test
+        void shouldPassValidation_WhenZero() {
+            config.setJolokiaPort(0);
+
+            assertNoPropertyViolations(config, "jolokiaPort");
+        }
+
+        @Test
+        void shouldPassValidation_WhenPositive() {
+            assertNoPropertyViolations(config, "jolokiaPort");
+        }
+    }
+}
 
     @Test
     void shouldProvideNonNull_ButDefault_TlsContextConfiguration_WhenProviderCannotProvide() {
