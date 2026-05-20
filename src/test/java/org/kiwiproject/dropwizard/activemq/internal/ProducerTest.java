@@ -74,7 +74,7 @@ class ProducerTest {
         when(session.createProducer(destination)).thenReturn(jmsProducer);
         doNothing().when(jmsProducer).setTimeToLive(anyLong());
 
-        var provider = spy(new Producer.ProducerProvider(connectionFactory, QUEUE, TIME_TO_LIVE, serviceName));
+        var provider = spy(new Producer.ProducerProvider(connectionFactory, QUEUE, serviceName, TIME_TO_LIVE));
         when(provider.getSession()).thenReturn(session);
         when(provider.getMessageProducer()).thenReturn(jmsProducer);
         Correlation.CORRELATION_ID.remove();
@@ -228,8 +228,7 @@ class ProducerTest {
     }
 
     private Producer newConfiguredProducer() {
-        var producer = new Producer(connectionFactory, QUEUE, false, serviceName);
-        producer.setTimeToLive(TIME_TO_LIVE);
+        var producer = new Producer(connectionFactory, QUEUE, false, serviceName, TIME_TO_LIVE);
 
         return producer;
     }

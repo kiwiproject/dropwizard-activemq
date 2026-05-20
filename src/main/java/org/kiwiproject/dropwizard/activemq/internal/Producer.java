@@ -10,8 +10,8 @@ import static org.kiwiproject.dropwizard.activemq.ActiveMqMessage.KIWI_AMQ_CONTE
 
 import com.google.common.annotations.VisibleForTesting;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageHeaderException;
 import org.kiwiproject.dropwizard.activemq.util.Utils;
@@ -40,19 +40,24 @@ public class Producer {
 
     private final String serviceName;
 
-    // TODO Why is this NOT part of the constructor?
-    @Setter
-    private Duration timeToLive;
+    /**
+     * The time that unconsumed messages will live in ActiveMQ.
+     * 
+     * @see MessageProducer#setTimeToLive(long)
+     */
+    private final Duration timeToLive;
 
     public Producer(ConnectionFactory factory,
                     String destination,
                     boolean isDefaultProducer,
-                    String serviceName) {
+                    String serviceName,
+                    @Nullable Duration timeToLive) {
 
         this.factory = requireNotNull(factory);
         this.destination = requireNotBlank(destination);
         this.isDefaultProducer = isDefaultProducer;
         this.serviceName = requireNotBlank(serviceName);
+        this.timeToLive = timeToLive;
     }
 
     /**
@@ -148,7 +153,7 @@ public class Producer {
     }
 
     private void send(String destination, FunctionThrowsException<Session, Message> messageBuilder) {
-        try (var provider = new ProducerProvider(factory, destination, timeToLive, serviceName)) {
+        try (var provider = new ProducerProvider(factory, destination, serviceName, timeToLive)) {
             var message = messageBuilder.apply(provider.getSession());
 
             LOG.trace("Sending {} message to {}", message.getClass().getSimpleName(), destination);
@@ -167,8 +172,8 @@ public class Producer {
 
         ProducerProvider(ConnectionFactory factory,
                          String destination,
-                         Duration timeToLive,
-                         String serviceName) throws JMSException {
+                         String serviceName,
+                         @Nullable Duration timeToLive) throws JMSException {
 
             super(factory, serviceName);
 
