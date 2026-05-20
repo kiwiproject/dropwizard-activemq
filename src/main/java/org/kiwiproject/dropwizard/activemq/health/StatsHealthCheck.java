@@ -53,6 +53,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     private final String simpleClassName;  // exists to allow logging the actual subclass for easier debugging
     
     private final long healthCheckRefreshIntervalMillis;
+    private final long statsTimeoutMillis;
 
     @VisibleForTesting
     Result lastResult;
@@ -84,6 +85,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
 
         this.lastUpdateTimestamp = new AtomicLong();
         this.healthCheckRefreshIntervalMillis = healthConfig.getRefreshInterval().toMilliseconds();
+        this.statsTimeoutMillis = healthConfig.getStatsTimeout().toMilliseconds();
         this.simpleClassName = getClass().getSimpleName();
         this.kiwiEnvironment = requireNotNull(kiwiEnvironment);
     }
@@ -120,8 +122,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
 
     @VisibleForTesting
     Result getResult(CompletableFuture<Result> future) throws InterruptedException, ExecutionException, TimeoutException {
-        var timeout = healthConfig.getStatsTimeoutMillis();
-        return future.get(timeout, TimeUnit.MILLISECONDS);
+        return future.get(statsTimeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     private Result performCheck() {
