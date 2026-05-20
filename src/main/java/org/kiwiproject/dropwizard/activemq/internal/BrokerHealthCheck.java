@@ -2,6 +2,7 @@ package org.kiwiproject.dropwizard.activemq.internal;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.metrics.health.HealthCheckResults.newHealthyResult;
@@ -15,6 +16,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.jms.pool.PooledConnectionFactory;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jspecify.annotations.Nullable;
+import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.util.Utils;
 import org.kiwiproject.metrics.health.HealthStatus;
 
@@ -44,9 +46,13 @@ public class BrokerHealthCheck extends HealthCheck {
     private final TimeUnit jmsCheckWaitTimeUnit;
     private final ConnectionFactory factory;
     private final String serviceName;
+    private final long receiveTimeoutMillis;
 
-    public BrokerHealthCheck(String name, ConnectionFactory factory, String serviceName) {
-        this(name, factory, DEFAULT_JMS_CHECK_WAIT_TIME, DEFAULT_JMS_CHECK_WAIT_TIME_UNIT, serviceName);
+    public BrokerHealthCheck(String name, 
+                             ConnectionFactory factory,
+                             String serviceName,
+                             ActiveMqConfig configuration) {
+        this(name, factory, DEFAULT_JMS_CHECK_WAIT_TIME, DEFAULT_JMS_CHECK_WAIT_TIME_UNIT, serviceName, configuration);
     }
 
     @VisibleForTesting
@@ -54,13 +60,17 @@ public class BrokerHealthCheck extends HealthCheck {
                       ConnectionFactory factory,
                       long jmsCheckWaitTime,
                       TimeUnit jmsCheckWaitTimeUnit,
-                      String serviceName) {
+                      String serviceName,
+                      ActiveMqConfig configuration) {
 
         this.name = requireNotBlank(name);
         this.factory = requireNotNull(factory);
         this.jmsCheckWaitTime = jmsCheckWaitTime;
         this.jmsCheckWaitTimeUnit = requireNotNull(jmsCheckWaitTimeUnit);
         this.serviceName = requireNotBlank(serviceName);
+
+        checkArgumentNotNull(configuration);
+        this.receiveTimeoutMillis = configuration.getBrokerHealthCheckConsumerReceiveTimeout().toMilliseconds();
     }
 
     public static String createHealthCheckNameWithPrefix(String prefix) {
@@ -147,7 +157,7 @@ public class BrokerHealthCheck extends HealthCheck {
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
             producer.send(provider.getSession().createTextMessage(messageText));
 
-            var payload = (TextMessage) consumer.receive(400);  // TODO Extract to constant? Make configurable?
+            var payload = (TextMessage) consumer.receive(receiveTimeoutMillis);
 
             // TODO Consider separating the payload null check from message equality check, with different return value
             if (nonNull(payload) && messageText.equals(payload.getText())) {

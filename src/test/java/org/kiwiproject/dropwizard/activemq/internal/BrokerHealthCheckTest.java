@@ -13,6 +13,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.codahale.metrics.health.HealthCheck;
+import io.dropwizard.util.Duration;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.jms.pool.PooledConnectionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.kiwiproject.base.DefaultEnvironment;
+import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqExtension;
 import org.mockito.Mockito;
 
@@ -39,10 +41,14 @@ class BrokerHealthCheckTest {
     final EmbeddedActiveMqExtension broker = new EmbeddedActiveMqExtension();
 
     private String serviceName;
+    private ActiveMqConfig config;
 
     @BeforeEach
     void setUp() {
         serviceName = uniqueServiceName();
+        
+        config = new ActiveMqConfig();
+        config.setBrokerHealthCheckConsumerReceiveTimeout(Duration.milliseconds(10));
     }
 
     @Test
@@ -69,7 +75,7 @@ class BrokerHealthCheckTest {
 
     @Test
     void shouldBeHealthy_WhenCanProduceAndConsumeMessages() {
-        var healthCheck = new BrokerHealthCheck("testBrokerHealthCheck", broker.newConnectionFactory(), serviceName);
+        var healthCheck = new BrokerHealthCheck("testBrokerHealthCheck", broker.newConnectionFactory(), serviceName, config);
 
         assertThatHealthCheck(healthCheck)
                 .isHealthy()
@@ -79,7 +85,7 @@ class BrokerHealthCheckTest {
     @Test
     void shouldBeUnhealthy_WhenReturnsUnexpectedText() throws JMSException {
         var factory = broker.newConnectionFactory();
-        var healthCheck = spy(new BrokerHealthCheck("testBrokerHealthCheck", factory, serviceName));
+        var healthCheck = spy(new BrokerHealthCheck("testBrokerHealthCheck", factory, serviceName, config));
         var provider = spy(new BrokerHealthCheck.ConsumerAndProducerProvider(factory, serviceName));
         var consumer = mock(MessageConsumer.class);
         var message = mock(TextMessage.class);
@@ -99,7 +105,7 @@ class BrokerHealthCheckTest {
     void shouldBeUnhealthy_WhenTimesOut() throws JMSException {
         var factory = broker.newConnectionFactory();
         var waitTimeMillis = 1L;
-        var healthCheck = spy(new BrokerHealthCheck("testBrokerHealthCheck", factory, waitTimeMillis, TimeUnit.MILLISECONDS, serviceName));
+        var healthCheck = spy(new BrokerHealthCheck("testBrokerHealthCheck", factory, waitTimeMillis, TimeUnit.MILLISECONDS, serviceName, config));
         Mockito.doAnswer(invocation -> {
                     // ensure sleep time is much more than health check's timeout
                     var sleepTime = 5 * waitTimeMillis;
@@ -116,7 +122,7 @@ class BrokerHealthCheckTest {
     @Test
     void shouldBeUnhealthy_WhenHealthCheckThrowsException() throws JMSException {
         var factory = broker.newConnectionFactory();
-        var healthCheck = spy(new BrokerHealthCheck("testBrokerHealthCheck", factory, serviceName));
+        var healthCheck = spy(new BrokerHealthCheck("testBrokerHealthCheck", factory, serviceName, config));
 
         doThrow(new RuntimeException("oops")).when(healthCheck).doProduceConsumeCheck(anyString());
 

@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ActiveMqConfig {
 
+    private static final long DEFAULT_CONSUMER_RECEIVE_TIMEOUT_MILLIS = 400;
+
     public static final String DEFAULT_BROKER_URI = "tcp://localhost:61616";
 
     /**
@@ -36,6 +38,15 @@ public class ActiveMqConfig {
      * Whether to register a BrokerHealthCheck or not.
      */
     private boolean registerBrokerHealthCheck = true;
+
+    /**
+     * The maximum duration the BrokerHealthCheck's temporary consumer will wait for the next message.
+     * 
+     * @see javax.jms.MessageConsumer#receive(long)
+     */
+    @NotNull
+    @MinDuration(value = 10, unit = TimeUnit.MILLISECONDS)
+    private Duration brokerHealthCheckConsumerReceiveTimeout = Duration.milliseconds(DEFAULT_CONSUMER_RECEIVE_TIMEOUT_MILLIS);
 
     /**
      * Use this to differentiate the ActiveMQ (e.g., internal-cluster, external-cluster) when
@@ -75,7 +86,7 @@ public class ActiveMqConfig {
      */
     @NotNull
     @MinDuration(value = 10, unit = TimeUnit.MILLISECONDS)
-    private Duration consumerReceiveTimeout = Duration.milliseconds(400);
+    private Duration consumerReceiveTimeout = Duration.milliseconds(DEFAULT_CONSUMER_RECEIVE_TIMEOUT_MILLIS);
 
     /**
      * List of producer destinations, e.g., topics, queues.
