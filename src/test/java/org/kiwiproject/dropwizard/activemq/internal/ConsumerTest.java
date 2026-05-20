@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import io.dropwizard.util.Duration;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
 import org.awaitility.Durations;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
+import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqExtension;
 import org.kiwiproject.dropwizard.activemq.test.mock.MockActiveMqConsumer;
 import org.kiwiproject.dropwizard.activemq.test.util.ActiveMqTestUtils;
@@ -71,6 +73,7 @@ class ConsumerTest {
     private Session session;
     private ElucidationClient<String> elucidationClient;
     private String serviceName;
+    private ActiveMqConfig config;
 
     @BeforeEach
     void setUp() throws JMSException {
@@ -87,6 +90,8 @@ class ConsumerTest {
         when(elucidationClient.recordNewEvent(anyString())).thenReturn(CompletableFuture.completedFuture(result));
 
         serviceName = uniqueServiceName();
+        config = new ActiveMqConfig();
+        config.setConsumerReceiveTimeout(Duration.milliseconds(10));  // minimize waiting in test
     }
 
     @SuppressWarnings("unchecked")
@@ -402,7 +407,7 @@ class ConsumerTest {
     }
 
     private void createAndStartConsumerWith(MockActiveMqConsumer jmsConsumer) {
-        consumer = new Consumer(connectionFactory, QUEUE, jmsConsumer, elucidationClient, serviceName);
+        consumer = new Consumer(connectionFactory, QUEUE, jmsConsumer, elucidationClient, serviceName, config);     
         consumer.start();
     }
 

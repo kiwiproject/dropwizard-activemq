@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Your {@link io.dropwizard.core.Configuration} class should implement this interface
@@ -17,6 +18,7 @@ public interface ActiveMqConfigured extends ElucidationConfigured {
      * The configuration property (e.g., in YAML) must be named according to the value in
      * the {@link JsonProperty} annotation.
      */
+    @NonNull
     @JsonProperty("activeMq")
     ActiveMqConfig getActiveMqConfig();
 }
