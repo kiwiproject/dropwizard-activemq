@@ -94,9 +94,8 @@ class ConsumerTest {
         config.setConsumerReceiveTimeout(Duration.milliseconds(10));  // minimize waiting in test
     }
 
-    @SuppressWarnings("unchecked")
     private static ElucidationClient<String> mockElucidationClient() {
-        return mock(ElucidationClient.class);
+        return mock();
     }
 
     @AfterEach

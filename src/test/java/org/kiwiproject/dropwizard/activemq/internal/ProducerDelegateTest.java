@@ -62,9 +62,8 @@ class ProducerDelegateTest {
         serviceName = uniqueServiceName();
     }
 
-    @SuppressWarnings("unchecked")
     private ElucidationClient<String> mockElucidationClient() {
-        return mock(ElucidationClient.class);
+        return mock();
     }
 
     @Test
