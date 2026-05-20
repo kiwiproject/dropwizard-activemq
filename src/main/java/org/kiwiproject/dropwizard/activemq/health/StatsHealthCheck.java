@@ -3,6 +3,7 @@ package org.kiwiproject.dropwizard.activemq.health;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.joining;
+import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotEmpty;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.base.KiwiStrings.f;
@@ -14,6 +15,8 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.kiwiproject.base.DefaultEnvironment;
+import org.kiwiproject.base.KiwiEnvironment;
 import org.kiwiproject.concurrent.Async;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;
@@ -27,7 +30,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
@@ -42,19 +47,33 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     private final ActiveMqHealthConfig healthConfig;
     private final List<String> ignoredDestinations;
 
-    private final AtomicLong lastUpdateTimestamp;
+    @VisibleForTesting
+    final AtomicLong lastUpdateTimestamp;
+
+    private final String simpleClassName;  // exists to allow logging the actual subclass for easier debugging
+    
     private final long healthCheckRefreshIntervalMillis;
-    private Result lastResult;
+
+    @VisibleForTesting
+    Result lastResult;
 
     @VisibleForTesting
     @Setter(AccessLevel.PACKAGE)
     private StatHelper statHelper;
+
+    @VisibleForTesting
+    KiwiEnvironment kiwiEnvironment;
 
     StatsHealthCheck(C activeMqConfigured) {
         this(activeMqConfigured, new StatHelper(activeMqConfigured.getActiveMqConfig()));
     }
 
     StatsHealthCheck(C activeMqConfigured, StatHelper statHelper) {
+        this(activeMqConfigured, statHelper, new DefaultEnvironment());
+    }
+
+    @VisibleForTesting
+    StatsHealthCheck(C activeMqConfigured, StatHelper statHelper, KiwiEnvironment kiwiEnvironment) {
         this.activeMqConfigured = requireNotNull(activeMqConfigured);
         var activeMqConfig = activeMqConfigured.getActiveMqConfig();
         this.config = requireNotNull(activeMqConfig);
@@ -65,6 +84,8 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
 
         this.lastUpdateTimestamp = new AtomicLong();
         this.healthCheckRefreshIntervalMillis = healthConfig.getRefreshInterval().toMilliseconds();
+        this.simpleClassName = getClass().getSimpleName();
+        this.kiwiEnvironment = requireNotNull(kiwiEnvironment);
     }
 
     @Override
@@ -73,18 +94,20 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
             CompletableFuture<Result> future = Async.doAsync(this::performCheck);
 
             try {
-                lastResult = future.get(10, TimeUnit.SECONDS); // TODO make this configurable?
+                lastResult = getResult(future);
                 lastUpdateTimestamp.set(System.currentTimeMillis());
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                LOG.warn("Interrupted while checking ActiveMQ statistics", e);
+                future.cancel(true);
+                kiwiEnvironment.currentThread().interrupt();
+                LOG.warn("{}: Interrupted while checking ActiveMQ statistics", simpleClassName, e);
             } catch (Exception e) {
-                LOG.error("Encountered exception checking ActiveMQ statistics", e);
+                future.cancel(true);
+                LOG.error("{}: Encountered exception checking ActiveMQ statistics", simpleClassName, e);
                 return HealthCheckResults.newUnhealthyResult("Failed to retrieve stats: %s", e.getMessage());
             }
         } else {
-            LOG.debug("Skipping stat check, refresh interval ({} seconds) not yet reached",
-                    healthCheckRefreshIntervalMillis);
+            LOG.debug("{}: Skipping stat check, refresh interval ({} seconds) not yet reached",
+                    simpleClassName, healthCheckRefreshIntervalMillis);
         }
 
         return lastResult;
@@ -93,6 +116,12 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     private boolean refreshIntervalElapsed() {
         long maxAllowedTimestampSinceLastRefresh = System.currentTimeMillis() - healthCheckRefreshIntervalMillis;
         return lastUpdateTimestamp.get() < maxAllowedTimestampSinceLastRefresh;
+    }
+
+    @VisibleForTesting
+    Result getResult(CompletableFuture<Result> future) throws InterruptedException, ExecutionException, TimeoutException {
+        var timeout = healthConfig.getStatsTimeoutMillis();
+        return future.get(timeout, TimeUnit.MILLISECONDS);
     }
 
     private Result performCheck() {
@@ -115,7 +144,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
 
         String key = null;
         try {
-            LOG.debug("Performing Stat Check for destination: {}", dest);
+            LOG.debug("{}: Performing Stat Check for destination: {}", simpleClassName, dest);
             if (nonNull(info)) {
                 key = info.getName();
                 JolokiaResponseValue result = statHelper.getStatsSingleResultOrNull(info.getName());
@@ -125,10 +154,12 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
                 }
                 resultMap.put(key, result);
             } else {
-                LOG.warn("Unable to evaluate a destination for: {} (no DestinationInfo)", dest);
+                LOG.warn("{}: Unable to evaluate a destination for: {} (no DestinationInfo, make sure this is a valid destination)",
+                        simpleClassName, dest);
+                resultMap.put(key, null);
             }
         } catch (Exception e) {
-            LOG.error("Encountered exception trying to gather stats for destination: {}", key, e);
+            LOG.error("{}: Encountered exception trying to gather stats for destination: {}", simpleClassName, key, e);
             resultMap.put(key, null);
         }
     }
@@ -244,9 +275,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     }
 
     private static String concatenateUnhealthyMessages(Map<String, Map<String, Object>> results) {
-        if (results.isEmpty()) {
-            return "";
-        }
+        checkArgumentNotEmpty(results, "results must not be empty");
 
         var messages = results.values().stream()
                 .map(StatsHealthCheck::getMessageStringOrNull)

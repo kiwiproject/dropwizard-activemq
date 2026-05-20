@@ -4,9 +4,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.awaitility.Durations.FIVE_SECONDS;
+import static org.awaitility.Durations.ONE_SECOND;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.kiwiproject.base.KiwiStrings.f;
 import static org.kiwiproject.collect.KiwiLists.first;
+import static org.kiwiproject.collect.KiwiLists.isNotNullOrEmpty;
 import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.uniqueServiceName;
 import static org.kiwiproject.test.assertj.KiwiAssertJ.assertPresentAndGet;
 import static org.kiwiproject.test.assertj.dropwizard.metrics.HealthCheckResultAssertions.assertThatHealthCheck;
@@ -38,6 +41,7 @@ import org.kiwiproject.xml.KiwiXml;
 
 import java.util.Base64;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
 import javax.jms.Connection;
@@ -109,7 +113,7 @@ class ConsumerTest {
         producer.send(textMessage);
 
         // Need a minor wait to make sure the Consumer.loop ingests the message
-        waitForSingleMessage(jmsConsumer);
+        waitForSingleMessageAndCondition(jmsConsumer, () -> isNotNullOrEmpty(jmsConsumer.consumedHistory()));
 
         assertMessageWasConsumed(jmsConsumer);
         validateActiveMqMessage(first(jmsConsumer.consumedHistory()), "JSON", SPECIFIC_TEXT_MESSAGE_TYPE);
@@ -126,7 +130,7 @@ class ConsumerTest {
         var textMessage = session.createTextMessage(JSON_HELPER.toJson(new InternalMessage()));
         producer.send(textMessage);
 
-        await().atMost(Durations.FIVE_SECONDS).until(() -> jmsConsumer.getShouldConsumeCount() > 0);
+        await().atMost(FIVE_SECONDS).until(() -> jmsConsumer.getShouldConsumeCount() > 0);
 
         assertThat(jmsConsumer.consumedHistory()).isEmpty();
         assertThat(jmsConsumer.consumedHistory(QUEUE_NAME)).isEmpty();
@@ -145,12 +149,38 @@ class ConsumerTest {
         producer.send(textMessage);
 
         // Need a minor wait to make sure the Consumer.loop ingests the message
-        waitForSingleMessage(jmsConsumer);
+        waitForSingleMessageAndCondition(jmsConsumer, () -> isNotNullOrEmpty(jmsConsumer.ignoredHistory()));
 
         assertThat(jmsConsumer.consumedHistory()).isEmpty();
         assertThat(jmsConsumer.ignoredHistory()).hasSize(1);
         assertThat(jmsConsumer.ignoredHistory(QUEUE_NAME)).hasSize(1);
         assertThat(first(jmsConsumer.ignoredHistory()).getMessageType()).contains("TEXT_MESSAGE");
+
+        assertConsumerIsHealthy();
+
+        verifyNoInteractions(elucidationClient);
+    }
+
+    @Test
+    void shouldIgnoreTextMessage_withBadJson_whenNotRequireMessageType() throws JMSException {
+        var jmsConsumer = createMockActiveMqConsumerOf(SPECIFIC_TEXT_MESSAGE_TYPE);
+        
+         // JSON has missing trailing double quote
+        var textMessage = session.createTextMessage("""
+                {
+                    "payload": "with-broken-message-not-requiring-messageType
+                }
+                """);
+
+        producer.send(textMessage);
+
+         // Need a minor wait to make sure the Consumer.loop ingests the message
+        waitForSingleMessageAndCondition(jmsConsumer, () -> isNotNullOrEmpty(jmsConsumer.ignoredHistory()));
+
+         assertThat(jmsConsumer.consumedHistory()).isEmpty();
+        assertThat(jmsConsumer.ignoredHistory()).hasSize(1);
+        assertThat(jmsConsumer.ignoredHistory(QUEUE_NAME)).hasSize(1);
+        assertThat(first(jmsConsumer.ignoredHistory()).getMessageType()).contains("UNKNOWN");
 
         assertConsumerIsHealthy();
 
@@ -171,7 +201,7 @@ class ConsumerTest {
         producer.send(textMessage);
 
         // Need a minor wait to make sure the Consumer.loop ingests the message
-        waitForSingleMessage(jmsConsumer);
+        waitForSingleMessageAndCondition(jmsConsumer, () -> consumer.getErrors().get() > 0);
 
         assertThat(consumer.getErrors()).hasValue(1);
         assertThat(jmsConsumer.consumedHistory()).isEmpty();
@@ -195,7 +225,7 @@ class ConsumerTest {
         producer.send(textMessage);
 
         // Need a minor wait to make sure the Consumer.loop ingests the message
-        waitForSingleMessage(jmsConsumer);
+        waitForSingleMessageAndCondition(jmsConsumer, () -> isNotNullOrEmpty(jmsConsumer.ignoredHistory()));
 
         assertThat(jmsConsumer.consumedHistory()).isEmpty();
         assertThat(jmsConsumer.ignoredHistory()).hasSize(1);
@@ -220,9 +250,7 @@ class ConsumerTest {
         producer.send(textMessage);
 
         // Need a minor wait to make sure the Consumer.loop ingests the message
-        waitForSingleMessage(jmsConsumer);
-
-        await().atMost(Durations.ONE_SECOND).until(() -> consumer.getErrors().get() > 0);
+        waitForSingleMessageAndCondition(jmsConsumer, () -> consumer.getErrors().get() > 0);
 
         assertThat(consumer.getErrors()).hasValue(1);
         assertThat(jmsConsumer.consumedHistory()).isEmpty();
@@ -241,7 +269,7 @@ class ConsumerTest {
         producer.send(textMessage);
 
         // Need a minor wait to make sure the Consumer.loop ingests the message
-        waitForSingleMessage(jmsConsumer);
+        waitForSingleMessageAndCondition(jmsConsumer, () -> isNotNullOrEmpty(jmsConsumer.consumedHistory()));
 
         assertMessageWasConsumed(jmsConsumer);
         validateActiveMqMessage(first(jmsConsumer.consumedHistory()), "TEXT", GENERIC_TEXT_MESSAGE_TYPE);
@@ -261,7 +289,7 @@ class ConsumerTest {
         producer.send(bytesMessage);
 
         // Need a minor wait to make sure the Consumer.loop ingests the message
-        waitForSingleMessage(jmsConsumer);
+        waitForSingleMessageAndCondition(jmsConsumer, () -> isNotNullOrEmpty(jmsConsumer.consumedHistory()));
 
         assertMessageWasConsumed(jmsConsumer);
         validateActiveMqMessage(first(jmsConsumer.consumedHistory()), "BYTES", BYTES_MESSAGE_TYPE);
@@ -283,7 +311,7 @@ class ConsumerTest {
         producer.send(textMessage);
 
         // Need a minor wait to make sure the Consumer.loop ingests the message
-        waitForSingleMessage(jmsConsumer);
+        waitForSingleMessageAndCondition(jmsConsumer, () -> isNotNullOrEmpty(jmsConsumer.ignoredHistory()));
 
         assertThat(jmsConsumer.consumedHistory()).isEmpty();
         assertThat(jmsConsumer.ignoredHistory()).hasSize(1);
@@ -378,8 +406,16 @@ class ConsumerTest {
         consumer.start();
     }
 
-    private void waitForSingleMessage(MockActiveMqConsumer jmsConsumer) {
-        await().atMost(Durations.FIVE_SECONDS).until(() -> jmsConsumer.getReceivedCount() >= 1);
+    private void waitForSingleMessageAndCondition(MockActiveMqConsumer jmsConsumer, Callable<Boolean> additionalCondition) {
+        await().atMost(FIVE_SECONDS)
+                .alias("received count")
+                .until(() -> jmsConsumer.getReceivedCount() >= 1);
+        
+        if (nonNull(additionalCondition)) {
+            await().atMost(ONE_SECOND)
+                    .alias("additional condition")
+                    .until(additionalCondition);
+        }        
     }
 
     private void assertMessageWasConsumed(MockActiveMqConsumer jmsConsumer) {
@@ -482,4 +518,5 @@ class ConsumerTest {
         final String payload = PAYLOAD;
         final String messageType = SPECIFIC_TEXT_MESSAGE_TYPE;
     }
+
 }
