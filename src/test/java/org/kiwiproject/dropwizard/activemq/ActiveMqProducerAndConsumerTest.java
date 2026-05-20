@@ -28,17 +28,18 @@ import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import io.dropwizard.core.setup.Environment;
 import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.internal.Consumer;
 import org.kiwiproject.dropwizard.activemq.internal.ProducerDelegate;
+import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqExtension;
 import org.kiwiproject.dropwizard.activemq.test.mock.MockActiveMqConsumer;
 import org.kiwiproject.jersey.client.RegistryAwareClient;
 import org.kiwiproject.test.dropwizard.mockito.DropwizardMockitoMocks;
@@ -51,6 +52,9 @@ import javax.jms.Session;
 
 @DisplayName("ActiveMqProducerAndConsumer")
 class ActiveMqProducerAndConsumerTest {
+
+    @RegisterExtension
+    final EmbeddedActiveMqExtension broker = new EmbeddedActiveMqExtension();
 
     private TestAppConfig appConfig;
     private ActiveMqConfig activeMqConfig;
@@ -84,13 +88,7 @@ class ActiveMqProducerAndConsumerTest {
 
         registryAwareClient = mock(RegistryAwareClient.class);
 
-        // TODO Use the EmbeddedActiveMqExtension here instead of this custom code?
-        //  Need extension to support using pooled factory?
-        //  Could add newPooledConnectionFactory method in the extension.
-        //  Maybe a second extension that uses a broker URL with option to use pooled factory?
-
-        var amqFactory = buildActiveMQConnectionFactory();
-        var pooledFactory = new ActiveMqHelper().newPooledConnectionFactory(amqFactory);
+        var pooledFactory = broker.newPooledConnectionFactory();
 
         connection = pooledFactory.createConnection();
         connection.start();
@@ -100,17 +98,6 @@ class ActiveMqProducerAndConsumerTest {
         activeMqHelper = mock(ActiveMqHelper.class);
         when(activeMqHelper.newPooledConnectionFactory(any(ActiveMqConfig.class)))
                 .thenReturn(pooledFactory);
-    }
-
-    private static ActiveMQConnectionFactory buildActiveMQConnectionFactory() {
-        var brokerUrl = "vm://embedded?" +
-                "broker.brokerName=test-broker" +
-                "&broker.persistent=false" +
-                "&broker.useJmx=false" +
-                "&broker.useShutdownHook=false" +
-                "&broker.enableStatistics=false";
-
-        return new ActiveMQConnectionFactory(brokerUrl);
     }
 
     @AfterEach
