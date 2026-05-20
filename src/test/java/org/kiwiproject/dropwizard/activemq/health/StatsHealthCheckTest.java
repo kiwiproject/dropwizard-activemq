@@ -26,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kiwiproject.base.KiwiEnvironment;
+import org.kiwiproject.collect.KiwiMaps;
 import org.kiwiproject.dropwizard.activemq.TestAppConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqHealthConfig;
@@ -96,7 +97,6 @@ class StatsHealthCheckTest {
         assertHealthyHealthCheck(new ConsumerStatsHealthCheck<>(appConfig, statHelper));
     }
 
-    @SuppressWarnings("unchecked")
     private void assertHealthyHealthCheck(StatsHealthCheck<TestAppConfig> healthCheck) {
         configureMockResponse();
 
@@ -128,7 +128,7 @@ class StatsHealthCheckTest {
 
                 () -> assertThat(MapUtils.getMap(details, "unhealthyResults")).isEmpty(),
 
-                () -> assertThat((List<String>) details.get("ignoredDestinations")).isEmpty()
+                () -> assertThat(KiwiMaps.getTypedListOrEmpty(details, "ignoredDestinations", String.class)).isEmpty()
         );
     }
 
@@ -160,7 +160,6 @@ class StatsHealthCheckTest {
         assertUnhealthyHealthCheck(new ConsumerStatsHealthCheck<>(appConfig, statHelper));
     }
 
-    @SuppressWarnings("unchecked")
     private void assertUnhealthyHealthCheck(StatsHealthCheck<TestAppConfig> healthCheck) {
         configureMockResponse();
 
@@ -192,7 +191,7 @@ class StatsHealthCheckTest {
                             "test - Pending messages: 3 (threshold: 1), Active consumers: 2 (threshold: 3)");
                 },
 
-                () -> assertThat((List<String>) details.get("ignoredDestinations")).isEmpty()
+                () -> assertThat(KiwiMaps.getTypedListOrEmpty(details, "ignoredDestinations", String.class)).isEmpty()
         );
     }
 
@@ -327,14 +326,12 @@ class StatsHealthCheckTest {
         Map<String, Object> details = result.getDetails();
         assertThat(details).hasSize(3);
 
-        @SuppressWarnings("unchecked")
-        var unhealthyResults = (Map<String, Object>) MapUtils.getMap(details, "unhealthyResults");
+        var unhealthyResults = KiwiMaps.getTypedMapOrEmpty(details, "unhealthyResults", String.class, Object.class); 
 
         var expectedKey = f("Consumer.{}.VirtualTopic.{}", appConfig.getServiceName(), topicName);
         assertThat(unhealthyResults).hasSize(1).containsKey(expectedKey);
 
-        @SuppressWarnings("unchecked")
-        var virtualTopicDetail = (Map<String, Object>) MapUtils.getMap(unhealthyResults, expectedKey);
+        var virtualTopicDetail = KiwiMaps.getTypedMapOrEmpty(unhealthyResults, expectedKey, String.class, Object.class);
 
         assertThat(virtualTopicDetail)
                 .containsEntry("message", f("Unable to retrieve stats for: {}", expectedKey))
