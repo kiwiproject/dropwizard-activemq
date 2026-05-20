@@ -3,8 +3,8 @@ package org.kiwiproject.dropwizard.activemq.health;
 import static java.util.Objects.isNull;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
-import static org.kiwiproject.metrics.health.HealthCheckResults.newHealthyResult;
-import static org.kiwiproject.metrics.health.HealthCheckResults.newUnhealthyResult;
+import static org.kiwiproject.metrics.health.HealthCheckResults.newHealthyResultBuilder;
+import static org.kiwiproject.metrics.health.HealthCheckResults.newUnhealthyResultBuilder;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.google.common.annotations.VisibleForTesting;
@@ -21,7 +21,7 @@ import org.kiwiproject.jaxrs.exception.JaxrsNotFoundException;
  * You must explicitly register this health check, which gives you control over which service
  * will report on an unhealthy DLQ.
  * <p>
- * Note that you can also change the name of the DLQ if you are nor using the ActiveMQ
+ * Note that you can also change the name of the DLQ if you are not using the ActiveMQ
  * default name. This can be done in
  * {@link org.kiwiproject.dropwizard.activemq.config.ActiveMqHealthConfig ActiveMqHealthConfig}
  * by setting the {@code dlqName} property.
@@ -59,22 +59,38 @@ public class DeadLetterQueueHealthCheck extends HealthCheck {
             LOG.trace("Got a JaxrsNotFoundException trying to find the DLQ using getStatsSingleResultOrNull."
                     + " We will assume it does not exist, which is OK (b/c it means there are no messages in the DLQ)");
 
-            return newHealthyResult("Dead-letter queue does not exist");
+            return buildHealthyResult("Dead-letter queue does not exist");
         }
 
         if (isNull(result)) {
-            return newHealthyResult("No stats available for DLQ");
+            return buildHealthyResult("No stats available for DLQ");
         }
 
         var queueSize = result.getQueueSize();
         if (isNull(queueSize)) {
-            return newUnhealthyResult("No QueueSize in response from ActiveMQ");
+            return buildUnhealthyResult("No QueueSize in response from ActiveMQ");
         }
 
         if (queueSize > 0) {
-            return newUnhealthyResult("Dead-letter queue contains messages. Current count: " + queueSize);
+            return buildUnhealthyResult("Dead-letter queue contains messages. Current count: " + queueSize);
         }
 
-        return newHealthyResult("Dead-letter queue is empty");
+        return buildHealthyResult("Dead-letter queue is empty");
+    }
+
+    private Result buildHealthyResult(String message) {
+        return buildResult(true, message);
+    }
+
+    private Result buildUnhealthyResult(String message) {
+        return buildResult(false, message);
+    }
+
+    private Result buildResult(boolean healthy, String message) {
+        var builder = healthy ? newHealthyResultBuilder() : newUnhealthyResultBuilder();
+        return builder
+                .withMessage(message)
+                .withDetail("dlqName", dlqName)
+                .build();
     }
 }

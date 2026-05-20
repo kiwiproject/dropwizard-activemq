@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
+import org.kiwiproject.dropwizard.activemq.config.ActiveMqHealthConfig;
 import org.kiwiproject.jaxrs.exception.JaxrsNotFoundException;
 
 @DisplayName("DeadLetterQueueHealthCheck")
@@ -54,7 +55,8 @@ class DeadLetterQueueHealthCheckTest {
 
             assertThatHealthCheck(healthCheck)
                     .isHealthy()
-                    .hasMessage("No stats available for DLQ");
+                    .hasMessage("No stats available for DLQ")
+                    .hasDetail("dlqName", ActiveMqHealthConfig.DEFAULT_DLQ_NAME);
 
             verifyGetStatsMethodCall();
         }
@@ -65,7 +67,8 @@ class DeadLetterQueueHealthCheckTest {
 
             assertThatHealthCheck(healthCheck)
                     .isHealthy()
-                    .hasMessage("Dead-letter queue is empty");
+                    .hasMessage("Dead-letter queue is empty")
+                    .hasDetail("dlqName", ActiveMqHealthConfig.DEFAULT_DLQ_NAME);
 
             verifyGetStatsMethodCall();
         }
@@ -77,7 +80,8 @@ class DeadLetterQueueHealthCheckTest {
 
             assertThatHealthCheck(healthCheck)
                     .isHealthy()
-                    .hasMessage("Dead-letter queue does not exist");
+                    .hasMessage("Dead-letter queue does not exist")
+                    .hasDetail("dlqName", ActiveMqHealthConfig.DEFAULT_DLQ_NAME);
 
             verifyGetStatsMethodCall();
         }
@@ -92,7 +96,8 @@ class DeadLetterQueueHealthCheckTest {
 
             assertThatHealthCheck(healthCheck)
                     .isUnhealthy()
-                    .hasMessage("No QueueSize in response from ActiveMQ");
+                    .hasMessage("No QueueSize in response from ActiveMQ")
+                    .hasDetail("dlqName", ActiveMqHealthConfig.DEFAULT_DLQ_NAME);
 
             verifyGetStatsMethodCall();
         }
@@ -104,9 +109,33 @@ class DeadLetterQueueHealthCheckTest {
 
             assertThatHealthCheck(healthCheck)
                     .isUnhealthy()
-                    .hasMessage("Dead-letter queue contains messages. Current count: {}", queueSize);
+                    .hasMessage("Dead-letter queue contains messages. Current count: {}", queueSize)
+                    .hasDetail("dlqName", ActiveMqHealthConfig.DEFAULT_DLQ_NAME);
 
             verifyGetStatsMethodCall();
+        }
+    }
+
+    @Nested
+    class CustomDlqName {
+
+        private static final String CUSTOM_DLQ_NAME = "ActiveMQ.DLQ.myqueue";
+
+        @BeforeEach
+        void setUp() {
+            config.getHealthConfig().setDlqName(CUSTOM_DLQ_NAME);
+            healthCheck = new DeadLetterQueueHealthCheck(config, statHelper);
+        }
+
+        @Test
+        void shouldUseCustomDlqName_InHealthCheckResult() {
+            when(statHelper.getStatsSingleResultOrNull(anyString())).thenReturn(null);
+
+            assertThatHealthCheck(healthCheck)
+                    .isHealthy()
+                    .hasDetail("dlqName", CUSTOM_DLQ_NAME);
+
+            verify(statHelper).getStatsSingleResultOrNull(CUSTOM_DLQ_NAME);
         }
     }
 
