@@ -436,14 +436,7 @@ class ConsumerTest {
         String messageType = assertPresentAndGet(messageTypeOptional);
         assertThat(messageType).isEqualTo(expectedMessageType);
 
-        // TODO Why does the following switch expression blow up with a "Bad operand in call stack" in Gitpod when using 'var' ???
-        //  It works fine using Maven at the command line, only fails when using RedHat Java language support plugin to compile.
-        //  It also works fine in Gitpod when declaring the type explicitly as String.
-        //  I found this: https://github.com/eclipse-jdt/eclipse.jdt.core/issues/2476
-        //  and this: https://stackoverflow.com/questions/69197046/jdk-17-switch-statement-causes-java-lang-verifyerror-bad-type-on-operand-stack
-        //  So, it seems to be a problem with the Eclipse compiler.
-
-        String payload = switch (messageType) {
+        var payload = switch (messageType) {
             case SPECIFIC_TEXT_MESSAGE_TYPE -> JSON_HELPER.getPath(body, "payload", String.class);
             case GENERIC_TEXT_MESSAGE_TYPE -> KiwiXml.toObject(body, InternalMessage.class).getPayload();
             case BYTES_MESSAGE_TYPE -> new String(Base64.getDecoder().decode(body), UTF_8);
