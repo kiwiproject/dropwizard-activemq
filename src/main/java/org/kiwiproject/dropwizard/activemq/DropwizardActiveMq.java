@@ -191,7 +191,8 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
                 destination,
                 consumerDelegate,
                 ElucidationClient.of(eventRecorder, consumingTextMessageEventFactory),
-                configuration.getServiceName()
+                configuration.getServiceName(),
+                configuration.getActiveMqConfig()
         );
 
         addConsumer(destination);

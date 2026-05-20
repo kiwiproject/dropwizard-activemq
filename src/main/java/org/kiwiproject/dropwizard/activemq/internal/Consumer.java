@@ -3,6 +3,7 @@ package org.kiwiproject.dropwizard.activemq.internal;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.base.KiwiStrings.f;
@@ -33,6 +34,7 @@ import org.kiwiproject.base.UUIDs;
 import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer;
 import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer.Result;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
+import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageException;
 import org.kiwiproject.dropwizard.activemq.util.Utils;
 import org.kiwiproject.elucidation.client.ElucidationClient;
@@ -71,6 +73,7 @@ public class Consumer implements Managed, Runnable {
 
     private final String destination;
     private final ActiveMqConsumer delegateConsumer;
+    private final long receiveTimeoutMillis;
     private final ConnectionFactory factory;
     private final ElucidationClient<String> elucidation;
     private final String serviceName;
@@ -90,13 +93,17 @@ public class Consumer implements Managed, Runnable {
                     String destination,
                     ActiveMqConsumer delegateConsumer,
                     ElucidationClient<String> elucidation,
-                    String serviceName) {
+                    String serviceName,
+                    ActiveMqConfig configuration) {
 
         this.factory = requireNotNull(factory);
         this.destination = requireNotBlank(destination);
         this.delegateConsumer = requireNotNull(delegateConsumer);
         this.elucidation = requireNotNull(elucidation);
         this.serviceName = requireNotBlank(serviceName);
+        
+        checkArgumentNotNull(configuration);
+        this.receiveTimeoutMillis = configuration.getConsumerReceiveTimeout().toMilliseconds();
 
         threadName = "DelegateConsumer[" + destination + "]";
         thread = new Thread(this, threadName);
@@ -154,7 +161,7 @@ public class Consumer implements Managed, Runnable {
             LOG.trace("Wait to receive next message...");
 
             try {
-                var message = consumer.receive(400);  // TODO Make configurable and/or extract constant?
+                var message = consumer.receive(receiveTimeoutMillis);
                 LOG.trace("Received a message or 'receive' timed out; reset errors to zero");
                 errors.set(0);
 

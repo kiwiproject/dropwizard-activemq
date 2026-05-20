@@ -3,6 +3,7 @@ package org.kiwiproject.dropwizard.activemq.config;
 import static java.util.Objects.isNull;
 
 import io.dropwizard.util.Duration;
+import io.dropwizard.validation.MinDuration;
 import io.dropwizard.validation.ValidationMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import org.kiwiproject.validation.KiwiValidations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter
@@ -65,6 +67,15 @@ public class ActiveMqConfig {
      * List of consumer destinations, e.g., topics, queues.
      */
     private List<String> consumers = new ArrayList<>();
+
+    /**
+     * The maximum duration a consumer will wait for the next message.
+     * 
+     * @see javax.jms.MessageConsumer#receive(long)
+     */
+    @NotNull
+    @MinDuration(value = 10, unit = TimeUnit.MILLISECONDS)
+    private Duration consumerReceiveTimeout = Duration.milliseconds(400);
 
     /**
      * List of producer destinations, e.g., topics, queues.
