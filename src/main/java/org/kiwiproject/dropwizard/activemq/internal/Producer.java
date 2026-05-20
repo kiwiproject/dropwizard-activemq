@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageHeaderException;
+import org.kiwiproject.dropwizard.activemq.exception.ActiveMqProducerException;
 import org.kiwiproject.dropwizard.activemq.util.Utils;
 import org.kiwiproject.dropwizard.activemq.util.Utils.FunctionThrowsException;
 
@@ -160,8 +161,7 @@ public class Producer {
             provider.getMessageProducer().send(message);
         } catch (Exception e) {
             LOG.error("Error sending message via JMS to {}", destination, e);
-            // TODO Should this throw an exception? It never did (and it's been like this since 2016...)
-            //  At the least, it should have a "handler" that can be configured. The default one can just log
+            throw new ActiveMqProducerException("Error sending message via JMS to " + destination, e);
         }
     }
 
