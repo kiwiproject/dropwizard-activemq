@@ -2,6 +2,7 @@ package org.kiwiproject.dropwizard.activemq.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.kiwiproject.base.UUIDs.randomUUIDString;
 import static org.kiwiproject.dropwizard.activemq.ActiveMqMessage.JMS_X_GROUP_ID;
 import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.uniqueServiceName;
@@ -10,6 +11,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -23,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
+import org.kiwiproject.dropwizard.activemq.exception.ActiveMqProducerException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.verification.VerificationMode;
 
@@ -225,6 +228,20 @@ class ProducerTest {
 
         verifyJmsResourcesWereCreatedAndClosed();
         verifyNoMoreInteractions(message);
+    }
+
+    @Test
+    void shouldThrow_WhenSendFails() throws JMSException {
+        var producer = newConfiguredProducer();
+        var message = mock(TextMessage.class);
+        when(session.createTextMessage(anyString())).thenReturn(message);
+        doThrow(new JMSException("send failed")).when(jmsProducer).send(any());
+
+        assertThatThrownBy(() -> producer.produce(PAYLOAD))
+                .isInstanceOf(ActiveMqProducerException.class)
+                .hasMessageContaining(QUEUE);
+
+        verify(jmsProducer).send(any());
     }
 
     private Producer newConfiguredProducer() {
