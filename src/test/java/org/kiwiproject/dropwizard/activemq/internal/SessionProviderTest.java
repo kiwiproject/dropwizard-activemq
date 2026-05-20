@@ -15,7 +15,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier.ActorType;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -88,11 +89,11 @@ class SessionProviderTest {
     class NewDestination {
 
         @ParameterizedTest
-        @ValueSource(booleans = { true, false })
-        void shouldCreateFixedTopicDestination(boolean isProducer) throws JMSException {
+        @EnumSource(value = ActorType.class)
+        void shouldCreateFixedTopicDestination(ActorType actorType) throws JMSException {
             var name = "fixedtopic:test";
 
-            var session = checkSessionDestination(name, isProducer);
+            var session = checkSessionDestination(name, actorType);
 
             verify(session, only()).createTopic("test");
         }
@@ -101,7 +102,7 @@ class SessionProviderTest {
         void shouldCreateQueueDestination_ForVirtualTopicConsumer() throws JMSException {
             var name = "topic:test";
 
-            var session = checkSessionDestination(name, false, "my-service");
+            var session = checkSessionDestination(name, ActorType.CONSUMER, "my-service");
 
             verify(session, only()).createQueue("Consumer.my-service.VirtualTopic.test");
         }
@@ -110,17 +111,17 @@ class SessionProviderTest {
         void shouldCreateTopicDestination_ForVirtualTopicProducer() throws JMSException {
             var name = "topic:test";
 
-            var session = checkSessionDestination(name, true, "my-service");
+            var session = checkSessionDestination(name, ActorType.PRODUCER, "my-service");
 
             verify(session, only()).createTopic("VirtualTopic.test");
         }
 
         @ParameterizedTest
-        @ValueSource(booleans = { true, false })
-        void shouldCreateQueueDestination(boolean isProducer) throws JMSException {
+        @EnumSource(value = ActorType.class)
+        void shouldCreateQueueDestination(ActorType actorType) throws JMSException {
             var name = "queue:test";
 
-            var session = checkSessionDestination(name, isProducer);
+            var session = checkSessionDestination(name, actorType);
 
             verify(session, only()).createQueue("test");
         }
@@ -129,7 +130,7 @@ class SessionProviderTest {
         void shouldCreateDynamicDestinations() throws JMSException {
             var name = "*:queue://queueA,topic:topicB";
 
-            var session = checkSessionDestination(name, true);
+            var session = checkSessionDestination(name, ActorType.PRODUCER);
 
             verify(session, only()).createTopic("queue://queueA,topic:topicB");
         }
@@ -138,18 +139,18 @@ class SessionProviderTest {
         void shouldCreateQueueDestination_WhenGivenInvalidPrefix() throws JMSException {
             var name = "test";
 
-            var session = checkSessionDestination(name, true);
+            var session = checkSessionDestination(name, ActorType.PRODUCER);
 
             verify(session, only()).createQueue("test");
         }
 
-        private Session checkSessionDestination(String destination, boolean isProducer) throws JMSException {
-            return checkSessionDestination(destination, isProducer, serviceName);
+        private Session checkSessionDestination(String destination, ActorType actorType) throws JMSException {
+            return checkSessionDestination(destination, actorType, serviceName);
         }
 
         @SuppressWarnings("resource")
         private Session checkSessionDestination(String destination,
-                                                boolean isProducer,
+                                                ActorType actorType,
                                                 String serviceName) throws JMSException {
 
             var connection = mock(Connection.class);
@@ -159,7 +160,7 @@ class SessionProviderTest {
             when(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).thenReturn(session);
 
             var provider = new SessionProvider(factory, serviceName);
-            provider.newDestination(destination, session, isProducer);
+            provider.newDestination(destination, session, actorType);
 
             return session;
         }

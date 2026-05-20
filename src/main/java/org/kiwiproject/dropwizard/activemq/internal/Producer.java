@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageHeaderException;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqProducerException;
+import org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier.ActorType;
 import org.kiwiproject.dropwizard.activemq.util.Utils;
 import org.kiwiproject.dropwizard.activemq.util.Utils.FunctionThrowsException;
 
@@ -178,7 +179,7 @@ public class Producer {
             super(factory, serviceName);
 
             try {
-                messageProducer = session.createProducer(newDestination(destination, session, true));
+                messageProducer = session.createProducer(newDestination(destination, session, ActorType.PRODUCER));
 
                 if (nonNull(timeToLive)) {
                     var timeToLiveMillis = timeToLive.toMillis();

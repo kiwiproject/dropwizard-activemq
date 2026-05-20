@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.internal;
 
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotBlank;
+import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.base.KiwiStrings.f;
@@ -36,6 +37,14 @@ public class DestinationIdentifier {
      */
     static final String DYNAMIC_PREFIX = "*:";
 
+    public enum ActorType {
+        PRODUCER, CONSUMER;
+
+        public boolean isProducer() {
+            return this == PRODUCER;
+        }
+    }
+
     public enum DestinationType {
         QUEUE, TOPIC
     }
@@ -43,18 +52,16 @@ public class DestinationIdentifier {
     /**
      * Evaluate a destination name and return a {@link DestinationInfo}.
      * <p>
-     * Note that {@code isProducer} and {@code serviceName} are only used for virtual topics (the name
+     * Note that {@code actorType} and {@code serviceName} are only used for virtual topics (the name
      * starts with {@code "topic:"}). The {@code serviceName} is only required in that case.
-     *
      * @param name        the destination name to evaluate
-     * @param isProducer  true, if the evaluation should be performed from a Producer's perspective, otherwise the
-     *                    evaluation is performed from a Consumer's perspective
+     * @param actorType   whether this is a producer or consumer; determines if the evaluation should be performed
+     *                    from a Producer's perspective, otherwise the evaluation is performed from a Consumer's perspective
      * @param serviceName the service/application name
+     *
      * @return an Optional that may contain a DestinationInfo
      */
-    public static Optional<DestinationInfo> evaluateDestinationName(String name, boolean isProducer, String serviceName) {
-        // TODO Consider replacing boolean isProducer with ActorType enum (CONSUMER, PRODUCER)or similarly named enum
-
+    public static Optional<DestinationInfo> evaluateDestinationName(String name, ActorType actorType, String serviceName) {
         checkArgumentNotBlank(name, "destination name must not be blank");
 
         if (name.startsWith(FIXED_TOPIC_PREFIX)) {  // normal JMS topic
@@ -62,13 +69,16 @@ public class DestinationIdentifier {
             return Optional.of(new DestinationInfo(DestinationType.TOPIC, trimmedName));
         }
 
+        var isProducer = actorType.isProducer(); 
+        
         if (name.startsWith(TOPIC_PREFIX)) {  // this is an ActiveMQ virtual topic
+            checkArgumentNotNull(actorType, "actorType must not be null");
             checkArgumentNotBlank(serviceName, "serviceName must not be blank for virtual topics ('topic:' prefix)");
 
             // Producers produce to VirtualTopic.<name> while consumers
             // consume from a queue named Consumer.<serviceName>.VirtualTopic.<name>
 
-            var trimmedName = trimPrefix(name, TOPIC_PREFIX);
+            var trimmedName = trimPrefix(name, TOPIC_PREFIX);            
             var dest = isProducer ?
                     new DestinationInfo(DestinationType.TOPIC, f("VirtualTopic.{}", trimmedName)) :
                     new DestinationInfo(DestinationType.QUEUE, f("Consumer.{}.VirtualTopic.{}", serviceName, trimmedName));

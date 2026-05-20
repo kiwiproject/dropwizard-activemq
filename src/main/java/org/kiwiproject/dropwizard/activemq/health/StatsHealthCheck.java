@@ -22,6 +22,7 @@ import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqHealthConfig;
 import org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier;
+import org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier.ActorType;
 import org.kiwiproject.metrics.health.HealthCheckResults;
 
 import java.util.HashMap;
@@ -140,8 +141,10 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     }
 
     private void checkStatsForDestination(Map<String, JolokiaResponseValue> resultMap, String dest) {
+        var actorType = isProducer() ? ActorType.PRODUCER : ActorType.CONSUMER;
         DestinationIdentifier.DestinationInfo info = DestinationIdentifier
-                .evaluateDestinationName(dest, isProducer(), serviceName).orElse(null);
+                .evaluateDestinationName(dest, actorType, serviceName)
+                .orElse(null);
 
         String key = null;
         try {

@@ -11,18 +11,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier.ActorType;
 import org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier.DestinationType;
 
 @DisplayName("DestinationIdentifier")
 class DestinationIdentifierTest {
-
-    enum ActorType {
-        PRODUCER, CONSUMER;
-
-        boolean isProducer() {
-            return this == PRODUCER;
-        }
-    }
 
     @Nested
     class EvaluateDestinationName {
@@ -35,7 +28,7 @@ class DestinationIdentifierTest {
                 """)
         void shouldThrowIllegalArgument_WhenMissingRequiredArguments(String name, String serviceName) {
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> evaluateDestinationName(name, true, serviceName));
+                    .isThrownBy(() -> evaluateDestinationName(name, ActorType.PRODUCER, serviceName));
         }
 
         @ParameterizedTest
@@ -49,7 +42,7 @@ class DestinationIdentifierTest {
                                               ActorType actorType,
                                               String serviceName,
                                               String expectedName) {
-            var destinationInfo = evaluateDestinationName(name, actorType.isProducer(), serviceName)
+            var destinationInfo = evaluateDestinationName(name, actorType, serviceName)
                     .orElseThrow();
 
             assertAll(
@@ -69,7 +62,7 @@ class DestinationIdentifierTest {
                                                      ActorType actorType,
                                                      String serviceName) {
 
-            var destinationInfo = evaluateDestinationName(name, actorType.isProducer(), serviceName)
+            var destinationInfo = evaluateDestinationName(name, actorType, serviceName)
                     .orElseThrow();
 
             var bareTopicName = Strings.CS.removeStart(name, "topic:");
@@ -96,7 +89,7 @@ class DestinationIdentifierTest {
                                               ActorType actorType,
                                               String serviceName,
                                               String expectedName) {
-            var destinationInfo = evaluateDestinationName(name, actorType.isProducer(), serviceName)
+            var destinationInfo = evaluateDestinationName(name, actorType, serviceName)
                     .orElseThrow();
 
             assertAll(
@@ -113,7 +106,7 @@ class DestinationIdentifierTest {
                 '*:topic1,queue://queue1,topic2,topic3,queue://queue2', PRODUCER, test-service
                 """)
         void shouldReturnDynamicDestinationInfo(String name, ActorType actorType, String serviceName) {
-            var destinationInfo = evaluateDestinationName(name, actorType.isProducer(), serviceName)
+            var destinationInfo = evaluateDestinationName(name, actorType, serviceName)
                     .orElseThrow();
 
             var bareName = Strings.CS.removeStart(name, "*:");
@@ -132,7 +125,7 @@ class DestinationIdentifierTest {
                 foo:shipping, PRODUCER, shipping-service, shipping
                 """)
         void shouldReturnEmptyOptional_WhenUnknown(String name, ActorType actorType, String serviceName) {
-            assertThat(evaluateDestinationName(name, actorType.isProducer(), serviceName))
+            assertThat(evaluateDestinationName(name, actorType, serviceName))
                     .isEmpty();
         }
     }
