@@ -1,5 +1,6 @@
 package org.kiwiproject.dropwizard.activemq.internal;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
@@ -159,12 +160,17 @@ public class BrokerHealthCheck extends HealthCheck {
 
             var payload = (TextMessage) consumer.receive(receiveTimeoutMillis);
 
-            // TODO Consider separating the payload null check from message equality check, with different return value
-            if (nonNull(payload) && messageText.equals(payload.getText())) {
-                return newHealthyResult("This health check can produce to and consume from JMS broker: " + brokerUrl);
+            if (isNull(payload)) {
+                return newUnhealthyResult(
+                        "This health check did not receive a message from JMS broker within the timeout: " + brokerUrl);
             }
 
-            return newUnhealthyResult("This health check CANNOT produce to or consume from JMS broker: " + brokerUrl);
+            if (!messageText.equals(payload.getText())) {
+                return newUnhealthyResult(
+                        "This health check received an unexpected message from JMS broker: " + brokerUrl);
+            }
+
+            return newHealthyResult("This health check can produce to and consume from JMS broker: " + brokerUrl);
         }
     }
 
