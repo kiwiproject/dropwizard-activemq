@@ -5,6 +5,7 @@ import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier.ActorType;
 import org.kiwiproject.dropwizard.activemq.util.Utils;
 
 import java.util.Optional;
@@ -45,9 +46,9 @@ class SessionProvider implements AutoCloseable {
         Utils.silentlyRun(session::close, connection::close);
     }
 
-    Destination newDestination(String name, Session session, boolean isProducer) throws JMSException {
+    Destination newDestination(String name, Session session, ActorType actorType) throws JMSException {
         Optional<DestinationIdentifier.DestinationInfo> info =
-                DestinationIdentifier.evaluateDestinationName(name, isProducer, serviceName);
+                DestinationIdentifier.evaluateDestinationName(name, actorType, serviceName);
 
         // Using conditional here because of the checked JMSException, which can't be
         // thrown inside a lambda. This avoids wrapping and unwrapping checked exceptions.
@@ -58,7 +59,7 @@ class SessionProvider implements AutoCloseable {
 
         LOG.error("Unexpected JMS configuration. Returning a Queue (which probably is not correct)." +
                         " A {} destination should start with '{}', '{}', '{}', or '{}' but was: '{}'",
-                isProducer ? "producer" : "consumer",
+                actorType.isProducer() ? "producer" : "consumer",
                 DestinationIdentifier.FIXED_TOPIC_PREFIX,
                 DestinationIdentifier.TOPIC_PREFIX,
                 DestinationIdentifier.QUEUE_PREFIX,

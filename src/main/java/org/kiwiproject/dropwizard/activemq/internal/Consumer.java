@@ -36,6 +36,7 @@ import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer.Result;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageException;
+import org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier.ActorType;
 import org.kiwiproject.dropwizard.activemq.util.Utils;
 import org.kiwiproject.elucidation.client.ElucidationClient;
 import org.kiwiproject.metrics.health.HealthStatus;
@@ -396,7 +397,7 @@ public class Consumer implements Managed, Runnable {
             super(factory, serviceName);
 
             try {
-                consumer = session.createConsumer(newDestination(destination, session, false));
+                consumer = session.createConsumer(newDestination(destination, session, ActorType.CONSUMER));
             } catch (JMSException e) {
                 LOG.warn("Caught JMSException: errorCode={}, message={} (enable DEBUG for stack traces)",
                         e.getErrorCode(), e.getMessage());
