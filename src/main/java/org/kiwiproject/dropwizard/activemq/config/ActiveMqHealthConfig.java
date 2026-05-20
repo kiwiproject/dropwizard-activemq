@@ -17,6 +17,11 @@ import java.util.List;
 public class ActiveMqHealthConfig {
 
     /**
+     * The default name of the ActiveMQ DLQ.
+     */
+    public static final String DEFAULT_DLQ_NAME = "ActiveMQ.DLQ";
+
+    /**
      * Username that Jolokia will use making HTTP requests using Basic Authentication.
      */
     @NotBlank
@@ -42,4 +47,10 @@ public class ActiveMqHealthConfig {
 
     @NotNull
     private Duration statsTimeout = Duration.seconds(10);
+
+    /**
+     * The name of the dead-letter queue. Defaults to {@code "ActiveMQ.DLQ"}.
+     */
+    @NotBlank
+    private String dlqName = DEFAULT_DLQ_NAME;
 }
