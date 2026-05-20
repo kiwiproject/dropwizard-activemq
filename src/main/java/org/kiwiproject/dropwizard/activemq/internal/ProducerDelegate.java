@@ -83,8 +83,7 @@ public class ProducerDelegate implements ActiveMqProducer {
     }
 
     private void putNewProducer(String destination, ConnectionFactory factory, boolean isDefaultProducer) {
-        var producer = new Producer(factory, destination, isDefaultProducer, serviceName);
-        producer.setTimeToLive(timeToLive);
+        var producer = new Producer(factory, destination, isDefaultProducer, serviceName, timeToLive);
 
         producers.put(destination, producer);
     }
