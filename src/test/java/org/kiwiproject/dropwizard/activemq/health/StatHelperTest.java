@@ -74,7 +74,6 @@ class StatHelperTest {
             SIMULATE_ERROR.set(true);
         }
 
-        @SuppressWarnings("unused")
         @GET
         @Path("/read/{details}")
         public Response getStats(@PathParam("details") String details) {

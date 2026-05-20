@@ -168,13 +168,11 @@ class BrokerHealthCheckTest {
     private ConnectionFactory newNoOpConnectionFactory() {
         return new ConnectionFactory() {
 
-            @SuppressWarnings("RedundantThrows")
             @Override
             public Connection createConnection() throws JMSException {
                 return null;
             }
 
-            @SuppressWarnings("RedundantThrows")
             @Override
             public Connection createConnection(String userName, String password) throws JMSException {
                 return null;

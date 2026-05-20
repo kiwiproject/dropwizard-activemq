@@ -84,19 +84,16 @@ class ActiveMqTestUtilsTest {
             throw new UnsupportedOperationException();
         }
 
-        @SuppressWarnings("RedundantThrows")
         @Override
         public MessageProducer createProducer(ActiveMQSession session) throws JMSException {
             throw new UnsupportedOperationException();
         }
 
-        @SuppressWarnings("RedundantThrows")
         @Override
         public TopicPublisher createPublisher(ActiveMQSession session) throws JMSException {
             throw new UnsupportedOperationException();
         }
 
-        @SuppressWarnings("RedundantThrows")
         @Override
         public QueueSender createSender(ActiveMQSession session) throws JMSException {
             throw new UnsupportedOperationException();

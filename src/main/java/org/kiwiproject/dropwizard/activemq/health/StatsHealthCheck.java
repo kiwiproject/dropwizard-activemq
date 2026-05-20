@@ -266,7 +266,6 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     /**
      * This is a no-op. Override to run additional checks.
      */
-    @SuppressWarnings({ "EmptyMethod", "unused" })
     protected void runAdditionalChecks(JolokiaResponseValue stats,
                                        Map<String, Object> resultMap,
                                        Map<String, Map<String, Object>> healthyResults,
