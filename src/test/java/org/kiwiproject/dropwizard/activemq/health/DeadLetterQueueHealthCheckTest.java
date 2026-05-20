@@ -21,12 +21,14 @@ import org.kiwiproject.jaxrs.exception.JaxrsNotFoundException;
 class DeadLetterQueueHealthCheckTest {
 
     private DeadLetterQueueHealthCheck healthCheck;
+    private ActiveMqConfig config;
     private StatHelper statHelper;
 
     @BeforeEach
     void setUp() {
+        config = new ActiveMqConfig();
         statHelper = mock(StatHelper.class);
-        healthCheck = new DeadLetterQueueHealthCheck(statHelper);
+        healthCheck = new DeadLetterQueueHealthCheck(config, statHelper);
     }
 
     @Test

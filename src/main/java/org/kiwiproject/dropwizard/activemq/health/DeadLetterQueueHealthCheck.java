@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.health;
 
 import static java.util.Objects.isNull;
+import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.metrics.health.HealthCheckResults.newHealthyResult;
 import static org.kiwiproject.metrics.health.HealthCheckResults.newUnhealthyResult;
@@ -19,26 +20,33 @@ import org.kiwiproject.jaxrs.exception.JaxrsNotFoundException;
  * <p>
  * You must explicitly register this health check, which gives you control over which service
  * will report on an unhealthy DLQ.
+ * <p>
+ * Note that you can also change the name of the DLQ if you are nor using the ActiveMQ
+ * default name. This can be done in
+ * {@link org.kiwiproject.dropwizard.activemq.config.ActiveMqHealthConfig ActiveMqHealthConfig}
+ * by setting the {@code dlqName} property.
  */
 @Slf4j
 public class DeadLetterQueueHealthCheck extends HealthCheck {
 
     private final StatHelper statHelper;
+    private final String dlqName;
 
     public DeadLetterQueueHealthCheck(ActiveMqConfig config) {
-        this(new StatHelper(config));
+        this(config, new StatHelper(config));
     }
 
     @VisibleForTesting
-    DeadLetterQueueHealthCheck(StatHelper statHelper) {
+    DeadLetterQueueHealthCheck(ActiveMqConfig config, StatHelper statHelper) {
         this.statHelper = requireNotNull(statHelper);
+        this.dlqName = requireNotBlank(config.getHealthConfig().getDlqName());
     }
 
     /**
      * @return the name of the ActiveMQ dead-letter queue
      */
     public String getQueueName() {
-        return StatHelper.DLQ_QUEUE_NAME;
+        return dlqName;
     }
 
     @Override
@@ -46,7 +54,7 @@ public class DeadLetterQueueHealthCheck extends HealthCheck {
         JolokiaResponseValue result;
 
         try {
-            result = statHelper.getStatsSingleResultOrNull(StatHelper.DLQ_QUEUE_NAME);
+            result = statHelper.getStatsSingleResultOrNull(dlqName);
         } catch (JaxrsNotFoundException e) {
             LOG.trace("Got a JaxrsNotFoundException trying to find the DLQ using getStatsSingleResultOrNull."
                     + " We will assume it does not exist, which is OK (b/c it means there are no messages in the DLQ)");
