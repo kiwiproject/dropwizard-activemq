@@ -1,7 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.test.util;
 
-import org.apache.http.conn.ssl.DefaultHostnameVerifier;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.DefaultHostnameVerifier;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 
 public enum HostnameVerification {
 
