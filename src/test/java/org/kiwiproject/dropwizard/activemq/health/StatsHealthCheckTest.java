@@ -8,8 +8,11 @@ import static org.kiwiproject.test.assertj.dropwizard.metrics.HealthCheckResultA
 import static org.kiwiproject.test.constants.KiwiTestConstants.JSON_HELPER;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.codahale.metrics.health.HealthCheck;
@@ -19,19 +22,24 @@ import org.apache.commons.collections4.MapUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.kiwiproject.base.KiwiEnvironment;
 import org.kiwiproject.dropwizard.activemq.TestAppConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqHealthConfig;
 import org.kiwiproject.test.constants.KiwiTestConstants;
+import org.kiwiproject.test.junit.jupiter.AsyncModeDisablingExtension;
 import org.kiwiproject.test.util.Fixtures;
 import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @DisplayName("StatsHealthCheck")
+@ExtendWith(AsyncModeDisablingExtension.class)
 class StatsHealthCheckTest {
 
     private static final String DEVELOPMENT_SERVERS =
@@ -212,6 +220,25 @@ class StatsHealthCheckTest {
     }
 
     @Test
+    void shouldReportUnhealthy_WhenInvalidDestination() {
+        var healthConfig = new ActiveMqHealthConfig();
+
+        var config = new ActiveMqConfig();
+        config.setConsumers(List.of("not_a_thing:test"));
+        config.setHealthConfig(healthConfig);
+        appConfig.setActiveMqConfig(config);
+
+        configureMockResponse();
+        var result = new ConsumerStatsHealthCheck<>(appConfig, statHelper).check();
+
+        assertThatResult(result)
+                .isUnhealthy()
+                .hasMessage("""
+                        <strong>Unhealthy</strong>
+                        <br />Unable to retrieve stats for: null""");
+    }
+
+    @Test
     void shouldReportHealthy_WhenNoConsumers_AndNoPendingMessages() {
         var config = new ActiveMqConfig();
         config.setConsumers(List.of("queue:test"));
@@ -285,7 +312,7 @@ class StatsHealthCheckTest {
 
         var response = mock(Response.class);
         when(response.getStatus()).thenReturn(200);
-        when(response.readEntity(String.class)).thenReturn(null);
+        when(response.readEntity(String.class)).thenReturn(null);  // causes an NPE in checkStatsForDestination
 
         var urlCaptor = ArgumentCaptor.forClass(String.class);
         doReturn(response).when(statHelper).doGet(any(), urlCaptor.capture());
@@ -312,6 +339,80 @@ class StatsHealthCheckTest {
         assertThat(virtualTopicDetail)
                 .containsEntry("message", f("Unable to retrieve stats for: {}", expectedKey))
                 .containsEntry("details", null);
+    }
+
+    @Test
+    void shouldReportUnhealthy_WhenExceptionThrown_WhileGettingFuture() throws Exception {
+        var config = new ActiveMqConfig();
+        config.setProducers(List.of("topic:test"));
+
+        appConfig.setActiveMqConfig(config);
+
+        configureMockResponse();
+
+        var healthCheckSpy = spy(new ConsumerStatsHealthCheck<>(appConfig, statHelper));
+
+        doThrow(new ExecutionException("who knows", new RuntimeException("random error")))
+                .when(healthCheckSpy)
+                .getResult(any());
+
+        var result = healthCheckSpy.check();
+
+        assertThatResult(result)
+                .isUnhealthy()
+                .hasMessage("Failed to retrieve stats: who knows");
+
+        verify(healthCheckSpy).getResult(any());
+    }
+
+    @Test
+    void shouldReturnLastResult_WhenInterruptedExceptionThrown_WhileGettingFuture() throws Exception {
+          var config = new ActiveMqConfig();
+        config.setProducers(List.of("topic:test"));
+
+        appConfig.setActiveMqConfig(config);
+
+        configureMockResponse();
+
+        var kiwiEnvironment = mock(KiwiEnvironment.class);
+        var thread = mock(Thread.class);
+        when(kiwiEnvironment.currentThread()).thenReturn(thread);
+
+        var healthCheckSpy = spy(new ConsumerStatsHealthCheck<>(appConfig, statHelper, kiwiEnvironment));
+
+        var lastResult = HealthCheck.Result.healthy();
+        healthCheckSpy.lastResult = lastResult;
+
+        doThrow(new InterruptedException("I interrupt you!"))
+                .when(healthCheckSpy)
+                .getResult(any());
+        
+        var result = healthCheckSpy.check();
+
+        assertThat(result).isSameAs(lastResult);
+
+        verify(healthCheckSpy).getResult(any());
+        verify(kiwiEnvironment, only()).currentThread();
+        verify(thread, only()).interrupt();
+    }
+
+    @Test
+    void shouldSkipExecution_WhenRefreshInterval_HasNotElapsed() {
+        var config = new ActiveMqConfig();
+        config.setProducers(List.of("topic:test"));
+
+        appConfig.setActiveMqConfig(config);
+
+        var lastResult = HealthCheck.Result.healthy();
+
+        var healthCheck = new ConsumerStatsHealthCheck<>(appConfig, statHelper);
+        
+        healthCheck.lastResult = lastResult;
+        healthCheck.lastUpdateTimestamp.set(System.currentTimeMillis());
+
+        var result = healthCheck.check();
+
+        assertThat(result).isSameAs(lastResult);
     }
 
     private ArgumentCaptor<String> configureMockResponse() {

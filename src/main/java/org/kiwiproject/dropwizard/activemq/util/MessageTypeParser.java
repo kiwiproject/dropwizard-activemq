@@ -54,7 +54,7 @@ public class MessageTypeParser {
         try {
             return Optional.ofNullable(findType(maybeJson));
         } catch (MessageTypeParsingException e) {
-            LOG.debug("Unable to find message type in msg: '{}', sending back an empty optional (enable TRACE for details)",
+            LOG.debug("Unable to find message type in msg: '{}', sending back an empty optional (enable TRACE for full message content)",
                     lazy(() -> StringUtils.abbreviate(maybeJson, 50)), e);
             LOG.trace("Message content: {}", maybeJson);
         }

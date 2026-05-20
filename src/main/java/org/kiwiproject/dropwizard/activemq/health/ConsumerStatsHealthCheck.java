@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.health;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.kiwiproject.base.KiwiEnvironment;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfigured;
 
 import java.util.List;
@@ -21,6 +22,11 @@ public class ConsumerStatsHealthCheck<C extends ActiveMqConfigured> extends Stat
     @VisibleForTesting
     ConsumerStatsHealthCheck(C activeMqConfigured, StatHelper statHelper) {
         super(activeMqConfigured, statHelper);
+    }
+
+    @VisibleForTesting
+    ConsumerStatsHealthCheck(C activeMqConfigured, StatHelper statHelper, KiwiEnvironment kiwiEnvironment) {
+        super(activeMqConfigured, statHelper, kiwiEnvironment);
     }
 
     @Override

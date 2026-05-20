@@ -39,4 +39,6 @@ public class ActiveMqHealthConfig {
     private Duration refreshInterval = Duration.minutes(2);
 
     private boolean ignoreEmptyQueuesWithNoConsumers = true;
+
+    private long statsTimeoutMillis = 10_000;  // 10 seconds
 }
