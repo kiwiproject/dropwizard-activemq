@@ -101,7 +101,7 @@ class StatHelperTest {
             baseUri = CLIENT.baseUri();
 
             statHelper = new StatHelper(
-                "tcp://host1:61616,tcp://host2:61616", "http", 8011, client, JSON_HELPER);
+                "tcp://host1:61616,tcp://host2:61616", "http", 8011, ActiveMqHealthConfig.DEFAULT_DLQ_NAME, client, JSON_HELPER);
         }
 
         @AfterEach
@@ -222,7 +222,7 @@ class StatHelperTest {
         @Test
         void shouldGetUrlsForDestination() {
             var statHelper = new StatHelper(
-                    "tcp://host1:61616,tcp://host2:61616", "http", 8011, client, JSON_HELPER);
+                    "tcp://host1:61616,tcp://host2:61616", "http", 8011, ActiveMqHealthConfig.DEFAULT_DLQ_NAME, client, JSON_HELPER);
             assertThat(statHelper.getUrlsForDestination("foo")).containsExactly(
                     STATS_URL_1,
                     STATS_URL_2);
@@ -231,7 +231,7 @@ class StatHelperTest {
         @Test
         void shouldWrapAroundToFirstOfTwoUrls_AfterIncrementingLastUrl() {
             var statHelper = new StatHelper(
-                    "tcp://host1:61616,tcp://host2:61616", "http", 8011, client, JSON_HELPER);
+                    "tcp://host1:61616,tcp://host2:61616", "http", 8011, ActiveMqHealthConfig.DEFAULT_DLQ_NAME, client, JSON_HELPER);
 
             // Start at base URL 1
             assertThat(statHelper.getCurrentBaseUrl()).isEqualTo(BASE_HTTP_URL_1);
@@ -262,7 +262,7 @@ class StatHelperTest {
         @Test
         void shouldWrapAroundToFirstOfThreeUrls_AfterIncrementingLastUrl() {
             var statHelper = new StatHelper(
-                    "tcp://host1:61616,tcp://host2:61616,tcp://host3:61616", "http", 8011, client, JSON_HELPER);
+                    "tcp://host1:61616,tcp://host2:61616,tcp://host3:61616", "http", 8011, ActiveMqHealthConfig.DEFAULT_DLQ_NAME, client, JSON_HELPER);
 
             // Test incrementing 30 times, starting at base URL 1
             IntStream.rangeClosed(1, 10).forEach(ignored -> {
@@ -294,7 +294,7 @@ class StatHelperTest {
         @Test
         void shouldNotIncrementWhenCurrentUrlDoesNotMatch() {
             var statHelper = new StatHelper(
-                    "tcp://host1:61616,tcp://host2:61616", "http", 8011, client, JSON_HELPER);
+                    "tcp://host1:61616,tcp://host2:61616", "http", 8011, ActiveMqHealthConfig.DEFAULT_DLQ_NAME, client, JSON_HELPER);
 
             assertThat(statHelper.getCurrentBaseUrl()).isEqualTo(BASE_HTTP_URL_1);
 
