@@ -1,12 +1,12 @@
 package org.kiwiproject.dropwizard.activemq.internal;
 
-import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.kiwiproject.base.KiwiStrings.f;
 import static org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier.evaluateDestinationName;
 
+import org.apache.commons.lang3.Strings;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -72,7 +72,7 @@ class DestinationIdentifierTest {
             var destinationInfo = evaluateDestinationName(name, actorType.isProducer(), serviceName)
                     .orElseThrow();
 
-            var bareTopicName = removeStart(name, "topic:");
+            var bareTopicName = Strings.CS.removeStart(name, "topic:");
             var expectedName = actorType.isProducer() ?
                     "VirtualTopic." + bareTopicName :
                     f("Consumer.{}.VirtualTopic.{}", serviceName, bareTopicName);
@@ -116,7 +116,7 @@ class DestinationIdentifierTest {
             var destinationInfo = evaluateDestinationName(name, actorType.isProducer(), serviceName)
                     .orElseThrow();
 
-            var bareName = removeStart(name, "*:");
+            var bareName = Strings.CS.removeStart(name, "*:");
 
             assertAll(
                     () -> assertThat(destinationInfo.getType()).isEqualTo(DestinationType.TOPIC),
