@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.uniqueServiceName;
 import static org.kiwiproject.test.assertj.dropwizard.metrics.HealthCheckResultAssertions.assertThatHealthCheck;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -83,6 +83,23 @@ class BrokerHealthCheckTest {
     }
 
     @Test
+    void shouldBeUnhealthy_WhenPayloadIsNull() throws JMSException {
+        var factory = broker.newConnectionFactory();
+        var healthCheck = spy(new BrokerHealthCheck("testBrokerHealthCheck", factory, serviceName, config));
+        var provider = spy(new BrokerHealthCheck.ConsumerAndProducerProvider(factory, serviceName));
+        var consumer = mock(MessageConsumer.class);
+
+        doReturn(provider).when(healthCheck).newConsumerAndProducerProvider();
+        doReturn(consumer).when(provider).getConsumer();
+        when(consumer.receive(anyLong())).thenReturn(null);
+
+        assertThatHealthCheck(healthCheck)
+                .isUnhealthy()
+                .hasMessage(
+                        "This health check did not receive a message from JMS broker within the timeout: vm://embedded-broker");
+    }
+
+    @Test
     void shouldBeUnhealthy_WhenReturnsUnexpectedText() throws JMSException {
         var factory = broker.newConnectionFactory();
         var healthCheck = spy(new BrokerHealthCheck("testBrokerHealthCheck", factory, serviceName, config));
@@ -92,13 +109,12 @@ class BrokerHealthCheckTest {
 
         doReturn(provider).when(healthCheck).newConsumerAndProducerProvider();
         doReturn(consumer).when(provider).getConsumer();
-
-        when(consumer.receive(anyInt())).thenReturn(message);
+        when(consumer.receive(anyLong())).thenReturn(message);
         when(message.getText()).thenReturn("Unexpected!");
 
         assertThatHealthCheck(healthCheck)
                 .isUnhealthy()
-                .hasMessage("This health check CANNOT produce to or consume from JMS broker: vm://embedded-broker");
+                .hasMessage("This health check received an unexpected message from JMS broker: vm://embedded-broker");
     }
 
     @Test
