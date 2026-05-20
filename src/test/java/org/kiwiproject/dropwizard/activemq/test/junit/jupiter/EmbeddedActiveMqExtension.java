@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.time.Duration;
+import java.util.function.Consumer;
 
 import javax.jms.ConnectionFactory;
 
@@ -42,10 +43,6 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
 
     private final BrokerService service;
 
-    // TODO Enhance this to allow configuring via a builder? Another option would be
-    //  a factory method that allows you to provide a Consumer<BrokerService> which
-    //  con be configured however you want, perhaps with a few defaults (like in the no-args ctor)
-
     public EmbeddedActiveMqExtension() {
         service = new BrokerService();
         service.setBrokerName("embedded-broker");
@@ -53,6 +50,12 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
         service.setPersistent(false);
         service.setUseJmx(false);
         service.setUseShutdownHook(false);
+    }
+
+    public static EmbeddedActiveMqExtension withConfiguration(Consumer<BrokerService> configurer) {
+        var extension = new EmbeddedActiveMqExtension();
+        configurer.accept(extension.service);
+        return extension;
     }
 
     @Override
@@ -82,7 +85,8 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
             }
         }
 
-        // TODO This is a blocking call...is there another way?
+        // BrokerService does not provide a waitUntilStopped(timeout) overload,
+        // so this blocks until the broker is fully stopped.
         service.waitUntilStopped();
     }
 
