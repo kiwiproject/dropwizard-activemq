@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.exception.ExceptionUtils.indexOfThrowable;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotBlank;
+import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.base.KiwiStrings.f;
 import static org.kiwiproject.collect.KiwiLists.first;
@@ -55,6 +56,7 @@ class StatHelper {
     @VisibleForTesting
     final Client client;
 
+    private final String dlqName;
     private final List<String> baseUrlQueue;
     private final int baseUrlCount;
     private final AtomicLong currentUrlIndex;
@@ -64,12 +66,14 @@ class StatHelper {
         this(config.getBrokerUri(),
                 getUriScheme(config),
                 config.getJolokiaPort(),
+                config.getHealthConfig().getDlqName(),
                 buildClient(config),
                 JsonHelper.newDropwizardJsonHelper());
     }
 
     @VisibleForTesting
-    StatHelper(String brokerUri, String uriScheme, int port, Client client, JsonHelper jsonHelper) {
+    StatHelper(String brokerUri, String uriScheme, int port, String dlqName, Client client, JsonHelper jsonHelper) {
+        this.dlqName = requireNotBlank(dlqName);
         this.client = requireNotNull(client);
         this.currentUrlIndex = new AtomicLong();
         this.jsonHelper = requireNotNull(jsonHelper);
@@ -255,10 +259,9 @@ class StatHelper {
         });
     }
 
-    private static void logWarningsIfNotDLQ(String json, JolokiaResponse jolokiaResponse) {
-        // TODO See about changing this to use the "DLQ" boolean value (assuming it is always present)
-        if (json.contains(DLQ_QUEUE_NAME)) {
-            LOG.trace("DLQ was not found; this is not a problem (since it means we do NOT have dead messages)");
+    private void logWarningsIfNotDLQ(String json, JolokiaResponse jolokiaResponse) {
+        if (json.contains(dlqName)) {
+            LOG.trace("DLQ ({}) was not found; this is not a problem (since it means we do NOT have dead messages)", dlqName);
             return;
         }
 

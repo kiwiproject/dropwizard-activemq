@@ -54,7 +54,7 @@ class StatsHealthCheckTest {
     @BeforeEach
     void setUp() {
         var client = mock(Client.class);
-        statHelper = spy(new StatHelper(DEVELOPMENT_SERVERS, "http", 8011, client, JSON_HELPER));
+        statHelper = spy(new StatHelper(DEVELOPMENT_SERVERS, "http", 8011, ActiveMqHealthConfig.DEFAULT_DLQ_NAME, client, JSON_HELPER));
         appConfig = TestAppConfig.builder().build();
     }
 
