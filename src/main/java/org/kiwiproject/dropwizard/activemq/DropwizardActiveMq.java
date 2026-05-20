@@ -144,7 +144,12 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
         requireNonNull(factory);
 
         var name = BrokerHealthCheck.createHealthCheckNameWithPrefix(healthCheckNamePrefix);
-        var healthCheck = new BrokerHealthCheck(name, factory, configuration.getServiceName());
+        var healthCheck = new BrokerHealthCheck(name, 
+            factory, 
+            configuration.getServiceName(), 
+            configuration.getActiveMqConfig()
+        );
+        
         environment.healthChecks().register(name, healthCheck);
     }
 
