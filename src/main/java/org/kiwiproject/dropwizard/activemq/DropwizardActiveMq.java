@@ -29,7 +29,6 @@ import org.kiwiproject.elucidation.client.ElucidationRecorder;
 import org.kiwiproject.elucidation.common.model.ConnectionEvent;
 import org.kiwiproject.jersey.client.RegistryAwareClient;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -57,9 +56,6 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
     private final List<String> producerDestinations;
     private final List<String> defaultProducerDestinations;
     private final String healthCheckNamePrefix;
-    private final boolean allowDynamicDestinations;
-    private final Duration timeToLive;
-
     // Elucidation-related fields
     private ElucidationContext elucidationContext;
     private ElucidationRecorder eventRecorder;
@@ -90,8 +86,6 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
         producerDestinations = activeMqConfig.getProducers();
         defaultProducerDestinations = activeMqConfig.getDefaultProducers();
         healthCheckNamePrefix = activeMqConfig.getHealthCheckNamePrefix();
-        allowDynamicDestinations = activeMqConfig.isAllowDynamicDestinations();
-        timeToLive = activeMqConfig.getTimeToLive().toJavaDuration();
 
         if (configuration.isElucidationEnabled()) {
             checkArgumentNotNull(registryAwareClient,
@@ -228,10 +222,9 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
         activeMqProducer = new ProducerDelegate(factory,
                 producerDestinations,
                 defaultProducerDestinations,
-                allowDynamicDestinations,
-                timeToLive,
                 ElucidationClient.of(eventRecorder, producingTextMessageEventFactory),
-                configuration.getServiceName());
+                configuration.getServiceName(),
+                activeMqConfig);
 
         return activeMqProducer;
     }

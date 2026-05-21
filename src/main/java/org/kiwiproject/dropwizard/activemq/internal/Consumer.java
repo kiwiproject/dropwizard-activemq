@@ -83,6 +83,7 @@ public class Consumer implements Managed, Runnable {
     private final ConnectionFactory factory;
     private final ElucidationClient<String> elucidation;
     private final String serviceName;
+    private final DestinationExtractor destinationExtractor;
 
     private final String threadName;
     private final Thread thread;
@@ -108,9 +109,11 @@ public class Consumer implements Managed, Runnable {
         this.delegateConsumer = requireNotNull(delegateConsumer);
         this.elucidation = requireNotNull(elucidation);
         this.serviceName = requireNotBlank(serviceName);
-        
+
         checkArgumentNotNull(configuration);
         this.receiveTimeoutMillis = configuration.getConsumerReceiveTimeout().toMilliseconds();
+
+        this.destinationExtractor = new DestinationExtractor(configuration.getDestinationNormalizers());
 
         threadName = "DelegateConsumer[" + destination + "]";
         thread = new Thread(this, threadName);
@@ -210,7 +213,7 @@ public class Consumer implements Managed, Runnable {
             Optional<String> activeMqMessageType = activeMqMessage.getMessageType();
 
             var consumerName = activeMqMessage.getJMSDestination()
-                    .map(DestinationExtractor::simplifyDestination)
+                    .map(destinationExtractor::simplifyDestination)
                     .orElse("UNKNOWN DESTINATION");
 
             if (consumptionResult == Result.CONSUMED && activeMqMessageType.isPresent()) {

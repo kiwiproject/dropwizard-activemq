@@ -7,13 +7,13 @@ import static org.kiwiproject.base.KiwiStrings.f;
 import static org.kiwiproject.dropwizard.activemq.ActiveMqConstants.ALL_EVENTS_QUEUE;
 import static org.kiwiproject.dropwizard.activemq.ActiveMqProducer.PayloadDestination.SPECIFIED_AND_ALL_EVENTS;
 import static org.kiwiproject.dropwizard.activemq.internal.DestinationExtractor.createElucidationDestination;
-import static org.kiwiproject.dropwizard.activemq.internal.DestinationExtractor.simplifyDestinations;
 import static org.kiwiproject.dropwizard.activemq.util.DynamicDestinations.DYNAMIC_DESTINATION_ID;
 
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.kiwiproject.dropwizard.activemq.ActiveMqProducer;
+import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.elucidation.client.ElucidationClient;
 
 import java.time.Duration;
@@ -36,20 +36,22 @@ public class ProducerDelegate implements ActiveMqProducer {
     private final Duration timeToLive;
     private final ElucidationClient<String> elucidation;
     private final String serviceName;
+    private final DestinationExtractor destinationExtractor;
 
     public ProducerDelegate(ConnectionFactory factory,
                             List<String> destinations,
                             List<String> defaultDestinations,
-                            boolean allowDynamicDestinations,
-                            Duration timeToLive,
                             ElucidationClient<String> elucidation,
-                            String serviceName) {
+                            String serviceName,
+                            ActiveMqConfig configuration) {
 
         // Set this first so that other internal methods see it (putNewProducer)
         this.serviceName = requireNotBlank(serviceName);
 
-        this.allowDynamicDestinations = allowDynamicDestinations;
-        this.timeToLive = requireNotNull(timeToLive);
+        checkArgumentNotNull(configuration);
+        this.allowDynamicDestinations = configuration.isAllowDynamicDestinations();
+        this.timeToLive = configuration.getTimeToLive().toJavaDuration();
+        this.destinationExtractor = new DestinationExtractor(configuration.getDestinationNormalizers());
 
         checkArgumentNotNull(factory);
         requireNotNull(destinations).forEach(destination -> putNewProducer(destination, factory));
@@ -197,7 +199,7 @@ public class ProducerDelegate implements ActiveMqProducer {
     }
 
     private void recordElucidationEvent(String destination, String payload) {
-        simplifyDestinations(destination).stream()
+        destinationExtractor.simplifyDestinations(destination).stream()
                 .map(dest -> createElucidationDestination(dest, payload))
                 .forEach(event -> elucidation.recordNewEvent(event).whenComplete(ElucidationLogger::logResult));
     }
