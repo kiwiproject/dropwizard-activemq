@@ -21,6 +21,9 @@ import lombok.Setter;
  * <p>
  * The pattern and replacement follow {@link java.util.regex.Matcher#replaceAll(String)} semantics,
  * so capturing groups ({@code $1}, {@code $2}, etc.) are supported in the replacement string.
+ * The pattern must be a valid Java regex; an invalid pattern will cause a
+ * {@link java.util.regex.PatternSyntaxException} when the normalizer is used to construct a
+ * {@code DestinationExtractor} at service startup.
  * <p>
  * Example — normalize a user-group destination to a wildcard form:
  * <pre>
