@@ -38,7 +38,6 @@
 
         <!-- test dependency versions -->
         <kiwi-test.version>4.1.0</kiwi-test.version>
-        <netty-pkitesting.version>4.2.13.Final</netty-pkitesting.version>
     </properties>
 
     <dependencyManagement>
@@ -75,12 +74,6 @@
                 <groupId>org.kiwiproject</groupId>
                 <artifactId>kiwi-test</artifactId>
                 <version>${kiwi-test.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-pkitesting</artifactId>
-                <version>${netty-pkitesting.version}</version>
             </dependency>
 
             <dependency>
