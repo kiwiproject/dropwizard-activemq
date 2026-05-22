@@ -1,9 +1,15 @@
 package org.kiwiproject.dropwizard.activemq.config;
 
+import static java.util.Objects.isNull;
+
+import io.dropwizard.validation.ValidationMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Configures a single destination normalizer: a regex {@code pattern} applied to a destination
@@ -21,9 +27,7 @@ import lombok.Setter;
  * <p>
  * The pattern and replacement follow {@link java.util.regex.Matcher#replaceAll(String)} semantics,
  * so capturing groups ({@code $1}, {@code $2}, etc.) are supported in the replacement string.
- * The pattern must be a valid Java regex; an invalid pattern will cause a
- * {@link java.util.regex.PatternSyntaxException} when the normalizer is used to construct a
- * {@code DestinationExtractor} at service startup.
+ * The pattern must be a valid Java regex; an invalid pattern is caught during startup validation.
  * <p>
  * Example — normalize a user-group destination to a wildcard form:
  * <pre>
@@ -40,4 +44,17 @@ public class DestinationNormalizerConfig {
 
     @NotNull
     private String replacement = "";
+
+    @ValidationMethod(message = "pattern must be a valid regular expression")
+    public boolean isPatternValid() {
+        if (isNull(pattern)) {
+            return true;
+        }
+        try {
+            Pattern.compile(pattern);
+            return true;
+        } catch (PatternSyntaxException e) {
+            return false;
+        }
+    }
 }

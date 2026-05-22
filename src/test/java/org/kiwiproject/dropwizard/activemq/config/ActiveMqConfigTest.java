@@ -212,6 +212,19 @@ class Validation {
                     .extracting(v -> v.getPropertyPath().toString())
                     .contains("destinationNormalizers[0].pattern");
         }
+
+        @Test
+        void shouldCascadeValidation_WhenNormalizerHasInvalidPattern() {
+            var normalizer = new DestinationNormalizerConfig();
+            normalizer.setPattern("[invalid");
+            normalizer.setReplacement("$1.##");
+            config.setDestinationNormalizers(List.of(normalizer));
+
+            var violations = KiwiValidations.validate(config);
+            assertThat(violations)
+                    .extracting(v -> v.getPropertyPath().toString())
+                    .contains("destinationNormalizers[0].patternValid");
+        }
     }
 
     @Nested
