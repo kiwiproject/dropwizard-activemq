@@ -78,6 +78,10 @@ public class ActiveMqConfig {
      * order, after the built-in prefix/VirtualTopic/dynamic-destination stripping. Defaults to an
      * empty list — no app-specific normalization.
      * <p>
+     * If multiple normalizers can match the same destination string, they are applied in sequence —
+     * the output of one becomes the input of the next. Design normalizers with non-overlapping
+     * patterns to avoid unintended interactions.
+     * <p>
      * Example (YAML):
      * <pre>
      *   destinationNormalizers:

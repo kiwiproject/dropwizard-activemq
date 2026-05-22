@@ -13,6 +13,12 @@ import lombok.Setter;
  * <a href="https://github.com/elucidation-project/elucidation">Elucidation</a> event
  * recording. They have no effect on actual JMS routing.
  * <p>
+ * Some applications route messages to destinations that contain dynamic identifiers — for example,
+ * a separate topic per user or per group. Elucidation tracks service dependencies by destination
+ * name, so without normalization each unique identifier would appear as a distinct connection,
+ * obscuring the underlying relationship. A normalizer collapses those destinations into a canonical
+ * form (e.g., {@code myapp.user.##}) so Elucidation sees them as a single logical connection type.
+ * <p>
  * The pattern and replacement follow {@link java.util.regex.Matcher#replaceAll(String)} semantics,
  * so capturing groups ({@code $1}, {@code $2}, etc.) are supported in the replacement string.
  * <p>
