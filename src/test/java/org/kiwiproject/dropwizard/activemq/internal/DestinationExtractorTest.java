@@ -1,20 +1,30 @@
 package org.kiwiproject.dropwizard.activemq.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.kiwiproject.dropwizard.activemq.config.DestinationNormalizerConfig;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 @DisplayName("DestinationExtractor")
 class DestinationExtractorTest {
+
+    private DestinationExtractor extractor;
+
+    @BeforeEach
+    void setUp() {
+        extractor = DestinationExtractor.withNoNormalizers();
+    }
 
     @Test
     void shouldCreateElucidationDestinations() {
@@ -31,7 +41,7 @@ class DestinationExtractorTest {
 
         var activeMQDestination = new ActiveMQTopic(destination);
 
-        assertThat(DestinationExtractor.simplifyDestination(activeMQDestination))
+        assertThat(extractor.simplifyDestination(activeMQDestination))
                 .isEqualTo("myQueue");
     }
 
@@ -41,9 +51,29 @@ class DestinationExtractorTest {
         var originalDestination = testData.getLeft();
         var expectedResults = testData.getRight();
 
-        List<String> results = DestinationExtractor.simplifyDestinations(originalDestination);
+        List<String> results = extractor.simplifyDestinations(originalDestination);
 
         assertThat(results).containsExactly(expectedResults);
+    }
+
+    @Test
+    void shouldApplyConfiguredNormalizers() {
+        var groupNormalizer = new DestinationNormalizerConfig();
+        groupNormalizer.setPattern("(myapp.group).*");
+        groupNormalizer.setReplacement("$1.##");
+
+        var userNormalizer = new DestinationNormalizerConfig();
+        userNormalizer.setPattern("(myapp.user).*");
+        userNormalizer.setReplacement("$1.##");
+
+        var configured = new DestinationExtractor(List.of(groupNormalizer, userNormalizer));
+
+        assertAll(
+                () -> assertThat(configured.simplifyDestinations("myapp.group.42")).containsExactly("myapp.group.##"),
+                () -> assertThat(configured.simplifyDestinations("topic://myapp.group.42")).containsExactly("myapp.group.##"),
+                () -> assertThat(configured.simplifyDestinations("myapp.user.84")).containsExactly("myapp.user.##"),
+                () -> assertThat(configured.simplifyDestinations("topic://myapp.user.84")).containsExactly("myapp.user.##")
+        );
     }
 
     private static Stream<Arguments> queueAndTopicNames() {
@@ -64,14 +94,6 @@ class DestinationExtractorTest {
                 Arguments.of("Bare VirtualTopic name", Pair.of("VirtualTopic.ORDER_REQUEST", new String[] { "ORDER_REQUEST" })),
 
                 Arguments.of("Prefixed VirtualTopic name", Pair.of("queue://VirtualTopic.ORDER_REQUEST", new String[] { "ORDER_REQUEST" })),
-
-                Arguments.of("Bare application.group", Pair.of("application.group.42", new String[] { "application.group.##" })),
-
-                Arguments.of("Prefixed application.group", Pair.of("topic://application.group.42", new String[] { "application.group.##" })),
-
-                Arguments.of("Bare application.user", Pair.of("application.user.84", new String[] { "application.user.##" })),
-
-                Arguments.of("Prefixed application.user", Pair.of("topic://application.user.84", new String[] { "application.user.##" })),
 
                 // Multiple argument entries
 

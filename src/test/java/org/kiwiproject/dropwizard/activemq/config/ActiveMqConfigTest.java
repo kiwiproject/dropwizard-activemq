@@ -23,6 +23,7 @@ import org.kiwiproject.config.provider.TlsConfigProvider;
 import org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory;
 import org.kiwiproject.validation.KiwiValidations;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 @DisplayName("ActiveMqConfig")
@@ -47,6 +48,7 @@ class DefaultValues {
                 () -> assertThat(config.getHealthCheckNamePrefix()).isNull(),
                 () -> assertThat(config.isEnableStatsHealthChecks()).isTrue(),
                 () -> assertThat(config.isEnableElucidation()).isFalse(),
+                () -> assertThat(config.getDestinationNormalizers()).isEmpty(),
                 () -> assertThat(config.isAutoRegisterConsumers()).isTrue(),
                 () -> assertThat(config.getConsumers()).isEmpty(),
                 () -> assertThat(config.getConsumerReceiveTimeout()).isEqualTo(Duration.milliseconds(400)),
@@ -180,6 +182,48 @@ class Validation {
         @Test
         void shouldPassValidation_WhenEmpty() {
             assertNoPropertyViolations(config, "defaultProducers");
+        }
+    }
+
+    @Nested
+    class DestinationNormalizers {
+
+        @Test
+        void shouldFailValidation_WhenNull() {
+            config.setDestinationNormalizers(null);
+
+            assertOnePropertyViolation(config, "destinationNormalizers");
+        }
+
+        @Test
+        void shouldPassValidation_WhenEmpty() {
+            assertNoPropertyViolations(config, "destinationNormalizers");
+        }
+
+        @Test
+        void shouldCascadeValidation_WhenNormalizerHasBlankPattern() {
+            var normalizer = new DestinationNormalizerConfig();
+            normalizer.setPattern("  ");
+            normalizer.setReplacement("$1.##");
+            config.setDestinationNormalizers(List.of(normalizer));
+
+            var violations = KiwiValidations.validate(config);
+            assertThat(violations)
+                    .extracting(v -> v.getPropertyPath().toString())
+                    .contains("destinationNormalizers[0].pattern");
+        }
+
+        @Test
+        void shouldCascadeValidation_WhenNormalizerHasInvalidPattern() {
+            var normalizer = new DestinationNormalizerConfig();
+            normalizer.setPattern("[invalid");
+            normalizer.setReplacement("$1.##");
+            config.setDestinationNormalizers(List.of(normalizer));
+
+            var violations = KiwiValidations.validate(config);
+            assertThat(violations)
+                    .extracting(v -> v.getPropertyPath().toString())
+                    .contains("destinationNormalizers[0].patternValid");
         }
     }
 

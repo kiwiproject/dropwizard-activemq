@@ -19,10 +19,10 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.elucidation.client.ElucidationClient;
 import org.kiwiproject.elucidation.client.ElucidationResult;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -116,10 +116,9 @@ class ProducerDelegateTest {
         return new ProducerDelegate(factory,
                 destinations,
                 defaultDestinations,
-                false,
-                Duration.ZERO,
                 ElucidationClient.noop(),
-                serviceName);
+                serviceName,
+                newConfig(false));
     }
 
     @Test
@@ -180,10 +179,9 @@ class ProducerDelegateTest {
         var delegate = new ProducerDelegate(factory,
                 List.of(),
                 List.of(),
-                allowDynamicDestinations,
-                Duration.ZERO,
                 elucidationClient,
-                serviceName);
+                serviceName,
+                newConfig(allowDynamicDestinations));
 
         delegate.producers.putAll(newHashMap(destinationToProducers));
 
@@ -229,10 +227,9 @@ class ProducerDelegateTest {
         delegate = new ProducerDelegate(factory,
                 List.of(destination),
                 List.of(queue1, queue2),
-                allowDynamicDestinations,
-                Duration.ZERO,
                 elucidationClient,
-                serviceName);
+                serviceName,
+                newConfig(allowDynamicDestinations));
 
         delegate.producers.putAll(newHashMap(
                 identifier, testProducer,
@@ -258,6 +255,12 @@ class ProducerDelegateTest {
         verifyNoInteractions(allEventsProducer);
 
         verifyElucidationWasInvokedProperly(destination, payload, queue1, queue2);
+    }
+
+    private static ActiveMqConfig newConfig(boolean allowDynamicDestinations) {
+        var config = new ActiveMqConfig();
+        config.setAllowDynamicDestinations(allowDynamicDestinations);
+        return config;
     }
 
     private Producer newMockDefaultProducer(String payload, String destination) {

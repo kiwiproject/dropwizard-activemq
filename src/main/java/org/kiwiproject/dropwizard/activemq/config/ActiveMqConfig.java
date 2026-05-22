@@ -70,6 +70,32 @@ public class ActiveMqConfig {
     private boolean enableElucidation = false;
 
     /**
+     * App-specific destination normalizers applied only when simplifying JMS destination names for
+     * <a href="https://github.com/elucidation-project/elucidation">Elucidation</a> event
+     * recording. They have no effect on actual JMS routing.
+     * <p>
+     * Each normalizer is a regex {@code pattern} + {@code replacement} pair. They are applied in
+     * order, after the built-in prefix/VirtualTopic/dynamic-destination stripping. Defaults to an
+     * empty list — no app-specific normalization.
+     * <p>
+     * If multiple normalizers can match the same destination string, they are applied in sequence —
+     * the output of one becomes the input of the next. Design normalizers with non-overlapping
+     * patterns to avoid unintended interactions.
+     * <p>
+     * Example (YAML):
+     * <pre>
+     *   destinationNormalizers:
+     *     - pattern: "(myapp.group).*"
+     *       replacement: "$1.##"
+     *     - pattern: "(myapp.user).*"
+     *       replacement: "$1.##"
+     * </pre>
+     */
+    @NotNull
+    @Valid
+    private List<DestinationNormalizerConfig> destinationNormalizers = new ArrayList<>();
+
+    /**
      * Should all configured consumers be automatically registered when
      * {@link org.kiwiproject.dropwizard.activemq.DropwizardActiveMq#startConsumers(org.kiwiproject.dropwizard.activemq.ActiveMqConsumer) DropwizardActiveMq#startConsumers}
      * is called?
