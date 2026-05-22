@@ -14,6 +14,7 @@ import org.kiwiproject.test.security.TestKeyStores;
 @UtilityClass
 public class TestObjectFactory {
 
+    private static final String PKCS12 = KeyStoreType.PKCS12.getValue();
     private static final TestKeyStores TEST_KEY_STORES;
 
     static {
@@ -21,8 +22,8 @@ public class TestObjectFactory {
             var certDir = Files.createTempDirectory("dropwizard-activemq-test-certs");
             TEST_KEY_STORES = CertificateTestHelpers.createKeyAndTrustStores(
                     certDir,
-                    KeyStoreType.PKCS12.getValue(),
-                    KeyStoreType.PKCS12.getValue());
+                    PKCS12,
+                    PKCS12);
         } catch (IOException e) {
             throw new UncheckedIOException("Failed to generate test keystores", e);
         }
@@ -49,10 +50,10 @@ public class TestObjectFactory {
                 .protocol(SSLContextProtocol.TLS_1_3.value)
                 .keyStorePath(keyStorePath())
                 .keyStorePassword(TEST_KEY_STORES.keyStorePassword())
-                .keyStoreType(KeyStoreType.PKCS12.getValue())
+                .keyStoreType(PKCS12)
                 .trustStorePath(trustStorePath())
                 .trustStorePassword(TEST_KEY_STORES.trustStorePassword())
-                .trustStoreType(KeyStoreType.PKCS12.getValue())
+                .trustStoreType(PKCS12)
                 .verifyHostname(hostnameVerification.verifyHostname)
                 .build();
     }
@@ -64,9 +65,9 @@ public class TestObjectFactory {
     public static void setTlsConfigSystemProperties() {
         System.setProperty("kiwi.tls.keyStorePath", keyStorePath());
         System.setProperty("kiwi.tls.keyStorePassword", TEST_KEY_STORES.keyStorePassword());
-        System.setProperty("kiwi.tls.keyStoreType", KeyStoreType.PKCS12.getValue());
+        System.setProperty("kiwi.tls.keyStoreType", PKCS12);
         System.setProperty("kiwi.tls.trustStorePath", trustStorePath());
         System.setProperty("kiwi.tls.trustStorePassword", TEST_KEY_STORES.trustStorePassword());
-        System.setProperty("kiwi.tls.trustStoreType", KeyStoreType.PKCS12.getValue());
+        System.setProperty("kiwi.tls.trustStoreType", PKCS12);
     }
 }
