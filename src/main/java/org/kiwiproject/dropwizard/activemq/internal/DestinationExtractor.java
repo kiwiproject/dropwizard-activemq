@@ -25,6 +25,7 @@ class DestinationExtractor {
 
     private static final String DELIMITER = "::";
     static final Pattern DELIMITER_SPLITTER = Pattern.compile(DELIMITER);
+
     static final String BYTES_MESSAGE_TYPE = ActiveMqMessage.ContentType.BYTES.convertToMessageType();
 
     private final List<Pair<Pattern, String>> destinationReplacements;

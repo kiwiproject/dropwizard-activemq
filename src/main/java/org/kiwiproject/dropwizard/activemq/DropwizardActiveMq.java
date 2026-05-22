@@ -56,6 +56,7 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
     private final List<String> producerDestinations;
     private final List<String> defaultProducerDestinations;
     private final String healthCheckNamePrefix;
+
     // Elucidation-related fields
     private ElucidationContext elucidationContext;
     private ElucidationRecorder eventRecorder;
