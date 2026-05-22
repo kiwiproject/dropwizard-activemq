@@ -49,8 +49,10 @@ public class TestObjectFactory {
                 .protocol(SSLContextProtocol.TLS_1_3.value)
                 .keyStorePath(keyStorePath())
                 .keyStorePassword(TEST_KEY_STORES.keyStorePassword())
+                .keyStoreType(KeyStoreType.PKCS12.getValue())
                 .trustStorePath(trustStorePath())
                 .trustStorePassword(TEST_KEY_STORES.trustStorePassword())
+                .trustStoreType(KeyStoreType.PKCS12.getValue())
                 .verifyHostname(hostnameVerification.verifyHostname)
                 .build();
     }
@@ -62,7 +64,9 @@ public class TestObjectFactory {
     public static void setTlsConfigSystemProperties() {
         System.setProperty("kiwi.tls.keyStorePath", keyStorePath());
         System.setProperty("kiwi.tls.keyStorePassword", TEST_KEY_STORES.keyStorePassword());
+        System.setProperty("kiwi.tls.keyStoreType", KeyStoreType.PKCS12.getValue());
         System.setProperty("kiwi.tls.trustStorePath", trustStorePath());
         System.setProperty("kiwi.tls.trustStorePassword", TEST_KEY_STORES.trustStorePassword());
+        System.setProperty("kiwi.tls.trustStoreType", KeyStoreType.PKCS12.getValue());
     }
 }
