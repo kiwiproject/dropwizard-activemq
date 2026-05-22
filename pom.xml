@@ -145,6 +145,7 @@
         <dependency>
             <groupId>org.kiwiproject</groupId>
             <artifactId>dropwizard-leader-latch</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
