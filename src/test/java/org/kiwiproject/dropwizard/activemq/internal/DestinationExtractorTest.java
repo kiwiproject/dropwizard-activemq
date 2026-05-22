@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.lang3.tuple.Pair;
@@ -67,10 +68,12 @@ class DestinationExtractorTest {
 
         var configured = new DestinationExtractor(List.of(groupNormalizer, userNormalizer));
 
-        assertThat(configured.simplifyDestinations("myapp.group.42")).containsExactly("myapp.group.##");
-        assertThat(configured.simplifyDestinations("topic://myapp.group.42")).containsExactly("myapp.group.##");
-        assertThat(configured.simplifyDestinations("myapp.user.84")).containsExactly("myapp.user.##");
-        assertThat(configured.simplifyDestinations("topic://myapp.user.84")).containsExactly("myapp.user.##");
+        assertAll(
+                () -> assertThat(configured.simplifyDestinations("myapp.group.42")).containsExactly("myapp.group.##"),
+                () -> assertThat(configured.simplifyDestinations("topic://myapp.group.42")).containsExactly("myapp.group.##"),
+                () -> assertThat(configured.simplifyDestinations("myapp.user.84")).containsExactly("myapp.user.##"),
+                () -> assertThat(configured.simplifyDestinations("topic://myapp.user.84")).containsExactly("myapp.user.##")
+        );
     }
 
     private static Stream<Arguments> queueAndTopicNames() {
