@@ -1,39 +1,43 @@
 package org.kiwiproject.dropwizard.activemq.test.util;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+
 import lombok.experimental.UtilityClass;
 import org.kiwiproject.config.TlsContextConfiguration;
-import org.kiwiproject.io.KiwiPaths;
+import org.kiwiproject.security.KeyStoreType;
 import org.kiwiproject.security.SSLContextProtocol;
+import org.kiwiproject.test.security.CertificateTestHelpers;
+import org.kiwiproject.test.security.TestKeyStores;
 
 @UtilityClass
 public class TestObjectFactory {
+
+    private static final TestKeyStores TEST_KEY_STORES;
+
+    static {
+        try {
+            var certDir = Files.createTempDirectory("dropwizard-activemq-test-certs");
+            TEST_KEY_STORES = CertificateTestHelpers.createKeyAndTrustStores(
+                    certDir,
+                    KeyStoreType.PKCS12.getValue(),
+                    KeyStoreType.PKCS12.getValue());
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to generate test keystores", e);
+        }
+    }
 
     public static String uniqueServiceName() {
         return "test-service-" + System.currentTimeMillis();
     }
 
-    /*
-     * Used the following command to generate the keystore:
-     *
-     * keytool -genkeypair -alias testkey -keyalg RSA -keysize 2048 -keystore test-keystore.jks -dname "CN=Test, OU=Test, O=Test, L=Test, S=Test, C=US" -storepass password -keypass password
-     *
-     * To create the sample trust store, first exported the above keystore:
-     *
-     * keytool -export -alias testkey -keystore test-keystore.jks -file testkey.cer -storepass password
-     *
-     * Finally, created the trust store using:
-     *
-     * keytool -import -alias testkey -file testkey.cer -keystore test-truststore.jks -storepass password -noprompt
-     *
-     * Voilà!
-     */
-
     public static String keyStorePath() {
-        return KiwiPaths.pathFromResourceName("test-keystore.jks").toFile().getAbsolutePath();
+        return TEST_KEY_STORES.requiredKeyStorePathAsString();
     }
 
     public static String trustStorePath() {
-        return KiwiPaths.pathFromResourceName("test-truststore.jks").toFile().getAbsolutePath();
+        return TEST_KEY_STORES.requiredTrustStorePathAsString();
     }
 
     public static TlsContextConfiguration newTlsContextConfiguration() {
@@ -44,21 +48,21 @@ public class TestObjectFactory {
         return TlsContextConfiguration.builder()
                 .protocol(SSLContextProtocol.TLS_1_3.value)
                 .keyStorePath(keyStorePath())
-                .keyStorePassword("password")
+                .keyStorePassword(TEST_KEY_STORES.keyStorePassword())
                 .trustStorePath(trustStorePath())
-                .trustStorePassword("password")
+                .trustStorePassword(TEST_KEY_STORES.trustStorePassword())
                 .verifyHostname(hostnameVerification.verifyHostname)
                 .build();
     }
 
     /**
-     * When using this in a test, make sure the annotate the test method
+     * When using this in a test, make sure to annotate the test method
      * or class with {@link org.junitpioneer.jupiter.RestoreSystemProperties}.
      */
     public static void setTlsConfigSystemProperties() {
         System.setProperty("kiwi.tls.keyStorePath", keyStorePath());
-        System.setProperty("kiwi.tls.keyStorePassword", "password");
+        System.setProperty("kiwi.tls.keyStorePassword", TEST_KEY_STORES.keyStorePassword());
         System.setProperty("kiwi.tls.trustStorePath", trustStorePath());
-        System.setProperty("kiwi.tls.trustStorePassword", "password");
+        System.setProperty("kiwi.tls.trustStorePassword", TEST_KEY_STORES.trustStorePassword());
     }
 }
