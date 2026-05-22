@@ -61,7 +61,7 @@ class DefaultValues {
                 () -> assertThat(config.isUseSecureActiveMQConnections()).isTrue(),
                 () -> assertThat(config.getJolokiaPort()).isEqualTo(8161),
                 () -> assertThat(config.isUseSecureRestConnections()).isTrue(),
-                () -> assertThat(config.isVerifyRestConnectionHostnames()).isFalse()
+                () -> assertThat(config.isVerifyRestConnectionHostnames()).isTrue()
         );
     }
 }

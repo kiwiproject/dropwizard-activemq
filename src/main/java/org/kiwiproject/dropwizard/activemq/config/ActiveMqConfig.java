@@ -188,10 +188,12 @@ public class ActiveMqConfig {
     /**
      * Should DropwizardActiveMq verify host names when using Jolokia REST secure connections?
      * <p>
+     * By default this is {@code true}.
+     * <p>
      * The value of this option only matters if {@link #isUseSecureRestConnections()} is {@code true}.
      * Otherwise, it is ignored (because it won't be used).
      */
-    private boolean verifyRestConnectionHostnames;
+    private boolean verifyRestConnectionHostnames = true;
 
     /**
      * TLS configuration to use when connecting to the ActiveMQ message broker and/or to
