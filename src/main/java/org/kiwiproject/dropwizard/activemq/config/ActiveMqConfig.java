@@ -145,7 +145,8 @@ public class ActiveMqConfig {
     /**
      * The bare name of the "all events" queue.
      * <p>
-     * Defaults to {@code "all_events"}. Use {@link #getAllEventsQueue()} to get the full destination string.
+     * Defaults to {@code "all_events"}, which produces a full destination of {@code "queue:all_events"}.
+     * Use {@link #getAllEventsQueue()} to get the full destination string.
      */
     @NotBlank
     private String allEventsQueueName = DEFAULT_ALL_EVENTS_QUEUE_NAME;
