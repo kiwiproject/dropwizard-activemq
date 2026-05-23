@@ -320,9 +320,9 @@ public class ActiveMqConfig {
      * Check secure broker URLs: if using secure ActiveMQ connections, then the broker URI should contain "ssl://".
      * If not using secure connections, then the broker URI should not contain "ssl://".
      * <p>
-     * This is certainly not foolproof, but it should catch most simple configuration errors, such as saying
-     * you want to use secure connections, but you're not using the "ssl" scheme in the broker URI, or saying you
-     * do not want to use secure connections, but you are using the "ssl" scheme in the broker URI.
+     * This is certainly not foolproof, but it should catch most simple configuration errors — for example,
+     * saying you want secure connections but not using the "ssl" scheme, or saying you do not want secure
+     * connections but using the "ssl" scheme.
      */
     @ValidationMethod(message = "must use ssk scheme only for secure connections")
     public boolean isBrokerUriForSslProbablyValid() {
