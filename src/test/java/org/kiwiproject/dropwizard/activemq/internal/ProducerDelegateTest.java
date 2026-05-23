@@ -312,6 +312,29 @@ class ProducerDelegateTest {
     }
 
     @Test
+    void shouldProduceToCustomAllEventsQueue() {
+        var customQueue = "queue:my_events";
+        var customProducer = mock(Producer.class);
+
+        var config = newConfig(false);
+        config.setAllEventsQueueName("my_events");
+        var delegate = new ProducerDelegate(factory, List.of(), List.of(), elucidationClient, serviceName, config);
+        delegate.producers.put(customQueue, customProducer);
+
+        var payload = "Test!";
+
+        when(customProducer.isDefaultProducer()).thenReturn(true);
+        doNothing().when(customProducer).produce(payload, Map.of());
+
+        delegate.produceToAllEventsQueue(payload);
+
+        verify(customProducer).produce(payload, Map.of());
+        verifyNoMoreInteractions(customProducer);
+
+        verifyElucidationWasInvokedProperly(customQueue, payload);
+    }
+
+    @Test
     void shouldProduceBytesMessage_WithInvalidDestination() {
         var delegate = newDefaultProducerDelegateNoDynamicDestinations();
 
