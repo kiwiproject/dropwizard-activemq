@@ -28,7 +28,7 @@ public class ActiveMqConfig {
 
     private static final long DEFAULT_CONSUMER_RECEIVE_TIMEOUT_MILLIS = 400;
 
-    public static final String DEFAULT_BROKER_URI = "tcp://localhost:61616";
+    public static final String DEFAULT_BROKER_URI = "ssl://localhost:61617";
 
     /**
      * The full URI of the ActiveMQ broker, including failover, connection options, etc.
