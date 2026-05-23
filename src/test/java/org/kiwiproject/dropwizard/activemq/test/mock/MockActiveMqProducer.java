@@ -44,7 +44,7 @@ public class MockActiveMqProducer implements ActiveMqProducer {
      * @param allEventsQueue the full destination string, e.g. {@code "queue:my_events"}
      */
     public MockActiveMqProducer(String allEventsQueue) {
-        this.allEventsQueue = allEventsQueue;
+        this.allEventsQueue = checkArgumentNotBlank(allEventsQueue);
     }
 
     @Override
