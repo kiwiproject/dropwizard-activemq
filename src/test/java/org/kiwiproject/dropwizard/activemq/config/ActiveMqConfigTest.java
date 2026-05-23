@@ -60,8 +60,8 @@ class DefaultValues {
                 () -> assertThat(config.getHealthConfig()).isNotNull(),
                 () -> assertThat(config.isUseSecureActiveMQConnections()).isTrue(),
                 () -> assertThat(config.isVerifyActiveMQBrokerHostnames()).isTrue(),
-                () -> assertThat(config.getAllEventsQueueName()).isEqualTo("all_events"),
-                () -> assertThat(config.getAllEventsQueue()).isEqualTo("queue:all_events"),
+                () -> assertThat(config.getAllEventsQueueName()).isEqualTo(ActiveMqConfig.DEFAULT_ALL_EVENTS_QUEUE_NAME),
+                () -> assertThat(config.getAllEventsQueue()).isEqualTo("queue:" + ActiveMqConfig.DEFAULT_ALL_EVENTS_QUEUE_NAME),
                 () -> assertThat(config.getJolokiaPort()).isEqualTo(8161),
                 () -> assertThat(config.isUseSecureRestConnections()).isTrue(),
                 () -> assertThat(config.isVerifyRestConnectionHostnames()).isTrue()

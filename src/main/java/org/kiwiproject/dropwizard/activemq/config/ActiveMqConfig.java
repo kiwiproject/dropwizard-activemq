@@ -30,8 +30,15 @@ import java.util.concurrent.TimeUnit;
 public class ActiveMqConfig {
 
     private static final long DEFAULT_CONSUMER_RECEIVE_TIMEOUT_MILLIS = 400;
-    private static final String DEFAULT_ALL_EVENTS_QUEUE_NAME = "all_events";
 
+    /**
+     * The default bare name of the "all events" queue.
+     */
+    public static final String DEFAULT_ALL_EVENTS_QUEUE_NAME = "all_events";
+
+    /**
+     * The default broker URI, using the ActiveMQ SSL port.
+     */
     public static final String DEFAULT_BROKER_URI = "ssl://localhost:61617";
 
     /**
