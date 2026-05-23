@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.config;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import io.dropwizard.util.Duration;
 import io.dropwizard.validation.MinDuration;
@@ -9,8 +10,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.kiwiproject.config.TlsContextConfiguration;
 import org.kiwiproject.config.provider.TlsConfigProvider;
@@ -174,6 +177,15 @@ public class ActiveMqConfig {
     private boolean useSecureActiveMQConnections = true;
 
     /**
+     * Should DropwizardActiveMq verify the ActiveMQ broker's hostname?
+     * <p>
+     * By default, this is {@code true}. When set to {@code false}, {@code verifyHostName=false} is
+     * appended to the broker URI for regular transport connections. For failover connections,
+     * {@code nested.verifyHostName=false} is used instead. See {@link #getResolvedBrokerUri()}.
+     */
+    private boolean verifyActiveMQBrokerHostnames = true;
+
+    /**
      * The port to use when connecting to the ActiveMQ Jolokia REST API.
      */
     @PositiveOrZero
@@ -188,7 +200,7 @@ public class ActiveMqConfig {
     /**
      * Should DropwizardActiveMq verify host names when using Jolokia REST secure connections?
      * <p>
-     * By default this is {@code true}.
+     * By default, this is {@code true}.
      * <p>
      * The value of this option only matters if {@link #isUseSecureRestConnections()} is {@code true}.
      * Otherwise, it is ignored (because it won't be used).
@@ -206,6 +218,67 @@ public class ActiveMqConfig {
      */
     private TlsContextConfiguration tlsConfiguration =
             TlsConfigProvider.builder().build().getTlsContextConfiguration();
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private String resolvedBrokerUri;
+
+    /**
+     * Returns the broker URI with hostname verification options applied.
+     * <p>
+     * When {@link #isVerifyActiveMQBrokerHostnames()} is {@code true} (the default), this returns
+     * {@link #getBrokerUri()} unchanged. When it is {@code false}, {@code verifyHostName=false} is
+     * appended for regular transport URIs, or {@code nested.verifyHostName=false} for failover URIs.
+     * <p>
+     * The result is computed once and cached. This config object must not be mutated (via
+     * {@link #setBrokerUri(String)} or {@link #setVerifyActiveMQBrokerHostnames(boolean)}) after
+     * this method has been called, as changes will not be reflected in the cached value.
+     */
+    @Synchronized
+    public String getResolvedBrokerUri() {
+        if (isNull(resolvedBrokerUri)) {
+            resolvedBrokerUri = computeResolvedBrokerUri();
+        }
+        return resolvedBrokerUri;
+    }
+
+    private String computeResolvedBrokerUri() {
+        if (isBlank(brokerUri) || verifyActiveMQBrokerHostnames) {
+            return brokerUri;
+        }
+
+        var isFailover = brokerUri.startsWith("failover:");
+        var paramName = isFailover ? "nested.verifyHostName" : "verifyHostName";
+        var disableParam = paramName + "=false";
+
+        if (brokerUri.contains(disableParam)) {
+            return brokerUri;
+        }
+
+        var separator = brokerUri.contains("?") ? "&" : "?";
+        return brokerUri + separator + disableParam;
+    }
+
+    @ValidationMethod(message = "verifyActiveMQBrokerHostnames conflicts with verifyHostName in brokerUri")
+    @SuppressWarnings({ "RedundantIfStatement", "java:S1126" })  // keep separate easier-to-read conditionals
+    public boolean isVerifyActiveMQBrokerHostnamesConsistent() {
+        if (isBlank(brokerUri)) {
+            return true;
+        }
+
+        var isFailover = brokerUri.startsWith("failover:");
+        var paramName = isFailover ? "nested.verifyHostName" : "verifyHostName";
+
+        if (!verifyActiveMQBrokerHostnames && brokerUri.contains(paramName + "=true")) {
+            return false;
+        }
+
+        if (verifyActiveMQBrokerHostnames && brokerUri.contains(paramName + "=false")) {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * This is a validation method that checks that the configuration contains a TLS configuration if either
@@ -248,9 +321,9 @@ public class ActiveMqConfig {
      * Check secure broker URLs: if using secure ActiveMQ connections, then the broker URI should contain "ssl://".
      * If not using secure connections, then the broker URI should not contain "ssl://".
      * <p>
-     * This is certainly not foolproof, but it should catch most simple configuration errors, such as saying
-     * you want to use secure connections, but you're not using the "ssl" scheme in the broker URI, or saying you
-     * do not want to use secure connections, but you are using the "ssl" scheme in the broker URI.
+     * This is certainly not foolproof, but it should catch most simple configuration errors - for example,
+     * saying you want secure connections but not using the "ssl" scheme, or saying you do not want secure
+     * connections but using the "ssl" scheme.
      */
     @ValidationMethod(message = "must use ssk scheme only for secure connections")
     public boolean isBrokerUriForSslProbablyValid() {
