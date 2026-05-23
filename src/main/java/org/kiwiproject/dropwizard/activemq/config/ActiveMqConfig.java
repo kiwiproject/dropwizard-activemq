@@ -180,8 +180,8 @@ public class ActiveMqConfig {
      * Should DropwizardActiveMq verify the ActiveMQ broker's hostname?
      * <p>
      * By default, this is {@code true}. When set to {@code false}, {@code verifyHostName=false} is
-     * appended to the broker URI for regular transport connections, or {@code nested.verifyHostName=false}
-     * for failover connections. See {@link #getResolvedBrokerUri()}.
+     * appended to the broker URI for regular transport connections. For failover connections,
+     * {@code nested.verifyHostName=false} is used instead. See {@link #getResolvedBrokerUri()}.
      */
     private boolean verifyActiveMQBrokerHostnames = true;
 
@@ -320,7 +320,7 @@ public class ActiveMqConfig {
      * Check secure broker URLs: if using secure ActiveMQ connections, then the broker URI should contain "ssl://".
      * If not using secure connections, then the broker URI should not contain "ssl://".
      * <p>
-     * This is certainly not foolproof, but it should catch most simple configuration errors — for example,
+     * This is certainly not foolproof, but it should catch most simple configuration errors - for example,
      * saying you want secure connections but not using the "ssl" scheme, or saying you do not want secure
      * connections but using the "ssl" scheme.
      */
