@@ -260,6 +260,7 @@ public class ActiveMqConfig {
     }
 
     @ValidationMethod(message = "verifyActiveMQBrokerHostnames conflicts with verifyHostName in brokerUri")
+    @SuppressWarnings({ "RedundantIfStatement", "java:S1126" })  // keep separate easier-to-read conditionals
     public boolean isVerifyActiveMQBrokerHostnamesConsistent() {
         if (isBlank(brokerUri)) {
             return true;
