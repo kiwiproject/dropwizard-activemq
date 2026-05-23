@@ -59,6 +59,7 @@ class DefaultValues {
                 () -> assertThat(config.getTimeToLive()).isEqualTo(Duration.hours(1)),
                 () -> assertThat(config.getHealthConfig()).isNotNull(),
                 () -> assertThat(config.isUseSecureActiveMQConnections()).isTrue(),
+                () -> assertThat(config.isVerifyActiveMQBrokerHostnames()).isTrue(),
                 () -> assertThat(config.getJolokiaPort()).isEqualTo(8161),
                 () -> assertThat(config.isUseSecureRestConnections()).isTrue(),
                 () -> assertThat(config.isVerifyRestConnectionHostnames()).isTrue()
@@ -403,6 +404,73 @@ class Validation {
             config.setBrokerUri(brokerUri);
 
             assertThat(config.isBrokerUriForSslProbablyValid()).isEqualTo(expectedResult);
+        }
+    }
+
+    @Nested
+    class IsVerifyActiveMQBrokerHostnamesConsistent {
+
+        @ParameterizedTest
+        @CsvSource(textBlock = """
+                false, ssl://host1.prod:61617, true
+                false, ssl://host1.prod:61617?verifyHostName=false, true
+                false, ssl://host1.prod:61617?verifyHostName=true, false
+                false, 'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)', true
+                false, 'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?nested.verifyHostName=false', true
+                false, 'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?nested.verifyHostName=true', false
+                true, ssl://host1.prod:61617, true
+                true, ssl://host1.prod:61617?verifyHostName=true, true
+                true, ssl://host1.prod:61617?verifyHostName=false, false
+                true, 'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)', true
+                true, 'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?nested.verifyHostName=true', true
+                true, 'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?nested.verifyHostName=false', false
+                """)
+        void shouldReturnExpectedResult(boolean verifyActiveMQBrokerHostnames,
+                                        String brokerUri,
+                                        boolean expectedResult) {
+            config.setVerifyActiveMQBrokerHostnames(verifyActiveMQBrokerHostnames);
+            config.setBrokerUri(brokerUri);
+
+            assertThat(config.isVerifyActiveMQBrokerHostnamesConsistent()).isEqualTo(expectedResult);
+        }
+    }
+
+    @Nested
+    class GetResolvedBrokerUri {
+
+        @Test
+        void shouldReturnBrokerUri_WhenVerifyActiveMQBrokerHostnamesIsTrue() {
+            config.setBrokerUri("ssl://host1.prod:61617");
+            config.setVerifyActiveMQBrokerHostnames(true);
+
+            assertThat(config.getResolvedBrokerUri()).isEqualTo("ssl://host1.prod:61617");
+        }
+
+        @ParameterizedTest
+        @CsvSource(textBlock = """
+                ssl://host1.prod:61617, ssl://host1.prod:61617?verifyHostName=false
+                ssl://host1.prod:61617?someParam=true, ssl://host1.prod:61617?someParam=true&verifyHostName=false
+                ssl://host1.prod:61617?verifyHostName=false, ssl://host1.prod:61617?verifyHostName=false
+                'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)', 'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?nested.verifyHostName=false'
+                'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?randomize=false', 'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?randomize=false&nested.verifyHostName=false'
+                'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?nested.verifyHostName=false', 'failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?nested.verifyHostName=false'
+                """)
+        void shouldAppendVerifyHostName_WhenVerifyActiveMQBrokerHostnamesIsFalse(String brokerUri, String expectedUri) {
+            config.setBrokerUri(brokerUri);
+            config.setVerifyActiveMQBrokerHostnames(false);
+
+            assertThat(config.getResolvedBrokerUri()).isEqualTo(expectedUri);
+        }
+
+        @Test
+        void shouldCacheResolvedBrokerUri() {
+            config.setBrokerUri("ssl://host1.prod:61617");
+            config.setVerifyActiveMQBrokerHostnames(false);
+
+            var first = config.getResolvedBrokerUri();
+            var second = config.getResolvedBrokerUri();
+
+            assertThat(first).isSameAs(second);
         }
     }
 }

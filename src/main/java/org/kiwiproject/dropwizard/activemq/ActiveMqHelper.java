@@ -51,7 +51,7 @@ public class ActiveMqHelper {
         if (config.isUseSecureActiveMQConnections()) {
             connectionFactory = newActiveMQSslConnectionFactory(config);
         } else {
-            connectionFactory = new ActiveMQConnectionFactory(config.getBrokerUri());
+            connectionFactory = new ActiveMQConnectionFactory(config.getResolvedBrokerUri());
         }
 
         LOG.info("Override infinite sendTimeout on ActiveMQConnectionFactory. Set to {}ms",
@@ -66,7 +66,7 @@ public class ActiveMqHelper {
     }
 
     private ActiveMQSslConnectionFactory newActiveMQSslConnectionFactory(ActiveMqConfig config) {
-        var factory = new ActiveMQSslConnectionFactory(config.getBrokerUri());
+        var factory = new ActiveMQSslConnectionFactory(config.getResolvedBrokerUri());
         var securityConfig = config.getTlsConfiguration();
         configureConnectionFactorySecurity(factory, securityConfig);
 

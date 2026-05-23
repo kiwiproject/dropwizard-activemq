@@ -9,8 +9,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.kiwiproject.config.TlsContextConfiguration;
 import org.kiwiproject.config.provider.TlsConfigProvider;
@@ -174,6 +176,18 @@ public class ActiveMqConfig {
     private boolean useSecureActiveMQConnections = true;
 
     /**
+     * Should DropwizardActiveMq verify the ActiveMQ broker's hostname when using secure connections?
+     * <p>
+     * By default this is {@code true}. When set to {@code false}, {@code verifyHostName=false} is
+     * appended to the broker URI for regular transport connections, or {@code nested.verifyHostName=false}
+     * for failover connections. See {@link #getResolvedBrokerUri()}.
+     * <p>
+     * The value of this option only matters if {@link #isUseSecureActiveMQConnections()} is {@code true}.
+     * Otherwise, it is ignored.
+     */
+    private boolean verifyActiveMQBrokerHostnames = true;
+
+    /**
      * The port to use when connecting to the ActiveMQ Jolokia REST API.
      */
     @PositiveOrZero
@@ -206,6 +220,63 @@ public class ActiveMqConfig {
      */
     private TlsContextConfiguration tlsConfiguration =
             TlsConfigProvider.builder().build().getTlsContextConfiguration();
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private String resolvedBrokerUri;
+
+    /**
+     * Returns the broker URI with hostname verification options applied.
+     * <p>
+     * When {@link #isVerifyActiveMQBrokerHostnames()} is {@code true} (the default), this returns
+     * {@link #getBrokerUri()} unchanged. When it is {@code false}, {@code verifyHostName=false} is
+     * appended for regular transport URIs, or {@code nested.verifyHostName=false} for failover URIs.
+     * <p>
+     * The result is computed once and cached.
+     */
+    @Synchronized
+    public String getResolvedBrokerUri() {
+        if (isNull(resolvedBrokerUri)) {
+            resolvedBrokerUri = computeResolvedBrokerUri();
+        }
+        return resolvedBrokerUri;
+    }
+
+    private String computeResolvedBrokerUri() {
+        if (verifyActiveMQBrokerHostnames) {
+            return brokerUri;
+        }
+
+        var isFailover = brokerUri.startsWith("failover:");
+        var paramName = isFailover ? "nested.verifyHostName" : "verifyHostName";
+
+        if (brokerUri.contains(paramName + "=false")) {
+            return brokerUri;
+        }
+
+        var separator = brokerUri.contains("?") ? "&" : "?";
+        return brokerUri + separator + paramName + "=false";
+    }
+
+    @ValidationMethod(message = "verifyActiveMQBrokerHostnames conflicts with verifyHostName in brokerUri")
+    public boolean isVerifyActiveMQBrokerHostnamesConsistent() {
+        if (isNull(brokerUri)) {
+            return true;
+        }
+
+        var isFailover = brokerUri.startsWith("failover:");
+        var paramName = isFailover ? "nested.verifyHostName" : "verifyHostName";
+
+        if (!verifyActiveMQBrokerHostnames && brokerUri.contains(paramName + "=true")) {
+            return false;
+        }
+
+        if (verifyActiveMQBrokerHostnames && brokerUri.contains(paramName + "=false")) {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * This is a validation method that checks that the configuration contains a TLS configuration if either
