@@ -349,7 +349,7 @@ public class ActiveMqConfig {
      * saying you want secure connections but not using the "ssl" scheme, or saying you do not want secure
      * connections but using the "ssl" scheme.
      */
-    @ValidationMethod(message = "must use ssk scheme only for secure connections")
+    @ValidationMethod(message = "must use ssl scheme only for secure connections")
     public boolean isBrokerUriForSslProbablyValid() {
         return useSecureActiveMQConnections == getBrokerUri().contains("ssl://");
     }
