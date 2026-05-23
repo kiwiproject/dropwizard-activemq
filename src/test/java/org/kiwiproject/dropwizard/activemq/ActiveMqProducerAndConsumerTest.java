@@ -9,8 +9,6 @@ import static org.awaitility.Durations.ONE_SECOND;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.kiwiproject.collect.KiwiLists.first;
 import static org.kiwiproject.collect.KiwiLists.second;
-import static org.kiwiproject.dropwizard.activemq.ActiveMqConstants.ALL_EVENTS_QUEUE;
-import static org.kiwiproject.dropwizard.activemq.ActiveMqConstants.ALL_EVENTS_QUEUE_NAME;
 import static org.kiwiproject.dropwizard.activemq.test.util.ActiveMqTestUtils.createNonTransactedSession;
 import static org.kiwiproject.dropwizard.activemq.test.util.ActiveMqTestUtils.createQueueConsumerMessageListener;
 import static org.kiwiproject.dropwizard.activemq.test.util.ActiveMqTestUtils.createTopicConsumerMessageListener;
@@ -235,7 +233,7 @@ class ActiveMqProducerAndConsumerTest {
             assertAll(
                     () -> assertThat(delegate.containsDestination(first(producerDestinations))).isTrue(),
                     () -> assertThat(delegate.containsDestination(second(producerDestinations))).isTrue(),
-                    () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_QUEUE)).isTrue()
+                    () -> assertThat(delegate.containsDefaultDestination(activeMqConfig.getAllEventsQueue())).isTrue()
             );
         }
 
@@ -254,14 +252,14 @@ class ActiveMqProducerAndConsumerTest {
                     () -> assertThat(delegate.containsDestination(first(producerDestinations))).isTrue(),
                     () -> assertThat(delegate.containsDestination(second(producerDestinations))).isTrue(),
                     () -> assertThat(delegate.containsDefaultDestination(first(defaultProducerDestinations))).isTrue(),
-                    () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_QUEUE)).isFalse()
+                    () -> assertThat(delegate.containsDefaultDestination(activeMqConfig.getAllEventsQueue())).isFalse()
             );
         }
 
         @Test
         void shouldStartWhenSetDefaultProducerAsAllEvents() {
             var producerDestinations = List.of("topic:dest1", "topic:dest2");
-            var defaultProducerDestinations = List.of(ALL_EVENTS_QUEUE);
+            var defaultProducerDestinations = List.of(activeMqConfig.getAllEventsQueue());
             activeMqConfig.setProducers(producerDestinations);
             activeMqConfig.setDefaultProducers(defaultProducerDestinations);
             dropwizardActiveMq = newDropwizardActiveMq();
@@ -272,7 +270,7 @@ class ActiveMqProducerAndConsumerTest {
             assertAll(
                     () -> assertThat(delegate.containsDestination(first(producerDestinations))).isTrue(),
                     () -> assertThat(delegate.containsDestination(second(producerDestinations))).isTrue(),
-                    () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_QUEUE)).isTrue()
+                    () -> assertThat(delegate.containsDefaultDestination(activeMqConfig.getAllEventsQueue())).isTrue()
             );
         }
 
@@ -292,7 +290,7 @@ class ActiveMqProducerAndConsumerTest {
                     () -> assertThat(delegate.containsDestination(second(producerDestinations))).isTrue(),
                     () -> assertThat(delegate.containsDefaultDestination(first(defaultProducerDestinations))).isTrue(),
                     () -> assertThat(delegate.containsDefaultDestination(second(defaultProducerDestinations))).isTrue(),
-                    () -> assertThat(delegate.containsDefaultDestination(ALL_EVENTS_QUEUE)).isFalse()
+                    () -> assertThat(delegate.containsDefaultDestination(activeMqConfig.getAllEventsQueue())).isFalse()
             );
         }
 
@@ -316,7 +314,7 @@ class ActiveMqProducerAndConsumerTest {
 
             var listenerA = createTopicConsumerMessageListener(session, "topic-A");
             var listenerB = createQueueConsumerMessageListener(session, "queue-B");
-            var listenerC = createQueueConsumerMessageListener(session, ALL_EVENTS_QUEUE_NAME);
+            var listenerC = createQueueConsumerMessageListener(session, activeMqConfig.getAllEventsQueueName());
 
             var activeMqProducer = dropwizardActiveMq.startProducers();
 

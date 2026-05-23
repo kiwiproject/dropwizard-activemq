@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class ActiveMqConfig {
 
     private static final long DEFAULT_CONSUMER_RECEIVE_TIMEOUT_MILLIS = 400;
+    private static final String DEFAULT_ALL_EVENTS_QUEUE_NAME = "all_events";
 
     public static final String DEFAULT_BROKER_URI = "ssl://localhost:61617";
 
@@ -129,11 +130,18 @@ public class ActiveMqConfig {
     /**
      * List of default producer destinations.
      * <p>
-     * If none set this will be defaulted to a list containing
-     * {@link org.kiwiproject.dropwizard.activemq.ActiveMqConstants#ALL_EVENTS_QUEUE ALL_EVENTS_QUEUE}.
+     * If none set this will be defaulted to a list containing {@link #getAllEventsQueue()}.
      */
     @NotNull
     private List<String> defaultProducers = new ArrayList<>();
+
+    /**
+     * The bare name of the "all events" queue.
+     * <p>
+     * Defaults to {@code "all_events"}. Use {@link #getAllEventsQueue()} to get the full destination string.
+     */
+    @NotBlank
+    private String allEventsQueueName = DEFAULT_ALL_EVENTS_QUEUE_NAME;
 
     /**
      * Should dynamic destinations be permitted?
@@ -222,6 +230,14 @@ public class ActiveMqConfig {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private String resolvedBrokerUri;
+
+    /**
+     * Returns the full destination string for the all-events queue,
+     * i.e., {@code "queue:"} + {@link #getAllEventsQueueName()}.
+     */
+    public String getAllEventsQueue() {
+        return "queue:" + allEventsQueueName;
+    }
 
     /**
      * Returns the broker URI with hostname verification options applied.

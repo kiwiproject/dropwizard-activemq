@@ -6,7 +6,6 @@ import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
 import static org.kiwiproject.collect.KiwiLists.isNotNullOrEmpty;
 import static org.kiwiproject.collect.KiwiLists.isNullOrEmpty;
 import static org.kiwiproject.collect.KiwiLists.last;
-import static org.kiwiproject.dropwizard.activemq.ActiveMqConstants.ALL_EVENTS_QUEUE;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -25,9 +24,33 @@ import java.util.Optional;
  */
 public class MockActiveMqProducer implements ActiveMqProducer {
 
+    private static final String DEFAULT_ALL_EVENTS_QUEUE = "queue:all_events";
+
+    private final String allEventsQueue;
     private final Multimap<String, MockJmsMessage> messages = ArrayListMultimap.create();
     private final Multimap<String, MockJmsMessage> bytesMessages = ArrayListMultimap.create();
     private final Multimap<String, MockJmsMessage> allEventsMessages = ArrayListMultimap.create();
+
+    /**
+     * Creates a new instance using the default all-events queue ({@code "queue:all_events"}).
+     */
+    public MockActiveMqProducer() {
+        this(DEFAULT_ALL_EVENTS_QUEUE);
+    }
+
+    /**
+     * Creates a new instance using a custom all-events queue destination string.
+     *
+     * @param allEventsQueue the full destination string, e.g. {@code "queue:my_events"}
+     */
+    public MockActiveMqProducer(String allEventsQueue) {
+        this.allEventsQueue = allEventsQueue;
+    }
+
+    @Override
+    public void produceToAllEventsQueue(String payload) {
+        produce(allEventsQueue, payload, PayloadDestination.SPECIFIED_ONLY);
+    }
 
     /**
      * Produce a message to the given destination.
@@ -38,14 +61,14 @@ public class MockActiveMqProducer implements ActiveMqProducer {
                         PayloadDestination payloadDestination,
                         Map<String, Object> headers) {
 
-        if (ALL_EVENTS_QUEUE.equals(destination)) {
+        if (allEventsQueue.equals(destination)) {
             produceInternal(destination, payload, headers, allEventsMessages);
         } else {
             produceInternal(destination, payload, headers, messages);
         }
 
         if (payloadDestination == PayloadDestination.SPECIFIED_AND_ALL_EVENTS) {
-            produceInternal(ALL_EVENTS_QUEUE, payload, headers, allEventsMessages);
+            produceInternal(allEventsQueue, payload, headers, allEventsMessages);
         }
     }
 

@@ -77,6 +77,18 @@ class ProducerDelegateTest {
     }
 
     @Test
+    void shouldCreateNewInstance_WithCustomAllEventsQueue() {
+        var config = newConfig(false);
+        config.setAllEventsQueueName("my_events");
+        var delegate = new ProducerDelegate(factory, List.of(), List.of(), ElucidationClient.noop(), serviceName, config);
+
+        assertAll(
+                () -> assertThat(delegate.producers).containsOnlyKeys("queue:my_events"),
+                () -> assertThat(delegate.containsDefaultDestination("queue:my_events")).isTrue()
+        );
+    }
+
+    @Test
     void shouldCreateNewInstance_WithOneDestination_AndContainingAllEventsQueue() {
         var delegate = newDefaultProducerDelegate(List.of(NAMED_DESTINATION), List.of());
 
@@ -296,7 +308,7 @@ class ProducerDelegateTest {
         verifyNoMoreInteractions(allEventsProducer);
         verifyNoInteractions(testProducer);
 
-        verifyElucidationWasInvokedProperly("queue:all_events", payload);
+        verifyElucidationWasInvokedProperly(ALL_EVENTS_DESTINATION, payload);
     }
 
     @Test

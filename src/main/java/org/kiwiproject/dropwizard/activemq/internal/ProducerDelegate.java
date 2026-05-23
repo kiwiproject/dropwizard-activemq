@@ -4,8 +4,8 @@ import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.base.KiwiStrings.f;
-import static org.kiwiproject.dropwizard.activemq.ActiveMqConstants.ALL_EVENTS_QUEUE;
 import static org.kiwiproject.dropwizard.activemq.ActiveMqProducer.PayloadDestination.SPECIFIED_AND_ALL_EVENTS;
+import static org.kiwiproject.dropwizard.activemq.ActiveMqProducer.PayloadDestination.SPECIFIED_ONLY;
 import static org.kiwiproject.dropwizard.activemq.internal.DestinationExtractor.createElucidationDestination;
 import static org.kiwiproject.dropwizard.activemq.util.DynamicDestinations.DYNAMIC_DESTINATION_ID;
 
@@ -32,6 +32,7 @@ public class ProducerDelegate implements ActiveMqProducer {
     @VisibleForTesting
     final Map<String, Producer> producers = new HashMap<>();
 
+    private final String allEventsQueue;
     private final boolean allowDynamicDestinations;
     private final Duration timeToLive;
     private final ElucidationClient<String> elucidation;
@@ -49,6 +50,7 @@ public class ProducerDelegate implements ActiveMqProducer {
         this.serviceName = requireNotBlank(serviceName);
 
         checkArgumentNotNull(configuration);
+        this.allEventsQueue = configuration.getAllEventsQueue();
         this.allowDynamicDestinations = configuration.isAllowDynamicDestinations();
         this.timeToLive = configuration.getTimeToLive().toJavaDuration();
         this.destinationExtractor = new DestinationExtractor(configuration.getDestinationNormalizers());
@@ -59,7 +61,7 @@ public class ProducerDelegate implements ActiveMqProducer {
         checkArgumentNotNull(defaultDestinations);
         if (defaultDestinations.isEmpty()) {
             if (doesNotContainAllEventsQueue()) {
-                putNewDefaultProducer(ALL_EVENTS_QUEUE, factory);
+                putNewDefaultProducer(allEventsQueue, factory);
             }
         } else {
             defaultDestinations.forEach(destination -> putNewDefaultProducer(destination, factory));
@@ -72,12 +74,17 @@ public class ProducerDelegate implements ActiveMqProducer {
         this.elucidation = requireNotNull(elucidation);
     }
 
+    @Override
+    public void produceToAllEventsQueue(String payload) {
+        produce(allEventsQueue, payload, SPECIFIED_ONLY);
+    }
+
     private void putNewProducer(String destination, ConnectionFactory factory) {
         putNewProducer(destination, factory, false);
     }
 
     private boolean doesNotContainAllEventsQueue() {
-        return !producers.containsKey(ALL_EVENTS_QUEUE);
+        return !producers.containsKey(allEventsQueue);
     }
 
     private void putNewDefaultProducer(String destination, ConnectionFactory factory) {

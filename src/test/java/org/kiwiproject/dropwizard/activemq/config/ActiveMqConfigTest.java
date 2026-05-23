@@ -60,6 +60,8 @@ class DefaultValues {
                 () -> assertThat(config.getHealthConfig()).isNotNull(),
                 () -> assertThat(config.isUseSecureActiveMQConnections()).isTrue(),
                 () -> assertThat(config.isVerifyActiveMQBrokerHostnames()).isTrue(),
+                () -> assertThat(config.getAllEventsQueueName()).isEqualTo("all_events"),
+                () -> assertThat(config.getAllEventsQueue()).isEqualTo("queue:all_events"),
                 () -> assertThat(config.getJolokiaPort()).isEqualTo(8161),
                 () -> assertThat(config.isUseSecureRestConnections()).isTrue(),
                 () -> assertThat(config.isVerifyRestConnectionHostnames()).isTrue()
@@ -85,6 +87,24 @@ class Validation {
         @Test
         void shouldPassValidation_WhenNotBlank() {
             assertNoPropertyViolations(config, "brokerUri");
+        }
+    }
+
+    @Nested
+    class AllEventsQueueName {
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  ", "\t"})
+        void shouldFailValidation_WhenBlankOrNull(String value) {
+            config.setAllEventsQueueName(value);
+
+            assertOnePropertyViolation(config, "allEventsQueueName");
+        }
+
+        @Test
+        void shouldPassValidation_WhenNotBlank() {
+            assertNoPropertyViolations(config, "allEventsQueueName");
         }
     }
 

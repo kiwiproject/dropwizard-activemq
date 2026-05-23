@@ -34,6 +34,19 @@ class MockActiveMqProducerTest {
     }
 
     @Test
+    void shouldProduceToCustomAllEventsQueue() {
+        var customProducer = new MockActiveMqProducer("queue:my_events");
+
+        customProducer.produceToAllEventsQueue("message 1");
+        customProducer.produceToAllEventsQueue("message 2");
+
+        assertAll(
+                () -> assertThat(customProducer.allEventsHistory()).containsExactly("message 1", "message 2"),
+                () -> assertThat(customProducer.history()).isEmpty()
+        );
+    }
+
+    @Test
     void shouldProduceToDestination() {
         produceToDestinationMessages();
 

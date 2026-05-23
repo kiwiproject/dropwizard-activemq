@@ -21,11 +21,16 @@ public interface ActiveMqProducer {
     /**
      * Method that will only produce a message to the "All Events" queue,
      * sent as a JMS {@link javax.jms.TextMessage}.
+     * <p>
+     * The default implementation routes to {@code "queue:all_events"}. Implementations that use a
+     * different queue name (configured via
+     * {@link org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig#getAllEventsQueue()})
+     * must override this method.
      *
      * @param payload the payload to produce
      */
     default void produceToAllEventsQueue(String payload) {
-        produce(ActiveMqConstants.ALL_EVENTS_QUEUE, payload, SPECIFIED_ONLY);
+        produce("queue:all_events", payload, SPECIFIED_ONLY);
     }
 
     /**
