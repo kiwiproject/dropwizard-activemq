@@ -411,6 +411,15 @@ class Validation {
     class IsVerifyActiveMQBrokerHostnamesConsistent {
 
         @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"  "})
+        void shouldReturnTrue_WhenBrokerUriIsBlank(String brokerUri) {
+            config.setBrokerUri(brokerUri);
+
+            assertThat(config.isVerifyActiveMQBrokerHostnamesConsistent()).isTrue();
+        }
+
+        @ParameterizedTest
         @CsvSource(textBlock = """
                 false, ssl://host1.prod:61617, true
                 false, ssl://host1.prod:61617?verifyHostName=false, true
@@ -438,12 +447,16 @@ class Validation {
     @Nested
     class GetResolvedBrokerUri {
 
-        @Test
-        void shouldReturnBrokerUri_WhenVerifyActiveMQBrokerHostnamesIsTrue() {
-            config.setBrokerUri("ssl://host1.prod:61617");
+        @ParameterizedTest
+        @ValueSource(strings = {
+                "ssl://host1.prod:61617",
+                "failover:(ssl://host1.prod:61617,ssl://host2.prod:61617)?randomize=false"
+        })
+        void shouldReturnBrokerUri_WhenVerifyActiveMQBrokerHostnamesIsTrue(String brokerUri) {
+            config.setBrokerUri(brokerUri);
             config.setVerifyActiveMQBrokerHostnames(true);
 
-            assertThat(config.getResolvedBrokerUri()).isEqualTo("ssl://host1.prod:61617");
+            assertThat(config.getResolvedBrokerUri()).isEqualTo(brokerUri);
         }
 
         @ParameterizedTest

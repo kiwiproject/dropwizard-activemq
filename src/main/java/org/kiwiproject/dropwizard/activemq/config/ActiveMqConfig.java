@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.config;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import io.dropwizard.util.Duration;
 import io.dropwizard.validation.MinDuration;
@@ -243,7 +244,7 @@ public class ActiveMqConfig {
     }
 
     private String computeResolvedBrokerUri() {
-        if (verifyActiveMQBrokerHostnames) {
+        if (isBlank(brokerUri) || verifyActiveMQBrokerHostnames) {
             return brokerUri;
         }
 
@@ -260,7 +261,7 @@ public class ActiveMqConfig {
 
     @ValidationMethod(message = "verifyActiveMQBrokerHostnames conflicts with verifyHostName in brokerUri")
     public boolean isVerifyActiveMQBrokerHostnamesConsistent() {
-        if (isNull(brokerUri)) {
+        if (isBlank(brokerUri)) {
             return true;
         }
 
