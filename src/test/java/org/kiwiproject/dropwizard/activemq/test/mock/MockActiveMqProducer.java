@@ -3,6 +3,7 @@ package org.kiwiproject.dropwizard.activemq.test.mock;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
+import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.collect.KiwiLists.isNotNullOrEmpty;
 import static org.kiwiproject.collect.KiwiLists.isNullOrEmpty;
 import static org.kiwiproject.collect.KiwiLists.last;
@@ -11,6 +12,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.kiwiproject.dropwizard.activemq.ActiveMqProducer;
+import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 
 import java.util.Base64;
 import java.util.List;
@@ -24,7 +26,7 @@ import java.util.Optional;
  */
 public class MockActiveMqProducer implements ActiveMqProducer {
 
-    private static final String DEFAULT_ALL_EVENTS_QUEUE = "queue:all_events";
+    private static final String DEFAULT_ALL_EVENTS_QUEUE = "queue:" + ActiveMqConfig.DEFAULT_ALL_EVENTS_QUEUE_NAME;
 
     private final String allEventsQueue;
     private final Multimap<String, MockJmsMessage> messages = ArrayListMultimap.create();
@@ -44,7 +46,7 @@ public class MockActiveMqProducer implements ActiveMqProducer {
      * @param allEventsQueue the full destination string, e.g. {@code "queue:my_events"}
      */
     public MockActiveMqProducer(String allEventsQueue) {
-        this.allEventsQueue = checkArgumentNotBlank(allEventsQueue);
+        this.allEventsQueue = requireNotBlank(allEventsQueue);
     }
 
     @Override
