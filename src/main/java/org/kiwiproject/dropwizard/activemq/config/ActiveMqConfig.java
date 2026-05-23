@@ -177,14 +177,11 @@ public class ActiveMqConfig {
     private boolean useSecureActiveMQConnections = true;
 
     /**
-     * Should DropwizardActiveMq verify the ActiveMQ broker's hostname when using secure connections?
+     * Should DropwizardActiveMq verify the ActiveMQ broker's hostname?
      * <p>
      * By default this is {@code true}. When set to {@code false}, {@code verifyHostName=false} is
      * appended to the broker URI for regular transport connections, or {@code nested.verifyHostName=false}
      * for failover connections. See {@link #getResolvedBrokerUri()}.
-     * <p>
-     * The value of this option only matters if {@link #isUseSecureActiveMQConnections()} is {@code true}.
-     * Otherwise, it is ignored.
      */
     private boolean verifyActiveMQBrokerHostnames = true;
 
@@ -233,7 +230,9 @@ public class ActiveMqConfig {
      * {@link #getBrokerUri()} unchanged. When it is {@code false}, {@code verifyHostName=false} is
      * appended for regular transport URIs, or {@code nested.verifyHostName=false} for failover URIs.
      * <p>
-     * The result is computed once and cached.
+     * The result is computed once and cached. This config object must not be mutated (via
+     * {@link #setBrokerUri(String)} or {@link #setVerifyActiveMQBrokerHostnames(boolean)}) after
+     * this method has been called, as changes will not be reflected in the cached value.
      */
     @Synchronized
     public String getResolvedBrokerUri() {
