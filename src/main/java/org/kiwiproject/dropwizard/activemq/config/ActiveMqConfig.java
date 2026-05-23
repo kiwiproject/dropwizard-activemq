@@ -179,7 +179,7 @@ public class ActiveMqConfig {
     /**
      * Should DropwizardActiveMq verify the ActiveMQ broker's hostname?
      * <p>
-     * By default this is {@code true}. When set to {@code false}, {@code verifyHostName=false} is
+     * By default, this is {@code true}. When set to {@code false}, {@code verifyHostName=false} is
      * appended to the broker URI for regular transport connections, or {@code nested.verifyHostName=false}
      * for failover connections. See {@link #getResolvedBrokerUri()}.
      */
@@ -200,7 +200,7 @@ public class ActiveMqConfig {
     /**
      * Should DropwizardActiveMq verify host names when using Jolokia REST secure connections?
      * <p>
-     * By default this is {@code true}.
+     * By default, this is {@code true}.
      * <p>
      * The value of this option only matters if {@link #isUseSecureRestConnections()} is {@code true}.
      * Otherwise, it is ignored (because it won't be used).
@@ -249,13 +249,14 @@ public class ActiveMqConfig {
 
         var isFailover = brokerUri.startsWith("failover:");
         var paramName = isFailover ? "nested.verifyHostName" : "verifyHostName";
+        var disableParam = paramName + "=false";
 
-        if (brokerUri.contains(paramName + "=false")) {
+        if (brokerUri.contains(disableParam)) {
             return brokerUri;
         }
 
         var separator = brokerUri.contains("?") ? "&" : "?";
-        return brokerUri + separator + paramName + "=false";
+        return brokerUri + separator + disableParam;
     }
 
     @ValidationMethod(message = "verifyActiveMQBrokerHostnames conflicts with verifyHostName in brokerUri")
