@@ -21,12 +21,13 @@ public interface ActiveMqProducer {
     /**
      * Method that will only produce a message to the "All Events" queue,
      * sent as a JMS {@link javax.jms.TextMessage}.
+     * <p>
+     * Implementations must route to the configured all-events queue destination,
+     * as returned by {@link org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig#getAllEventsQueue()}.
      *
      * @param payload the payload to produce
      */
-    default void produceToAllEventsQueue(String payload) {
-        produce(ActiveMqConstants.ALL_EVENTS_QUEUE, payload, SPECIFIED_ONLY);
-    }
+    void produceToAllEventsQueue(String payload);
 
     /**
      * Method that will only produce a message to the specified destination,
@@ -56,7 +57,7 @@ public interface ActiveMqProducer {
      * @param destination        the destination topic, virtual topic, or queue
      * @param payload            the payload to produce
      * @param payloadDestination whether to send the message solely to the specified destination or to the
-     *                           "All Events" queue as well (as defined in {@link ActiveMqConstants})
+     *                           "All Events" queue as well (as configured via {@link org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig#getAllEventsQueue()})
      */
     default void produce(String destination, String payload, PayloadDestination payloadDestination) {
         produce(destination, payload, payloadDestination, Map.of());
@@ -96,7 +97,7 @@ public interface ActiveMqProducer {
      * @param destination        the destination topic, virtual topic, or queue
      * @param payload            the payload to produce
      * @param payloadDestination whether to send the message solely to the specified destination or to the
-     *                           "All Events" queue as well (as defined in {@link ActiveMqConstants})
+     *                           "All Events" queue as well (as configured via {@link org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig#getAllEventsQueue()})
      * @param headers            headers to add to the message prior to sending it
      */
     void produce(String destination,
