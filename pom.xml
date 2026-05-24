@@ -26,6 +26,11 @@
     </scm>
 
     <properties>
+        <!-- Sonar -->
+        <sonar.projectKey>kiwiproject_dropwizard-activemq</sonar.projectKey>
+        <sonar.organization>kiwiproject</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
         <!-- required dependency versions -->
         <activemq.version>5.19.6</activemq.version>
         <dropwizard-config-providers.version>3.0.2</dropwizard-config-providers.version>
