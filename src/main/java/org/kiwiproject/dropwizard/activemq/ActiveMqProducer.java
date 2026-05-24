@@ -7,6 +7,13 @@ import static org.kiwiproject.dropwizard.activemq.ActiveMqProducer.PayloadDestin
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+/**
+ * Interface for producing JMS messages to ActiveMQ destinations.
+ * <p>
+ * Supports producing text messages to a specific destination, to the configured "all events" queue,
+ * or to both simultaneously. Also supports producing raw byte messages via
+ * {@link #produceBytesMessage(String, byte[])}.
+ */
 public interface ActiveMqProducer {
 
     /**

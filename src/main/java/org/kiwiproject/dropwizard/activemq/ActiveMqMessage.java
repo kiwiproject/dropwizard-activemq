@@ -14,6 +14,13 @@ import java.util.Optional;
 import javax.jms.Queue;
 import javax.jms.Topic;
 
+/**
+ * Immutable value object representing a JMS message received from ActiveMQ.
+ * <p>
+ * Contains the message body, content type, parsed message type, JMS header properties,
+ * and convenience accessors for standard JMS and ActiveMQ-specific property keys.
+ * All field accessors return {@link java.util.Optional} to avoid null checks.
+ */
 @Value
 @Builder
 @ToString(onlyExplicitlyIncluded = true)

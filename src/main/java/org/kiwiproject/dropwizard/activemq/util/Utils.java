@@ -11,6 +11,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * Internal utility class providing helpers for silently running runnables and
+ * safely closing resources via reflection, suppressing any exceptions that occur.
+ */
 @UtilityClass
 @Slf4j
 public class Utils {

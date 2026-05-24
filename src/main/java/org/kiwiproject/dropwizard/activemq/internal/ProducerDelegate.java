@@ -24,6 +24,12 @@ import java.util.Map.Entry;
 
 import javax.jms.ConnectionFactory;
 
+/**
+ * Internal implementation of {@link ActiveMqProducer} that manages a map of
+ * {@link Producer} instances keyed by destination name and routes produce calls
+ * accordingly, including optional fan-out to the "all events" queue and
+ * Elucidation event recording.
+ */
 @Slf4j
 public class ProducerDelegate implements ActiveMqProducer {
 

@@ -7,6 +7,10 @@ import org.kiwiproject.json.FlexibleJsonModel;
 
 import java.util.Map;
 
+/**
+ * Model for the JSON response returned by the Jolokia HTTP API, used by
+ * {@link DeadLetterQueueHealthCheck} to query ActiveMQ queue state.
+ */
 @Getter
 @Setter
 public class JolokiaResponse extends FlexibleJsonModel {
