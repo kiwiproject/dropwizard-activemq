@@ -26,9 +26,6 @@
     </scm>
 
     <properties>
-        <!-- Sonar -->
-        <sonar.projectKey>kiwiproject_dropwizard-activemq</sonar.projectKey>
-
         <!-- required dependency versions -->
         <activemq.version>5.19.6</activemq.version>
         <dropwizard-config-providers.version>3.0.2</dropwizard-config-providers.version>
@@ -41,6 +38,9 @@
 
         <!-- test dependency versions -->
         <kiwi-test.version>4.1.0</kiwi-test.version>
+
+        <!-- Sonar properties -->
+        <sonar.projectKey>kiwiproject_dropwizard-activemq</sonar.projectKey>
     </properties>
 
     <dependencyManagement>
