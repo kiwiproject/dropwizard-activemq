@@ -40,7 +40,7 @@ public class Utils {
         try {
             runnable.run();
         } catch (Exception e) {
-            LOG.debug("Suppressed exception: " + e);
+            LOG.debug("Suppressed exception thrown by RunnableThrowsException in silentlyRun", e);
         }
     }
 
