@@ -24,6 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Dropwizard configuration class for connecting to an ActiveMQ broker.
+ * <p>
+ * Covers broker URI, consumer and producer destination lists, health check settings,
+ * TLS options, the "all events" queue name, and Elucidation integration.
+ * Bind it in your Dropwizard {@link io.dropwizard.core.Configuration} class and implement
+ * {@link ActiveMqConfigured} to make it available to the library.
+ */
 @Getter
 @Setter
 @Slf4j

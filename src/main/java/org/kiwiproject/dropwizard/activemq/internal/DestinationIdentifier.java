@@ -13,6 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 
+/**
+ * Internal utility that parses destination name strings (e.g., {@code topic:orders},
+ * {@code queue:notifications}, {@code fixedtopic:announcements}) and resolves them to
+ * the concrete JMS destination names used by ActiveMQ, accounting for virtual topic
+ * naming conventions for producers vs. consumers.
+ */
 @Slf4j
 public class DestinationIdentifier {
 

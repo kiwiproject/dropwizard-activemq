@@ -4,6 +4,10 @@ import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 
 import lombok.Getter;
 
+/**
+ * Base unchecked exception for errors that occur while processing an ActiveMQ JMS message.
+ * Carries a {@code category} string that subclasses use to identify the type of failure.
+ */
 public class ActiveMqMessageException extends RuntimeException {
 
     @Getter

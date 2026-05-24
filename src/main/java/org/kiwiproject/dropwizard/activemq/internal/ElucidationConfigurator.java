@@ -18,6 +18,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+/**
+ * Internal utility that builds an {@link org.kiwiproject.dropwizard.activemq.ElucidationContext}
+ * from an {@link org.kiwiproject.dropwizard.activemq.config.ElucidationConfigured} configuration
+ * for recording inbound and outbound JMS connection events to an Elucidation server.
+ */
 @Slf4j
 @UtilityClass
 public class ElucidationConfigurator {

@@ -35,6 +35,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Internal health check that verifies broker connectivity by producing a test message to a temporary
+ * queue and consuming it back. Reports unhealthy if the round-trip does not complete within the
+ * configured timeout.
+ */
 @Slf4j
 public class BrokerHealthCheck extends HealthCheck {
 
