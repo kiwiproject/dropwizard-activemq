@@ -66,7 +66,7 @@ class UtilsTest {
     class SafelyClose {
 
         @Test
-        void shouldCloseResources() throws Exception {
+        void shouldCloseResources() {
             var resource1 = new TrackingCloseable();
             var resource2 = new TrackingCloseable();
 
@@ -95,6 +95,7 @@ class UtilsTest {
             assertThat(resource.closed).isFalse();
         }
 
+        @SuppressWarnings("unused")
         static class TrackingCloseable {
             boolean closed = false;
             boolean customCloseCalled = false;
@@ -108,6 +109,7 @@ class UtilsTest {
             }
         }
 
+        @SuppressWarnings("unused")
         static class ExplodingCloseable {
             public void close() {
                 throw new RuntimeException("boom");
