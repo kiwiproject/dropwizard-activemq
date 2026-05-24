@@ -17,6 +17,8 @@ public interface ActiveMqConfigured extends ElucidationConfigured {
      * <p>
      * The configuration property (e.g., in YAML) must be named according to the value in
      * the {@link JsonProperty} annotation.
+     *
+     * @return the {@link ActiveMqConfig}
      */
     @NonNull
     @JsonProperty("activeMq")

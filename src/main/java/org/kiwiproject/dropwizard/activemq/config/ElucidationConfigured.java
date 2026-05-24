@@ -14,12 +14,16 @@ public interface ElucidationConfigured {
 
     /**
      * The name of the service/application that will be reported to Elucidation.
+     *
+     * @return the service name
      */
     @NotBlank
     String getServiceName();
 
     /**
      * A ServiceIdentifier that identifies that Elucidation service in a service registry (e.g., Consul).
+     *
+     * @return the {@link ServiceIdentifier} for the Elucidation service
      */
     @NotNull
     default ServiceIdentifier getElucidationService() {
@@ -28,6 +32,8 @@ public interface ElucidationConfigured {
 
     /**
      * Whether Elucidation is enabled.
+     *
+     * @return {@code true} if Elucidation is enabled, otherwise {@code false}
      */
     default boolean isElucidationEnabled() {
         return isElucidationEnabled(ElucidationConfigProvider.builder().build());
@@ -38,6 +44,9 @@ public interface ElucidationConfigured {
      * <p>
      * This method is provided specifically for testing purposes, and should generally not
      * be used in production code, which is why it is marked as {@link Beta}.
+     *
+     * @param provider the {@link ElucidationConfigProvider} to use
+     * @return {@code true} if Elucidation is enabled, otherwise {@code false}
      */
     @Beta
     default boolean isElucidationEnabled(ElucidationConfigProvider provider) {

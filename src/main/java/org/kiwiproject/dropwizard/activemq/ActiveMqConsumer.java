@@ -11,8 +11,15 @@ import org.slf4j.LoggerFactory;
 
 public interface ActiveMqConsumer {
 
+    /**
+     * The result of consuming a JMS message.
+     */
     enum Result {
-        CONSUMED, IGNORED
+        /** The message was consumed successfully. */
+        CONSUMED,
+
+        /** The message was intentionally ignored. */
+        IGNORED
     }
 
     /**
