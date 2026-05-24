@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * Interface to implement for consuming JMS messages delivered by the dropwizard-activemq library.
  * <p>
  * Implementations are registered with
- * {@link org.kiwiproject.dropwizard.activemq.DropwizardActiveMq#startConsumer(ActiveMqConsumer, String)}
+ * {@link org.kiwiproject.dropwizard.activemq.DropwizardActiveMq#startConsumer(ActiveMqConsumer, String[])}
  * and will have {@link #consume(ActiveMqMessage)} called for each incoming message.
  */
 public interface ActiveMqConsumer {
