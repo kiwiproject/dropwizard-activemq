@@ -29,9 +29,6 @@ import org.kiwiproject.dropwizard.activemq.exception.ActiveMqProducerException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.verification.VerificationMode;
 
-import java.time.Duration;
-import java.util.Map;
-
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -41,6 +38,8 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import java.time.Duration;
+import java.util.Map;
 
 @DisplayName("Producer")
 class ProducerTest {
@@ -245,9 +244,7 @@ class ProducerTest {
     }
 
     private Producer newConfiguredProducer() {
-        var producer = new Producer(connectionFactory, QUEUE, false, serviceName, TIME_TO_LIVE);
-
-        return producer;
+        return new Producer(connectionFactory, QUEUE, false, serviceName, TIME_TO_LIVE);
     }
 
     private void verifyJmsResourcesWereCreatedAndClosed() throws JMSException {

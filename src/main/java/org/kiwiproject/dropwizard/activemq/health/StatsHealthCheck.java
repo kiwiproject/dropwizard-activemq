@@ -64,7 +64,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     private StatHelper statHelper;
 
     @VisibleForTesting
-    KiwiEnvironment kiwiEnvironment;
+    final KiwiEnvironment kiwiEnvironment;
 
     StatsHealthCheck(C activeMqConfigured) {
         this(activeMqConfigured, new StatHelper(activeMqConfigured.getActiveMqConfig()));
@@ -269,6 +269,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     /**
      * This is a no-op. Override to run additional checks.
      */
+    @SuppressWarnings("unused")
     protected void runAdditionalChecks(JolokiaResponseValue stats,
                                        Map<String, Object> resultMap,
                                        Map<String, Map<String, Object>> healthyResults,

@@ -25,14 +25,13 @@ import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqExtension;
 import org.mockito.Mockito;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.TextMessage;
+import java.util.concurrent.TimeUnit;
 
 @DisplayName("BrokerHealthCheck")
 class BrokerHealthCheckTest {
@@ -185,12 +184,12 @@ class BrokerHealthCheckTest {
         return new ConnectionFactory() {
 
             @Override
-            public Connection createConnection() throws JMSException {
+            public Connection createConnection() {
                 return null;
             }
 
             @Override
-            public Connection createConnection(String userName, String password) throws JMSException {
+            public Connection createConnection(String userName, String password) {
                 return null;
             }
 
