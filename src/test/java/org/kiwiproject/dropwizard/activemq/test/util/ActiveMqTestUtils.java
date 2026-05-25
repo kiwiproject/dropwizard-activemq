@@ -37,7 +37,7 @@ public class ActiveMqTestUtils {
     }
 
     /**
-     * Create a new {@link ConsumerMessageListener} whose consumer name will be prefixed with "listener-".
+     * Create a new {@link ConsumerMessageListener} whose consumer name will be prefixed with {@code "listener-"}.
      *
      * @param destinationName the ActiveMQ destination name
      * @return a new instance

@@ -1,7 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.exception;
 
 /**
- * Thrown when a JMS message has no body attached.
+ * Thrown when a JMS message does not have a body.
  */
 public class ActiveMqMessageMissingBodyException extends ActiveMqMessageException {
 
