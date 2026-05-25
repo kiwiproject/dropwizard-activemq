@@ -13,7 +13,7 @@ import org.kiwiproject.curator.leader.ManagedLeaderLatch;
  * {@link #shouldConsumeMessage(ActiveMqMessage)} method, which allows for
  * per-message logic. Assuming the leader latch has leadership, this method
  * then determines whether a message should be consumed. The default behavior
- * is to process every message, so that implementing classes don't need to
+ * is to process every message so that implementing classes don't need to
  * override this if they only want message consumption to be based on the
  * leader latch.
  * <p>
@@ -33,7 +33,7 @@ public abstract class AbstractLeaderLatchConsumer implements ActiveMqConsumer {
     private final ManagedLeaderLatch leaderLatch;
 
     /**
-     * Create a new instance. Subclasses must call this.
+     * Create a new instance. Subclasses must call this constructor.
      *
      * @param leaderLatch the Leader Latch to use
      */
