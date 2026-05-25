@@ -76,7 +76,7 @@ class StatHelperTest {
 
         @GET
         @Path("/read/{details}")
-        public Response getStats(@PathParam("details") String details) {
+        public Response getStats(@PathParam("details") String ignored) {
             if (SIMULATE_ERROR.getAndSet(false)) {
                 return Response.serverError().entity("oops").build();
             }
@@ -192,7 +192,7 @@ class StatHelperTest {
         }
     }
 
-    // NOTE: Some values need single quotes around them, because they contain commas
+    // NOTE: Some values need single quotes around them because they contain commas
     @ParameterizedTest
     @CsvSource(textBlock = """
             http://messages.acme.com/api/jolokia, http, 8161, http://messages.acme.com:8161/api/jolokia/
