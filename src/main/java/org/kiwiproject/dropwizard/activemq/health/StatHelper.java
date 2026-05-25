@@ -29,6 +29,7 @@ import org.kiwiproject.jaxrs.KiwiResponses;
 import org.kiwiproject.jaxrs.exception.JaxrsNotFoundException;
 import org.kiwiproject.json.JsonHelper;
 
+import javax.net.ssl.HostnameVerifier;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +38,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import javax.net.ssl.HostnameVerifier;
 
 @Slf4j
 class StatHelper {
@@ -50,8 +49,6 @@ class StatHelper {
             "read/org.apache.activemq:type=Broker,brokerName=*,destinationType=*,destinationName=";
     private static final int DEFAULT_CONNECT_TIMEOUT_SECONDS = 5;
     private static final int DEFAULT_READ_TIMEOUT_SECONDS = 5;
-
-    static final String DLQ_QUEUE_NAME = "ActiveMQ.DLQ";
 
     @VisibleForTesting
     final Client client;
