@@ -64,7 +64,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     private StatHelper statHelper;
 
     @VisibleForTesting
-    KiwiEnvironment kiwiEnvironment;
+    final KiwiEnvironment kiwiEnvironment;
 
     StatsHealthCheck(C activeMqConfigured) {
         this(activeMqConfigured, new StatHelper(activeMqConfigured.getActiveMqConfig()));
