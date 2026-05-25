@@ -76,7 +76,7 @@ public interface ActiveMqProducer {
      *
      * @param destination the destination topic, virtual topic, or queue
      * @param payload     the payload to produce
-     * @param headers     headers to add to the message prior to sending it
+     * @param headers     headers to add to the message before sending it
      */
     default void produceToDestinationWithHeaders(String destination,
                                                  String payload,
@@ -90,7 +90,7 @@ public interface ActiveMqProducer {
      *
      * @param destination the destination topic, virtual topic, or queue
      * @param payload     the payload to produce
-     * @param headers     headers to add to the message prior to sending it
+     * @param headers     headers to add to the message before sending it
      */
     default void produceToDestinationAndAllEventsWithHeaders(String destination,
                                                              String payload,
@@ -105,7 +105,7 @@ public interface ActiveMqProducer {
      * @param payload            the payload to produce
      * @param payloadDestination whether to send the message solely to the specified destination or to the
      *                           "All Events" queue as well (as configured via {@link org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig#getAllEventsQueue()})
-     * @param headers            headers to add to the message prior to sending it
+     * @param headers            headers to add to the message before sending it
      */
     void produce(String destination,
                  String payload,

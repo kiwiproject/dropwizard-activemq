@@ -91,7 +91,7 @@ public interface ActiveMqConsumer {
      * This method is primarily exposed for testing purposes, but can also be used by implementations
      * of {@link ActiveMqConsumer} for custom exception handling.
      * <p>
-     * This default implementation logs a WARN-level message, and also a TRACE-level message containing
+     * This default implementation logs a WARN-level message and also a TRACE-level message containing
      * the actual message and the stack trace. If many messages are failing, this allows you to change
      * the log level to TRACE (temporarily) to view message contents for aid when debugging a problem.
      *
