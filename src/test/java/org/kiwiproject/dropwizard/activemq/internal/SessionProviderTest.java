@@ -59,6 +59,7 @@ class SessionProviderTest {
     void shouldThrowJMSException_CreatingInstance_WhenBadConnection() throws JMSException {
         when(factory.createConnection()).thenThrow(JMSException.class);
 
+        //noinspection unused — try-with-resources required; constructor throws before body executes
         try (var provider = new SessionProvider(factory, serviceName)) {
             fail("A JMSException should have been thrown");
         } catch (Exception e) {
@@ -75,6 +76,7 @@ class SessionProviderTest {
 
         when(connection.createSession(anyBoolean(), anyInt())).thenThrow(JMSException.class);
 
+        //noinspection unused — try-with-resources required; constructor throws before body executes
         try (var provider = new SessionProvider(factory, serviceName)) {
             fail("A JMSException should have been thrown");
         } catch (Exception e) {
