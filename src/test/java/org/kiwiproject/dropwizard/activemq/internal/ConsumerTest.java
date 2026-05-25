@@ -41,16 +41,15 @@ import org.kiwiproject.metrics.health.HealthCheckResults;
 import org.kiwiproject.metrics.health.HealthStatus;
 import org.kiwiproject.xml.KiwiXml;
 
-import java.util.Base64;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import java.util.Base64;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 
 @DisplayName("Consumer")
 class ConsumerTest {
@@ -489,12 +488,14 @@ class ConsumerTest {
         validateFieldIsEmpty("JMSXUserId", message.getJMSXUserId());
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private void validateFieldHasValue(String field, Optional<?> optional) {
         assertThat(optional)
                 .withFailMessage("Expected field [{}] to contain a value", field)
                 .isPresent();
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private void validateFieldIsEmpty(String field, Optional<?> optional) {
         assertThat(optional)
                 .withFailMessage("Did not expect field [{}] to contain a value", field)
