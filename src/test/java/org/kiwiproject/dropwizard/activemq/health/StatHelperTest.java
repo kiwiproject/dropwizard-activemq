@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
+@SuppressWarnings("HttpUrlsUsage")
 @DisplayName("StatHelper")
 @ExtendWith(ResetLogbackLoggingExtension.class)
 class StatHelperTest {
