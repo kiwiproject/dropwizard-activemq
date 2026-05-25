@@ -234,7 +234,7 @@ class StatsHealthCheckTest {
                 .isUnhealthy()
                 .hasMessage("""
                         <strong>Unhealthy</strong>
-                        <br />Unable to retrieve stats for: null""");
+                        <br />Unable to retrieve stats for: not_a_thing:test""");
     }
 
     @Test
