@@ -4,14 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.jms.pool.PooledConnectionFactory;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import javax.jms.ConnectionFactory;
 import java.time.Duration;
 import java.util.function.Consumer;
-
-import javax.jms.ConnectionFactory;
 
 /**
  * Creates an embedded ActiveMQ broker for use in JUnit 5 tests.
@@ -59,7 +59,7 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
     }
 
     @Override
-    public void beforeEach(ExtensionContext context) {
+    public void beforeEach(@NonNull ExtensionContext context) {
         try {
             LOG.trace("starting embedded broker");
             service.start();
@@ -75,7 +75,7 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
     }
 
     @Override
-    public void afterEach(ExtensionContext context) {
+    public void afterEach(@NonNull ExtensionContext context) {
         if (!service.isStopped()) {
             try {
                 LOG.trace("stopping embedded broker");

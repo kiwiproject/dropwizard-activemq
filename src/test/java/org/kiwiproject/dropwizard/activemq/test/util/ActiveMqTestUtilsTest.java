@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.QueueReceiver;
@@ -85,17 +84,17 @@ class ActiveMqTestUtilsTest {
         }
 
         @Override
-        public MessageProducer createProducer(ActiveMQSession session) throws JMSException {
+        public MessageProducer createProducer(ActiveMQSession session) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public TopicPublisher createPublisher(ActiveMQSession session) throws JMSException {
+        public TopicPublisher createPublisher(ActiveMQSession session) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public QueueSender createSender(ActiveMQSession session) throws JMSException {
+        public QueueSender createSender(ActiveMQSession session) {
             throw new UnsupportedOperationException();
         }
     }
