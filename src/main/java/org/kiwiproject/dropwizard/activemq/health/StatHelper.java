@@ -184,6 +184,7 @@ class StatHelper {
         LOG.debug("GET of stats to any of URLs {} succeeded? {}", activeMqUrls, anyRequestWasSuccessful);
 
         if (isNotNullOrEmpty(successfulResponses)) {
+            //noinspection resource
             var json = first(successfulResponses).readEntity(String.class);
             var jolokiaResponse = jsonHelper.toObject(json, JolokiaResponse.class);
 
