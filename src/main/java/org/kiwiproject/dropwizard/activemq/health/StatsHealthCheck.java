@@ -146,7 +146,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
                 .evaluateDestinationName(dest, actorType, serviceName)
                 .orElse(null);
 
-        String key = null;
+        String key = dest;
         try {
             LOG.debug("{}: Performing Stat Check for destination: {}", simpleClassName, dest);
             if (nonNull(info)) {
@@ -160,7 +160,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
             } else {
                 LOG.warn("{}: Unable to evaluate a destination for: {} (no DestinationInfo, make sure this is a valid destination)",
                         simpleClassName, dest);
-                resultMap.put(key, null);
+                resultMap.put(dest, null);
             }
         } catch (Exception e) {
             LOG.error("{}: Encountered exception trying to gather stats for destination: {}", simpleClassName, key, e);
