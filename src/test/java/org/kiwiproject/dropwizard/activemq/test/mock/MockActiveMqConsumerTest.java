@@ -325,26 +325,26 @@ class MockActiveMqConsumerTest {
 
     @Test
     void shouldConsumeMessages_FromQueuesAndTopics() {
-        var q1m1_payload = createJsonPayload("queue", 1, 1);
-        var q1m1_message = createMessageFrom(q1m1_payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
+        var q1m1Payload = createJsonPayload("queue", 1, 1);
+        var q1m1Message = createMessageFrom(q1m1Payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
 
-        var t2m1_payload = createJsonPayload("topic", 1, 1);
-        var t2m1_message = createMessageFrom(t2m1_payload, TARGET_MESSAGE_TYPE_2, TARGET_TOPIC_2);
+        var t2m1Payload = createJsonPayload("topic", 1, 1);
+        var t2m1Message = createMessageFrom(t2m1Payload, TARGET_MESSAGE_TYPE_2, TARGET_TOPIC_2);
 
         var consumer = MockActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .consumeMessagesOfType(TARGET_TOPIC_2_NAME, TARGET_MESSAGE_TYPE_2)
                 .buildConsumer();
 
-        consumer.consume(q1m1_message);
-        consumer.consume(t2m1_message);
+        consumer.consume(q1m1Message);
+        consumer.consume(t2m1Message);
 
         assertAll(
-                () -> assertThat(consumer.consumedHistory()).containsOnly(q1m1_message, t2m1_message),
-                () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_1_NAME)).containsOnly(q1m1_message),
+                () -> assertThat(consumer.consumedHistory()).containsOnly(q1m1Message, t2m1Message),
+                () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_1_NAME)).containsOnly(q1m1Message),
                 () -> assertThat(consumer.consumedHistory(TARGET_QUEUE_2_NAME)).isEmpty(),
                 () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
-                () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_2_NAME)).containsOnly(t2m1_message),
+                () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_2_NAME)).containsOnly(t2m1Message),
 
                 () -> assertThat(consumer.ignoredHistory()).isEmpty(),
                 () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_1_NAME)).isEmpty(),
@@ -356,19 +356,19 @@ class MockActiveMqConsumerTest {
 
     @Test
     void shouldIgnoreMessages_FromQueuesAndTopics() {
-        var q1m1_payload = createJsonPayload("queue", 1, 1);
-        var q1m1_message = createMessageFrom(q1m1_payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
+        var q1m1Payload = createJsonPayload("queue", 1, 1);
+        var q1m1Message = createMessageFrom(q1m1Payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
 
-        var t2m1_payload = createJsonPayload("topic", 1, 1);
-        var t2m1_message = createMessageFrom(t2m1_payload, TARGET_MESSAGE_TYPE_2, TARGET_TOPIC_2);
+        var t2m1Payload = createJsonPayload("topic", 1, 1);
+        var t2m1Message = createMessageFrom(t2m1Payload, TARGET_MESSAGE_TYPE_2, TARGET_TOPIC_2);
 
         var consumer = MockActiveMqConsumer.builder()
                 .ignoringMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .ignoringMessagesOfType(TARGET_TOPIC_2_NAME, TARGET_MESSAGE_TYPE_2)
                 .buildConsumer();
 
-        consumer.consume(q1m1_message);
-        consumer.consume(t2m1_message);
+        consumer.consume(q1m1Message);
+        consumer.consume(t2m1Message);
 
         assertAll(
                 () -> assertThat(consumer.consumedHistory()).isEmpty(),
@@ -377,11 +377,11 @@ class MockActiveMqConsumerTest {
                 () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
                 () -> assertThat(consumer.consumedHistory(TARGET_TOPIC_2_NAME)).isEmpty(),
 
-                () -> assertThat(consumer.ignoredHistory()).containsOnly(q1m1_message, t2m1_message),
-                () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_1_NAME)).containsOnly(q1m1_message),
+                () -> assertThat(consumer.ignoredHistory()).containsOnly(q1m1Message, t2m1Message),
+                () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_1_NAME)).containsOnly(q1m1Message),
                 () -> assertThat(consumer.ignoredHistory(TARGET_QUEUE_2_NAME)).isEmpty(),
                 () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_1_NAME)).isEmpty(),
-                () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_2_NAME)).containsOnly(t2m1_message)
+                () -> assertThat(consumer.ignoredHistory(TARGET_TOPIC_2_NAME)).containsOnly(t2m1Message)
         );
     }
 
@@ -389,31 +389,31 @@ class MockActiveMqConsumerTest {
     void shouldConsumeMultipleMessages() {
         // queue messages
 
-        var q1m1_payload = createJsonPayload("queue", 1, 1);
-        var q1m1_message = createMessageFrom(q1m1_payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
+        var q1m1Payload = createJsonPayload("queue", 1, 1);
+        var q1m1Message = createMessageFrom(q1m1Payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
 
-        var q1m2_payload = createJsonPayload("queue", 1, 2);
-        var q1m2_message = createMessageFrom(q1m2_payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
+        var q1m2Payload = createJsonPayload("queue", 1, 2);
+        var q1m2Message = createMessageFrom(q1m2Payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
 
-        var q2m1_payload = createJsonPayload("queue", 2, 1);
-        var q2m1_message = createMessageFrom(q2m1_payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_2);
+        var q2m1Payload = createJsonPayload("queue", 2, 1);
+        var q2m1Message = createMessageFrom(q2m1Payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_2);
 
-        var q2m2_payload = createJsonPayload("queue", 2, 2);
-        var q2m2_message = createMessageFrom(q2m2_payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_2);
+        var q2m2Payload = createJsonPayload("queue", 2, 2);
+        var q2m2Message = createMessageFrom(q2m2Payload, TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_2);
 
         // topic messages
 
-        var t1m1_payload = createJsonPayload("topic", 1, 1);
-        var t1m1_message = createMessageFrom(t1m1_payload, TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1);
+        var t1m1Payload = createJsonPayload("topic", 1, 1);
+        var t1m1Message = createMessageFrom(t1m1Payload, TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1);
 
-        var t1m2_payload = createJsonPayload("topic", 1, 2);
-        var t1m2_message = createMessageFrom(t1m2_payload, TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1);
+        var t1m2Payload = createJsonPayload("topic", 1, 2);
+        var t1m2Message = createMessageFrom(t1m2Payload, TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1);
 
-        var t2m1_payload = createJsonPayload("topic", 2, 1);
-        var t2m1_message = createMessageFrom(t2m1_payload, TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_2);
+        var t2m1Payload = createJsonPayload("topic", 2, 1);
+        var t2m1Message = createMessageFrom(t2m1Payload, TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_2);
 
-        var t2m2_payload = createJsonPayload("topic", 2, 2);
-        var t2m2_message = createMessageFrom(t2m2_payload, TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_2);
+        var t2m2Payload = createJsonPayload("topic", 2, 2);
+        var t2m2Message = createMessageFrom(t2m2Payload, TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_2);
 
         var consumer = MockActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
@@ -422,23 +422,23 @@ class MockActiveMqConsumerTest {
                 .ignoringMessagesOfType(TARGET_TOPIC_2_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
-        consumer.consume(q1m1_message);
-        consumer.consume(q1m2_message);
-        consumer.consume(q2m1_message);
-        consumer.consume(q2m2_message);
+        consumer.consume(q1m1Message);
+        consumer.consume(q1m2Message);
+        consumer.consume(q2m1Message);
+        consumer.consume(q2m2Message);
 
-        consumer.consume(t1m1_message);
-        consumer.consume(t1m2_message);
-        consumer.consume(t2m1_message);
-        consumer.consume(t2m2_message);
+        consumer.consume(t1m1Message);
+        consumer.consume(t1m2Message);
+        consumer.consume(t2m1Message);
+        consumer.consume(t2m2Message);
 
         // Right now we should have consumed the queue messages and ignored the topic ones
-        assertThat(consumer.consumedHistory()).containsExactlyInAnyOrder(q1m1_message, q1m2_message, q2m1_message, q2m2_message);
-        assertThat(consumer.ignoredHistory()).containsExactlyInAnyOrder(t1m1_message, t1m2_message, t2m1_message, t2m2_message);
+        assertThat(consumer.consumedHistory()).containsExactlyInAnyOrder(q1m1Message, q1m2Message, q2m1Message, q2m2Message);
+        assertThat(consumer.ignoredHistory()).containsExactlyInAnyOrder(t1m1Message, t1m2Message, t2m1Message, t2m2Message);
 
         // Consume more messages
-        assertMessagesAreConsumed(consumer, TARGET_QUEUE_1_NAME, q1m1_message, q1m2_message);
-        assertMessagesAreConsumed(consumer, TARGET_QUEUE_2_NAME, q2m1_message, q2m2_message);
+        assertMessagesAreConsumed(consumer, TARGET_QUEUE_1_NAME, q1m1Message, q1m2Message);
+        assertMessagesAreConsumed(consumer, TARGET_QUEUE_2_NAME, q2m1Message, q2m2Message);
 
         // Clear consumed messages
         consumer.clearConsumedMessages();
@@ -446,10 +446,10 @@ class MockActiveMqConsumerTest {
         assertThat(consumer.ignoredHistory()).hasSize(4);
 
         // Consume more messages (that should be ignored)
-        assertMessagesAreIgnored(consumer, TARGET_TOPIC_1_NAME, t1m1_message, t1m2_message);
-        assertMessagesAreIgnored(consumer, TARGET_TOPIC_2_NAME, t2m1_message, t2m2_message);
-        assertThat(consumer.ignoredHistory(TARGET_TOPIC_1_NAME)).contains(t1m1_message);
-        assertThat(consumer.ignoredHistory(TARGET_TOPIC_2_NAME)).contains(t2m1_message);
+        assertMessagesAreIgnored(consumer, TARGET_TOPIC_1_NAME, t1m1Message, t1m2Message);
+        assertMessagesAreIgnored(consumer, TARGET_TOPIC_2_NAME, t2m1Message, t2m2Message);
+        assertThat(consumer.ignoredHistory(TARGET_TOPIC_1_NAME)).contains(t1m1Message);
+        assertThat(consumer.ignoredHistory(TARGET_TOPIC_2_NAME)).contains(t2m1Message);
 
         // Clear ignored messages
         consumer.clearIgnoredMessages();
