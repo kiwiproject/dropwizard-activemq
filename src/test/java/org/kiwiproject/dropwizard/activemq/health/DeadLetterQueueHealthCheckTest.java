@@ -36,9 +36,9 @@ class DeadLetterQueueHealthCheckTest {
     void shouldConstruct() {
         var activeMqConfig = new ActiveMqConfig();
         activeMqConfig.setTlsConfiguration(newTlsContextConfiguration());
-        var healthCheck = new DeadLetterQueueHealthCheck(activeMqConfig);
+        var dlqHealthCheck = new DeadLetterQueueHealthCheck(activeMqConfig);
 
-        assertThat(healthCheck).isNotNull();
+        assertThat(dlqHealthCheck).isNotNull();
     }
 
     @Test
