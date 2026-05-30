@@ -27,7 +27,7 @@ public interface ActiveMqProducer {
 
     /**
      * Method that will only produce a message to the "All Events" queue,
-     * sent as a JMS {@link javax.jms.TextMessage}.
+     * sent as a JMS {@link jakarta.jms.TextMessage}.
      * <p>
      * Implementations must route to the configured all-events queue destination,
      * as returned by {@link org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig#getAllEventsQueue()}.
@@ -38,7 +38,7 @@ public interface ActiveMqProducer {
 
     /**
      * Method that will only produce a message to the specified destination,
-     * sent as a JMS {@link javax.jms.TextMessage}.
+     * sent as a JMS {@link jakarta.jms.TextMessage}.
      *
      * @param destination the destination topic, virtual topic, or queue
      * @param payload     the payload to produce
@@ -49,7 +49,7 @@ public interface ActiveMqProducer {
 
     /**
      * Method that will produce a message to the specified destination and to the "All Events" queue,
-     * sent as a JMS {@link javax.jms.TextMessage}.
+     * sent as a JMS {@link jakarta.jms.TextMessage}.
      *
      * @param destination the destination topic, virtual topic, or queue
      * @param payload     the payload to produce
@@ -59,7 +59,7 @@ public interface ActiveMqProducer {
     }
 
     /**
-     * Produce a message as a JMS {@link javax.jms.TextMessage}.
+     * Produce a message as a JMS {@link jakarta.jms.TextMessage}.
      *
      * @param destination        the destination topic, virtual topic, or queue
      * @param payload            the payload to produce
@@ -72,7 +72,7 @@ public interface ActiveMqProducer {
 
     /**
      * Method that will only produce a message to the specified destination,
-     * sent as a JMS {@link javax.jms.TextMessage}, with the specified headers.
+     * sent as a JMS {@link jakarta.jms.TextMessage}, with the specified headers.
      *
      * @param destination the destination topic, virtual topic, or queue
      * @param payload     the payload to produce
@@ -86,7 +86,7 @@ public interface ActiveMqProducer {
 
     /**
      * Method that will produce a message to the specified destination and to the "All Events" queue,
-     * sent as a JMS {@link javax.jms.TextMessage}, with the specified headers.
+     * sent as a JMS {@link jakarta.jms.TextMessage}, with the specified headers.
      *
      * @param destination the destination topic, virtual topic, or queue
      * @param payload     the payload to produce
@@ -99,7 +99,7 @@ public interface ActiveMqProducer {
     }
 
     /**
-     * Produce a message as a JMS {@link javax.jms.TextMessage}.
+     * Produce a message as a JMS {@link jakarta.jms.TextMessage}.
      *
      * @param destination        the destination topic, virtual topic, or queue
      * @param payload            the payload to produce
@@ -113,7 +113,7 @@ public interface ActiveMqProducer {
                  Map<String, Object> headers);
 
     /**
-     * Produce a message as a JMS {@link javax.jms.BytesMessage} by converting
+     * Produce a message as a JMS {@link jakarta.jms.BytesMessage} by converting
      * the payload into bytes using UTF-8 as the character set.
      * <p>
      * Conversion from String to a byte array is done using {@link String#getBytes(String)}
@@ -130,7 +130,7 @@ public interface ActiveMqProducer {
     }
 
     /**
-     * Produce a message as a JMS {@link javax.jms.BytesMessage}.
+     * Produce a message as a JMS {@link jakarta.jms.BytesMessage}.
      *
      * @param destination the destination topic, virtual topic, or queue
      * @param payload     the payload to produce

@@ -19,9 +19,9 @@ import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqEx
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Session;
+import jakarta.jms.Connection;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
 
 @DisplayName("RedundantVirtualTopicConsumers")
 class RedundantVirtualTopicConsumersTest {

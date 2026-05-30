@@ -6,13 +6,13 @@ import static org.kiwiproject.base.KiwiStrings.f;
 import lombok.experimental.UtilityClass;
 import org.kiwiproject.dropwizard.activemq.util.UncheckedJMSException;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MessageProducer;
-import javax.jms.Queue;
-import javax.jms.Session;
-import javax.jms.Topic;
+import jakarta.jms.Connection;
+import jakarta.jms.Destination;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Queue;
+import jakarta.jms.Session;
+import jakarta.jms.Topic;
 
 @UtilityClass
 public class ActiveMqTestUtils {

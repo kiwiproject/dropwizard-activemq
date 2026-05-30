@@ -22,14 +22,14 @@ import org.kiwiproject.dropwizard.activemq.util.Utils.FunctionThrowsException;
 import java.time.Duration;
 import java.util.Map;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Session;
 
 /**
- * This internal class uses JMS {@link javax.jms.MessageProducer} instances to send messages.
+ * This internal class uses JMS {@link jakarta.jms.MessageProducer} instances to send messages.
  */
 @Slf4j
 public class Producer {

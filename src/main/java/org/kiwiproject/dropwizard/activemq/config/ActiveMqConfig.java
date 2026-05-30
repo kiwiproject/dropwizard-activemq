@@ -63,7 +63,7 @@ public class ActiveMqConfig {
     /**
      * The maximum duration the BrokerHealthCheck's temporary consumer will wait for the next message.
      * 
-     * @see javax.jms.MessageConsumer#receive(long)
+     * @see jakarta.jms.MessageConsumer#receive(long)
      */
     @NotNull
     @MinDuration(value = 10, unit = TimeUnit.MILLISECONDS)
@@ -130,7 +130,7 @@ public class ActiveMqConfig {
     /**
      * The maximum duration a consumer will wait for the next message.
      * 
-     * @see javax.jms.MessageConsumer#receive(long)
+     * @see jakarta.jms.MessageConsumer#receive(long)
      */
     @NotNull
     @MinDuration(value = 10, unit = TimeUnit.MILLISECONDS)
@@ -183,7 +183,7 @@ public class ActiveMqConfig {
      * consumer failures invisible until manually investigated. A shorter TTL ensures
      * problems surface quickly. Set to {@code 0} to disable expiry entirely.
      *
-     * @see javax.jms.MessageProducer#setTimeToLive(long)
+     * @see jakarta.jms.MessageProducer#setTimeToLive(long)
      */
     @NotNull
     private Duration timeToLive = Duration.hours(1);
