@@ -41,11 +41,11 @@ import org.kiwiproject.metrics.health.HealthCheckResults;
 import org.kiwiproject.metrics.health.HealthStatus;
 import org.kiwiproject.xml.KiwiXml;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.Session;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.Callable;

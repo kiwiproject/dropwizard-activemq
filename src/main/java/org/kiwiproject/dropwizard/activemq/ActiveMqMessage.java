@@ -11,8 +11,8 @@ import org.apache.activemq.command.ActiveMQDestination;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.jms.Queue;
-import javax.jms.Topic;
+import jakarta.jms.Queue;
+import jakarta.jms.Topic;
 
 /**
  * Immutable value object representing a JMS message received from ActiveMQ.

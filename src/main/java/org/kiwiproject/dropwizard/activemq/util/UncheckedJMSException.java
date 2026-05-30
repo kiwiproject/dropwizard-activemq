@@ -1,9 +1,9 @@
 package org.kiwiproject.dropwizard.activemq.util;
 
-import javax.jms.JMSException;
+import jakarta.jms.JMSException;
 
 /**
- * Unchecked wrapper around {@link javax.jms.JMSException}, allowing JMS exceptions to
+ * Unchecked wrapper around {@link jakarta.jms.JMSException}, allowing JMS exceptions to
  * propagate without requiring checked exception handling at every call site.
  */
 public class UncheckedJMSException extends RuntimeException {

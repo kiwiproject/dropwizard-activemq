@@ -44,9 +44,9 @@ import org.kiwiproject.test.dropwizard.mockito.DropwizardMockitoMocks;
 
 import java.util.List;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Session;
+import jakarta.jms.Connection;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
 
 @DisplayName("ActiveMqProducerAndConsumer")
 class ActiveMqProducerAndConsumerTest {

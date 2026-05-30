@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import javax.jms.ConnectionFactory;
+import jakarta.jms.ConnectionFactory;
 import java.time.Duration;
 import java.util.function.Consumer;
 
@@ -93,8 +93,8 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
     /**
      * Use this in a test to get a new {@link ConnectionFactory} for the embedded broker.
      * <p>
-     * Once you have the factory, you need to create a {@link javax.jms.Connection}, for example,
-     * using {@link ConnectionFactory#createConnection()}, and then create a {@link javax.jms.Session}.
+     * Once you have the factory, you need to create a {@link jakarta.jms.Connection}, for example,
+     * using {@link ConnectionFactory#createConnection()}, and then create a {@link jakarta.jms.Session}.
      *
      * @return a JMS connection factory
      */
@@ -107,8 +107,8 @@ public class EmbeddedActiveMqExtension implements BeforeEachCallback, AfterEachC
     /**
      * Use this in a test to get a new {@link PooledConnectionFactory} for the embedded broker.
      * <p>
-     * Once you have the factory, you need to create a {@link javax.jms.Connection}, for example,
-     * using {@link ConnectionFactory#createConnection()}, and then create a {@link javax.jms.Session}.
+     * Once you have the factory, you need to create a {@link jakarta.jms.Connection}, for example,
+     * using {@link ConnectionFactory#createConnection()}, and then create a {@link jakarta.jms.Session}.
      *
      * @return an ActiveMQ pooled connection factory
      */

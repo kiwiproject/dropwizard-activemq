@@ -11,12 +11,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.QueueReceiver;
-import javax.jms.QueueSender;
-import javax.jms.TopicPublisher;
-import javax.jms.TopicSubscriber;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.MessageProducer;
+import jakarta.jms.QueueReceiver;
+import jakarta.jms.QueueSender;
+import jakarta.jms.TopicPublisher;
+import jakarta.jms.TopicSubscriber;
 
 @DisplayName("ActiveMqTestUtils")
 class ActiveMqTestUtilsTest {
