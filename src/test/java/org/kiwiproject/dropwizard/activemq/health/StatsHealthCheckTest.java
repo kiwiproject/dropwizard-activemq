@@ -428,18 +428,18 @@ class StatsHealthCheckTest {
     }
 
     private String getSampleJson() {
-        return Fixtures.fixture("sample-jolokia-stats-response-amq5.json");
+        return Fixtures.fixture("StatsHealthCheckTest/sample-jolokia-stats-response-amq5.json");
     }
 
     private String getSampleJsonForNoSubscriptionsWithQueueCount(int queueCount) {
-        var template = Fixtures.fixture("sample-jolokia-stats-no-subscriptions-response.json");
+        var template = Fixtures.fixture("StatsHealthCheckTest/sample-jolokia-stats-no-subscriptions-response.json");
         return template
                 .replaceAll("\\{CONSUMER_COUNT}", "0")
                 .replaceAll("\\{QUEUE_COUNT}", Integer.toString(queueCount));
     }
 
     private String getVirtualTopicResponse() {
-        return Fixtures.fixture("sample-jolokia-stats-virtual-topic-response.json");
+        return Fixtures.fixture("StatsHealthCheckTest/sample-jolokia-stats-virtual-topic-response.json");
     }
 
     private void verifyDetailMessage(HealthCheck.Result result, String path, String expectedValue) {
