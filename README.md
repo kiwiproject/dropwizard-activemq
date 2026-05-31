@@ -13,7 +13,7 @@ A small library that integrates [Dropwizard](https://www.dropwizard.io/) and [Ap
 
 - Java 17 or higher
 - Dropwizard 5.x
-- ActiveMQ Classic 5.x
+- ActiveMQ Classic 5.18.x or higher (uses AMQ 6.x client libraries)
 
 ## Dependency
 
