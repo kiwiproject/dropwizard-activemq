@@ -58,8 +58,8 @@ class StatHelperTest {
 
     private static final Headers EMPTY_HEADERS = new Headers.Builder().build();
 
-    private static final String JOLOKIA_RESPONSE_FIXTURE_AMQ5 = Fixtures.fixture("sample-jolokia-stats-response-amq5.json");
-    private static final String JOLOKIA_RESPONSE_FIXTURE_AMQ6 = Fixtures.fixture("sample-jolokia-stats-response-amq6.json");
+    private static final String JOLOKIA_RESPONSE_FIXTURE_AMQ5 = Fixtures.fixture("StatHelperTest/sample-jolokia-stats-response-amq5.json");
+    private static final String JOLOKIA_RESPONSE_FIXTURE_AMQ6 = Fixtures.fixture("StatHelperTest/sample-jolokia-stats-response-amq6.json");
 
     @Nested
     class IntegrationTests {

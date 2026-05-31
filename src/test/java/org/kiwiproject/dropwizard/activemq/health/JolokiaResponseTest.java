@@ -24,7 +24,7 @@ class JolokiaResponseTest {
 
         @Test
         void shouldDeserialize_WithoutAttribute() throws IOException {
-            var json = Fixtures.fixture("jolokia-response-amq5.json");
+            var json = Fixtures.fixture("JolokiaResponseTest/jolokia-response-amq5.json");
             var response = MAPPER.readValue(json, JolokiaResponse.class);
             var values = List.copyOf(response.getValue().values());
 
@@ -44,7 +44,7 @@ class JolokiaResponseTest {
 
         @Test
         void shouldDeserialize_WithAttributeAsArray() throws IOException {
-            var json = Fixtures.fixture("jolokia-response-amq6.json");
+            var json = Fixtures.fixture("JolokiaResponseTest/jolokia-response-amq6.json");
             var response = MAPPER.readValue(json, JolokiaResponse.class);
             var values = List.copyOf(response.getValue().values());
 
