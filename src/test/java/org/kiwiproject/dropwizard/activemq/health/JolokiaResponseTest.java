@@ -55,7 +55,7 @@ class JolokiaResponseTest {
                             .containsKey("attribute"),
                     () -> assertThat(response.getRequest().get("attribute"))
                             .asInstanceOf(InstanceOfAssertFactories.LIST)
-                            .contains("QueueSize", "ConsumerCount", "Name"),
+                            .isEmpty(),
                     () -> assertThat(values).satisfiesExactly(v -> {
                         assertThat(v.getQueueSize()).isEqualTo(3L);
                         assertThat(v.getConsumerCount()).isEqualTo(2L);
