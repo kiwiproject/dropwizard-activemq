@@ -1,0 +1,45 @@
+brokerUri: "ssl://broker.example.com:61617"
+registerBrokerHealthCheck: false
+brokerHealthCheckConsumerReceiveTimeout: "200ms"
+healthCheckNamePrefix: "internal"
+enableStatsHealthChecks: false
+enableElucidation: true
+autoRegisterConsumers: false
+consumers:
+  - "queue:orders"
+  - "topic:events"
+producers:
+  - "queue:notifications"
+defaultProducers:
+  - "queue:all_events"
+allEventsQueueName: "all_events_custom"
+allowDynamicDestinations: true
+allowMultipleConsumersPerDestination: true
+timeToLive: "30m"
+useSecureActiveMQConnections: true
+verifyActiveMQBrokerHostnames: false
+jolokiaPort: 9161
+useSecureRestConnections: true
+verifyRestConnectionHostnames: false
+destinationNormalizers:
+  - pattern: "(myapp\\.group).*"
+    replacement: "$1.##"
+healthConfig:
+  jmxUser: "monitor"
+  jmxCred: "s3cr3t"
+  ignoredDestinations:
+    - "queue:ignored-one"
+  minConsumerThreshold: 2
+  maxPendingThreshold: 500
+  refreshInterval: "5m"
+  ignoreEmptyQueuesWithNoConsumers: false
+  statsTimeout: "30s"
+  dlqName: "ActiveMQ.DLQ.custom"
+tlsConfiguration:
+  keyStorePath: "/test/keystore.p12"
+  keyStorePassword: "kspass"
+  keyStoreType: "PKCS12"
+  trustStorePath: "/test/truststore.p12"
+  trustStorePassword: "tspass"
+  trustStoreType: "PKCS12"
+  verifyHostname: false

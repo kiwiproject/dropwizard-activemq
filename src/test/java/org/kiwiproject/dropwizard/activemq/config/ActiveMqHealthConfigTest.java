@@ -15,6 +15,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.List;
+
 @DisplayName("ActiveMqHealthConfig")
 class ActiveMqHealthConfigTest {
 
@@ -46,6 +48,65 @@ class ActiveMqHealthConfigTest {
                     () -> assertThat(config.getStatsTimeout()).isEqualTo(Duration.seconds(10)),
                     () -> assertThat(config.getDlqName()).isEqualTo(ActiveMqHealthConfig.DEFAULT_DLQ_NAME)
             );
+        }
+    }
+
+    @Nested
+    class Builder {
+
+        @Test
+        void shouldBuildWithDefaults() {
+            var built = ActiveMqHealthConfig.builder().build();
+            var defaulted = new ActiveMqHealthConfig();
+
+            assertAll(
+                    () -> assertThat(built.getJmxUser()).isNull(),
+                    () -> assertThat(built.getJmxCred()).isNull(),
+                    () -> assertThat(built.getIgnoredDestinations()).isEmpty(),
+                    () -> assertThat(built.getMinConsumerThreshold()).isEqualTo(defaulted.getMinConsumerThreshold()),
+                    () -> assertThat(built.getMaxPendingThreshold()).isEqualTo(defaulted.getMaxPendingThreshold()),
+                    () -> assertThat(built.getRefreshInterval()).isEqualTo(defaulted.getRefreshInterval()),
+                    () -> assertThat(built.isIgnoreEmptyQueuesWithNoConsumers()).isEqualTo(defaulted.isIgnoreEmptyQueuesWithNoConsumers()),
+                    () -> assertThat(built.getStatsTimeout()).isEqualTo(defaulted.getStatsTimeout()),
+                    () -> assertThat(built.getDlqName()).isEqualTo(defaulted.getDlqName())
+            );
+        }
+
+        @Test
+        void shouldBuildWithExplicitValues() {
+            var built = ActiveMqHealthConfig.builder()
+                    .jmxUser("monitor")
+                    .jmxCred("s3cr3t")
+                    .ignoredDestinations(List.of("queue:ignored-one"))
+                    .minConsumerThreshold(2)
+                    .maxPendingThreshold(500)
+                    .refreshInterval(Duration.minutes(5))
+                    .ignoreEmptyQueuesWithNoConsumers(false)
+                    .statsTimeout(Duration.seconds(30))
+                    .dlqName("ActiveMQ.DLQ.custom")
+                    .build();
+
+            assertAll(
+                    () -> assertThat(built.getJmxUser()).isEqualTo("monitor"),
+                    () -> assertThat(built.getJmxCred()).isEqualTo("s3cr3t"),
+                    () -> assertThat(built.getIgnoredDestinations()).containsExactly("queue:ignored-one"),
+                    () -> assertThat(built.getMinConsumerThreshold()).isEqualTo(2),
+                    () -> assertThat(built.getMaxPendingThreshold()).isEqualTo(500),
+                    () -> assertThat(built.getRefreshInterval()).isEqualTo(Duration.minutes(5)),
+                    () -> assertThat(built.isIgnoreEmptyQueuesWithNoConsumers()).isFalse(),
+                    () -> assertThat(built.getStatsTimeout()).isEqualTo(Duration.seconds(30)),
+                    () -> assertThat(built.getDlqName()).isEqualTo("ActiveMQ.DLQ.custom")
+            );
+        }
+
+        @Test
+        void shouldPassBeanValidation_WhenAllRequiredFieldsAreSet() {
+            var built = ActiveMqHealthConfig.builder()
+                    .jmxUser("admin")
+                    .jmxCred("secret")
+                    .build();
+
+            assertNoViolations(built);
         }
     }
 
