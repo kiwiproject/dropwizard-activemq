@@ -12,6 +12,7 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.Response;
 import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
 import okhttp3.Headers;
 import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
@@ -64,11 +65,13 @@ class StatHelperTest {
         @RegisterExtension
         final MockWebServerExtension mockServer = new MockWebServerExtension();
 
+        private MockWebServer server;
         private StatHelper statHelper;
         private Client client;
 
         @BeforeEach
         void setUp() {
+            server = mockServer.server();
             client = ClientBuilder.newClient();
             statHelper = new StatHelper(
                 "tcp://host1:61616,tcp://host2:61616", "http", 8011, ActiveMqHealthConfig.DEFAULT_DLQ_NAME, client, JSON_HELPER);
@@ -86,9 +89,9 @@ class StatHelperTest {
         @ParameterizedTest
         @MethodSource("jolokiaResponseFixtures")
         void getStatsForDestination_shouldReturnTrue_OnSuccess(String fixture) {
-            mockServer.server().enqueue(new MockResponse(200, new Headers.Builder().build(), fixture));
+            server.enqueue(new MockResponse(200, new Headers.Builder().build(), fixture));
 
-            var urls = List.of(mockServer.server().url("/api/jolokia/read/foo").toString());
+            var urls = List.of(server.url("/api/jolokia/read/foo").toString());
             List<JolokiaResponseValue> stats = statHelper.getStatsForDestination(urls);
 
             assertThat(stats).hasSize(1);
@@ -101,9 +104,9 @@ class StatHelperTest {
 
         @Test
         void getStatsForDestination_shouldThrow_OnUnsuccessfulResponse() {
-            mockServer.server().enqueue(new MockResponse(500, new Headers.Builder().build(), "oops"));
+            server.enqueue(new MockResponse(500, new Headers.Builder().build(), "oops"));
 
-            var urls = List.of(mockServer.server().url("/api/jolokia/read/foo").toString());
+            var urls = List.of(server.url("/api/jolokia/read/foo").toString());
             assertUnableToFetchStatsFor(urls);
         }
 
@@ -127,9 +130,9 @@ class StatHelperTest {
 
         @Test
         void attemptClientGet_shouldReturnTrue_OnSuccessfulResponse() {
-            mockServer.server().enqueue(new MockResponse(200, new Headers.Builder().build(), JOLOKIA_RESPONSE_FIXTURE_AMQ5));
+            server.enqueue(new MockResponse(200, new Headers.Builder().build(), JOLOKIA_RESPONSE_FIXTURE_AMQ5));
 
-            var url = mockServer.server().url("/api/jolokia/read/foo").toString();
+            var url = server.url("/api/jolokia/read/foo").toString();
             var successfulResponses = new ArrayList<Response>();
             var succeeded = statHelper.attemptClientGet(client, url, successfulResponses);
             assertThat(successfulResponses).hasSize(1);
@@ -140,9 +143,9 @@ class StatHelperTest {
 
         @Test
         void attemptClientGet_shouldReturnFalse_OnUnsuccessfulResponse() {
-            mockServer.server().enqueue(new MockResponse(500, new Headers.Builder().build(), "oops"));
+            server.enqueue(new MockResponse(500, new Headers.Builder().build(), "oops"));
 
-            var url = mockServer.server().url("/api/jolokia/read/foo").toString();
+            var url = server.url("/api/jolokia/read/foo").toString();
             var successfulResponses = new ArrayList<Response>();
             var succeeded = statHelper.attemptClientGet(client, url, successfulResponses);
             assertThat(successfulResponses).isEmpty();
