@@ -673,9 +673,11 @@ class Validation {
                     () -> assertThat(loaded.getJolokiaPort()).isEqualTo(9161),
                     () -> assertThat(loaded.isUseSecureRestConnections()).isTrue(),
                     () -> assertThat(loaded.isVerifyRestConnectionHostnames()).isFalse(),
-                    () -> assertThat(loaded.getDestinationNormalizers()).hasSize(1),
-                    () -> assertThat(loaded.getDestinationNormalizers().get(0).getPattern()).isEqualTo("(myapp\\.group).*"),
-                    () -> assertThat(loaded.getDestinationNormalizers().get(0).getReplacement()).isEqualTo("$1.##"),
+                    () -> assertThat(loaded.getDestinationNormalizers()).satisfiesExactly(
+                            n -> {
+                                assertThat(n.getPattern()).isEqualTo("(myapp\\.group).*");
+                                assertThat(n.getReplacement()).isEqualTo("$1.##");
+                            }),
                     () -> assertThat(loaded.getHealthConfig().getJmxUser()).isEqualTo("monitor"),
                     () -> assertThat(loaded.getHealthConfig().getJmxCred()).isEqualTo("s3cr3t"),
                     () -> assertThat(loaded.getHealthConfig().getIgnoredDestinations()).containsExactly("queue:ignored-one"),
