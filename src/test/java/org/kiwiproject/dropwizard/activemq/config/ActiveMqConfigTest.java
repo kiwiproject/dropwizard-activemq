@@ -7,6 +7,9 @@ import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.se
 import static org.kiwiproject.test.validation.ValidationTestHelper.assertNoPropertyViolations;
 import static org.kiwiproject.test.validation.ValidationTestHelper.assertOnePropertyViolation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.dropwizard.jackson.Jackson;
 import io.dropwizard.util.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +26,8 @@ import org.kiwiproject.config.provider.TlsConfigProvider;
 import org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory;
 import org.kiwiproject.validation.KiwiValidations;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -461,6 +466,214 @@ class Validation {
             config.setBrokerUri(brokerUri);
 
             assertThat(config.isVerifyActiveMQBrokerHostnamesConsistent()).isEqualTo(expectedResult);
+        }
+    }
+
+    private static final ObjectMapper YAML_MAPPER = Jackson.newObjectMapper().copyWith(new YAMLFactory());
+
+    private static ActiveMqConfig loadYamlConfig(String filename) throws IOException {
+        return YAML_MAPPER.readValue(
+                Path.of("src/test/resources/ActiveMqConfigTest", filename).toFile(),
+                ActiveMqConfig.class);
+    }
+
+    @Nested
+    class Builder {
+
+        @Test
+        void shouldBuildWithDefaults() {
+            var built = ActiveMqConfig.builder().build();
+            var defaulted = new ActiveMqConfig();
+
+            assertAll(
+                    () -> assertThat(built.getBrokerUri()).isEqualTo(defaulted.getBrokerUri()),
+                    () -> assertThat(built.isRegisterBrokerHealthCheck()).isEqualTo(defaulted.isRegisterBrokerHealthCheck()),
+                    () -> assertThat(built.getBrokerHealthCheckConsumerReceiveTimeout()).isEqualTo(defaulted.getBrokerHealthCheckConsumerReceiveTimeout()),
+                    () -> assertThat(built.getHealthCheckNamePrefix()).isNull(),
+                    () -> assertThat(built.isEnableStatsHealthChecks()).isEqualTo(defaulted.isEnableStatsHealthChecks()),
+                    () -> assertThat(built.isEnableElucidation()).isEqualTo(defaulted.isEnableElucidation()),
+                    () -> assertThat(built.getDestinationNormalizers()).isEmpty(),
+                    () -> assertThat(built.isAutoRegisterConsumers()).isEqualTo(defaulted.isAutoRegisterConsumers()),
+                    () -> assertThat(built.getConsumers()).isEmpty(),
+                    () -> assertThat(built.getConsumerReceiveTimeout()).isEqualTo(defaulted.getConsumerReceiveTimeout()),
+                    () -> assertThat(built.getProducers()).isEmpty(),
+                    () -> assertThat(built.getDefaultProducers()).isEmpty(),
+                    () -> assertThat(built.getAllEventsQueueName()).isEqualTo(defaulted.getAllEventsQueueName()),
+                    () -> assertThat(built.isAllowDynamicDestinations()).isEqualTo(defaulted.isAllowDynamicDestinations()),
+                    () -> assertThat(built.isAllowMultipleConsumersPerDestination()).isEqualTo(defaulted.isAllowMultipleConsumersPerDestination()),
+                    () -> assertThat(built.getTimeToLive()).isEqualTo(defaulted.getTimeToLive()),
+                    () -> assertThat(built.getHealthConfig()).isNotNull(),
+                    () -> assertThat(built.isUseSecureActiveMQConnections()).isEqualTo(defaulted.isUseSecureActiveMQConnections()),
+                    () -> assertThat(built.isVerifyActiveMQBrokerHostnames()).isEqualTo(defaulted.isVerifyActiveMQBrokerHostnames()),
+                    () -> assertThat(built.getJolokiaPort()).isEqualTo(defaulted.getJolokiaPort()),
+                    () -> assertThat(built.isUseSecureRestConnections()).isEqualTo(defaulted.isUseSecureRestConnections()),
+                    () -> assertThat(built.isVerifyRestConnectionHostnames()).isEqualTo(defaulted.isVerifyRestConnectionHostnames()),
+                    () -> assertThat(built.getTlsConfiguration()).isNotNull()
+            );
+        }
+
+        @Test
+        @RestoreSystemProperties
+        void shouldBuildWithExplicitValues() {
+            setTlsConfigSystemProperties();
+            var tls = newTlsContextConfiguration();
+            var healthConfig = ActiveMqHealthConfig.builder()
+                    .jmxUser("monitor")
+                    .jmxCred("secret")
+                    .build();
+            var normalizer = new DestinationNormalizerConfig();
+            normalizer.setPattern("(myapp\\.group).*");
+            normalizer.setReplacement("$1.##");
+
+            var built = ActiveMqConfig.builder()
+                    .brokerUri("ssl://broker.example.com:61617")
+                    .registerBrokerHealthCheck(false)
+                    .brokerHealthCheckConsumerReceiveTimeout(Duration.milliseconds(200))
+                    .healthCheckNamePrefix("internal")
+                    .enableStatsHealthChecks(false)
+                    .enableElucidation(true)
+                    .destinationNormalizers(List.of(normalizer))
+                    .autoRegisterConsumers(false)
+                    .consumers(List.of("queue:orders"))
+                    .consumerReceiveTimeout(Duration.milliseconds(300))
+                    .producers(List.of("queue:notifications"))
+                    .defaultProducers(List.of("queue:all_events"))
+                    .allEventsQueueName("all_events_custom")
+                    .allowDynamicDestinations(true)
+                    .allowMultipleConsumersPerDestination(true)
+                    .timeToLive(Duration.minutes(30))
+                    .healthConfig(healthConfig)
+                    .useSecureActiveMQConnections(true)
+                    .verifyActiveMQBrokerHostnames(false)
+                    .jolokiaPort(9161)
+                    .useSecureRestConnections(true)
+                    .verifyRestConnectionHostnames(false)
+                    .tlsConfiguration(tls)
+                    .build();
+
+            assertAll(
+                    () -> assertThat(built.getBrokerUri()).isEqualTo("ssl://broker.example.com:61617"),
+                    () -> assertThat(built.isRegisterBrokerHealthCheck()).isFalse(),
+                    () -> assertThat(built.getBrokerHealthCheckConsumerReceiveTimeout()).isEqualTo(Duration.milliseconds(200)),
+                    () -> assertThat(built.getHealthCheckNamePrefix()).isEqualTo("internal"),
+                    () -> assertThat(built.isEnableStatsHealthChecks()).isFalse(),
+                    () -> assertThat(built.isEnableElucidation()).isTrue(),
+                    () -> assertThat(built.getDestinationNormalizers()).hasSize(1),
+                    () -> assertThat(built.isAutoRegisterConsumers()).isFalse(),
+                    () -> assertThat(built.getConsumers()).containsExactly("queue:orders"),
+                    () -> assertThat(built.getConsumerReceiveTimeout()).isEqualTo(Duration.milliseconds(300)),
+                    () -> assertThat(built.getProducers()).containsExactly("queue:notifications"),
+                    () -> assertThat(built.getDefaultProducers()).containsExactly("queue:all_events"),
+                    () -> assertThat(built.getAllEventsQueueName()).isEqualTo("all_events_custom"),
+                    () -> assertThat(built.isAllowDynamicDestinations()).isTrue(),
+                    () -> assertThat(built.isAllowMultipleConsumersPerDestination()).isTrue(),
+                    () -> assertThat(built.getTimeToLive()).isEqualTo(Duration.minutes(30)),
+                    () -> assertThat(built.getHealthConfig()).isSameAs(healthConfig),
+                    () -> assertThat(built.isUseSecureActiveMQConnections()).isTrue(),
+                    () -> assertThat(built.isVerifyActiveMQBrokerHostnames()).isFalse(),
+                    () -> assertThat(built.getJolokiaPort()).isEqualTo(9161),
+                    () -> assertThat(built.isUseSecureRestConnections()).isTrue(),
+                    () -> assertThat(built.isVerifyRestConnectionHostnames()).isFalse(),
+                    () -> assertThat(built.getTlsConfiguration()).isSameAs(tls)
+            );
+        }
+    }
+
+    @Nested
+    class YamlDeserialization {
+
+        @Test
+        void shouldDeserialize_WithConsumersOnly() throws IOException {
+            var config = loadYamlConfig("minimal-consumers-only.yml");
+
+            assertAll(
+                    () -> assertThat(config.getBrokerUri()).isEqualTo("tcp://localhost:61616"),
+                    () -> assertThat(config.getConsumers()).containsExactly("queue:orders"),
+                    () -> assertThat(config.getProducers()).isEmpty(),
+                    () -> assertThat(config.isUseSecureActiveMQConnections()).isFalse(),
+                    () -> assertThat(config.isUseSecureRestConnections()).isFalse(),
+                    () -> assertThat(config.getHealthConfig().getJmxUser()).isEqualTo("admin"),
+                    () -> assertThat(config.getHealthConfig().getJmxCred()).isEqualTo("secret"),
+                    () -> assertThat(config.isRegisterBrokerHealthCheck()).isTrue(),
+                    () -> assertThat(config.isEnableStatsHealthChecks()).isTrue(),
+                    () -> assertThat(config.getTimeToLive()).isEqualTo(Duration.hours(1))
+            );
+        }
+
+        @Test
+        void shouldDeserialize_WithProducersOnly() throws IOException {
+            var config = loadYamlConfig("minimal-producers-only.yml");
+
+            assertAll(
+                    () -> assertThat(config.getBrokerUri()).isEqualTo("tcp://localhost:61616"),
+                    () -> assertThat(config.getConsumers()).isEmpty(),
+                    () -> assertThat(config.getProducers()).containsExactly("queue:notifications"),
+                    () -> assertThat(config.isUseSecureActiveMQConnections()).isFalse(),
+                    () -> assertThat(config.isUseSecureRestConnections()).isFalse(),
+                    () -> assertThat(config.getHealthConfig().getJmxUser()).isEqualTo("admin"),
+                    () -> assertThat(config.getHealthConfig().getJmxCred()).isEqualTo("secret")
+            );
+        }
+
+        @Test
+        void shouldDeserialize_WithConsumersAndProducers() throws IOException {
+            var config = loadYamlConfig("minimal-consumers-and-producers.yml");
+
+            assertAll(
+                    () -> assertThat(config.getBrokerUri()).isEqualTo("tcp://localhost:61616"),
+                    () -> assertThat(config.getConsumers()).containsExactly("queue:orders", "topic:events"),
+                    () -> assertThat(config.getProducers()).containsExactly("queue:notifications"),
+                    () -> assertThat(config.isUseSecureActiveMQConnections()).isFalse(),
+                    () -> assertThat(config.isUseSecureRestConnections()).isFalse(),
+                    () -> assertThat(config.getHealthConfig().getJmxUser()).isEqualTo("admin"),
+                    () -> assertThat(config.getHealthConfig().getJmxCred()).isEqualTo("secret")
+            );
+        }
+
+        @Test
+        void shouldDeserialize_FullConfig() throws IOException {
+            var config = loadYamlConfig("full-config.yml");
+
+            assertAll(
+                    () -> assertThat(config.getBrokerUri()).isEqualTo("ssl://broker.example.com:61617"),
+                    () -> assertThat(config.isRegisterBrokerHealthCheck()).isFalse(),
+                    () -> assertThat(config.getBrokerHealthCheckConsumerReceiveTimeout()).isEqualTo(Duration.milliseconds(200)),
+                    () -> assertThat(config.getHealthCheckNamePrefix()).isEqualTo("internal"),
+                    () -> assertThat(config.isEnableStatsHealthChecks()).isFalse(),
+                    () -> assertThat(config.isEnableElucidation()).isTrue(),
+                    () -> assertThat(config.isAutoRegisterConsumers()).isFalse(),
+                    () -> assertThat(config.getConsumers()).containsExactly("queue:orders", "topic:events"),
+                    () -> assertThat(config.getProducers()).containsExactly("queue:notifications"),
+                    () -> assertThat(config.getDefaultProducers()).containsExactly("queue:all_events"),
+                    () -> assertThat(config.getAllEventsQueueName()).isEqualTo("all_events_custom"),
+                    () -> assertThat(config.isAllowDynamicDestinations()).isTrue(),
+                    () -> assertThat(config.isAllowMultipleConsumersPerDestination()).isTrue(),
+                    () -> assertThat(config.getTimeToLive()).isEqualTo(Duration.minutes(30)),
+                    () -> assertThat(config.isUseSecureActiveMQConnections()).isTrue(),
+                    () -> assertThat(config.isVerifyActiveMQBrokerHostnames()).isFalse(),
+                    () -> assertThat(config.getJolokiaPort()).isEqualTo(9161),
+                    () -> assertThat(config.isUseSecureRestConnections()).isTrue(),
+                    () -> assertThat(config.isVerifyRestConnectionHostnames()).isFalse(),
+                    () -> assertThat(config.getDestinationNormalizers()).hasSize(1),
+                    () -> assertThat(config.getDestinationNormalizers().get(0).getPattern()).isEqualTo("(myapp\\.group).*"),
+                    () -> assertThat(config.getDestinationNormalizers().get(0).getReplacement()).isEqualTo("$1.##"),
+                    () -> assertThat(config.getHealthConfig().getJmxUser()).isEqualTo("monitor"),
+                    () -> assertThat(config.getHealthConfig().getJmxCred()).isEqualTo("s3cr3t"),
+                    () -> assertThat(config.getHealthConfig().getIgnoredDestinations()).containsExactly("queue:ignored-one"),
+                    () -> assertThat(config.getHealthConfig().getMinConsumerThreshold()).isEqualTo(2),
+                    () -> assertThat(config.getHealthConfig().getMaxPendingThreshold()).isEqualTo(500),
+                    () -> assertThat(config.getHealthConfig().getRefreshInterval()).isEqualTo(Duration.minutes(5)),
+                    () -> assertThat(config.getHealthConfig().isIgnoreEmptyQueuesWithNoConsumers()).isFalse(),
+                    () -> assertThat(config.getHealthConfig().getStatsTimeout()).isEqualTo(Duration.seconds(30)),
+                    () -> assertThat(config.getHealthConfig().getDlqName()).isEqualTo("ActiveMQ.DLQ.custom"),
+                    () -> assertThat(config.getTlsConfiguration().getKeyStorePath()).isEqualTo("/test/keystore.p12"),
+                    () -> assertThat(config.getTlsConfiguration().getKeyStorePassword()).isEqualTo("kspass"),
+                    () -> assertThat(config.getTlsConfiguration().getKeyStoreType()).isEqualTo("PKCS12"),
+                    () -> assertThat(config.getTlsConfiguration().getTrustStorePath()).isEqualTo("/test/truststore.p12"),
+                    () -> assertThat(config.getTlsConfiguration().getTrustStorePassword()).isEqualTo("tspass"),
+                    () -> assertThat(config.getTlsConfiguration().getTrustStoreType()).isEqualTo("PKCS12"),
+                    () -> assertThat(config.getTlsConfiguration().isVerifyHostname()).isFalse()
+            );
         }
     }
 

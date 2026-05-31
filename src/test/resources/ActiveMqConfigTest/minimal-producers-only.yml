@@ -1,0 +1,8 @@
+brokerUri: "tcp://localhost:61616"
+useSecureActiveMQConnections: false
+useSecureRestConnections: false
+producers:
+  - "queue:notifications"
+healthConfig:
+  jmxUser: "admin"
+  jmxCred: "secret"

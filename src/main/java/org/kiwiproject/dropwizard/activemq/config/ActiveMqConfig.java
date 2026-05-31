@@ -11,7 +11,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import org.kiwiproject.validation.KiwiValidations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,6 +37,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 @Slf4j
 public class ActiveMqConfig {
 
@@ -360,5 +364,57 @@ public class ActiveMqConfig {
     @ValidationMethod(message = "must use ssl scheme only for secure connections")
     public boolean isBrokerUriForSslProbablyValid() {
         return useSecureActiveMQConnections == getBrokerUri().contains("ssl://");
+    }
+
+    @Builder
+    public ActiveMqConfig(String brokerUri,
+                          Boolean registerBrokerHealthCheck,
+                          Duration brokerHealthCheckConsumerReceiveTimeout,
+                          String healthCheckNamePrefix,
+                          Boolean enableStatsHealthChecks,
+                          Boolean enableElucidation,
+                          List<DestinationNormalizerConfig> destinationNormalizers,
+                          Boolean autoRegisterConsumers,
+                          List<String> consumers,
+                          Duration consumerReceiveTimeout,
+                          List<String> producers,
+                          List<String> defaultProducers,
+                          String allEventsQueueName,
+                          Boolean allowDynamicDestinations,
+                          Boolean allowMultipleConsumersPerDestination,
+                          Duration timeToLive,
+                          ActiveMqHealthConfig healthConfig,
+                          Boolean useSecureActiveMQConnections,
+                          Boolean verifyActiveMQBrokerHostnames,
+                          Integer jolokiaPort,
+                          Boolean useSecureRestConnections,
+                          Boolean verifyRestConnectionHostnames,
+                          TlsContextConfiguration tlsConfiguration) {
+        this.brokerUri = Objects.requireNonNullElse(brokerUri, DEFAULT_BROKER_URI);
+        this.registerBrokerHealthCheck = Objects.requireNonNullElse(registerBrokerHealthCheck, true);
+        this.brokerHealthCheckConsumerReceiveTimeout = Objects.requireNonNullElse(
+                brokerHealthCheckConsumerReceiveTimeout, Duration.milliseconds(DEFAULT_CONSUMER_RECEIVE_TIMEOUT_MILLIS));
+        this.healthCheckNamePrefix = healthCheckNamePrefix;
+        this.enableStatsHealthChecks = Objects.requireNonNullElse(enableStatsHealthChecks, true);
+        this.enableElucidation = Objects.requireNonNullElse(enableElucidation, false);
+        this.destinationNormalizers = Objects.requireNonNullElse(destinationNormalizers, new ArrayList<>());
+        this.autoRegisterConsumers = Objects.requireNonNullElse(autoRegisterConsumers, true);
+        this.consumers = Objects.requireNonNullElse(consumers, new ArrayList<>());
+        this.consumerReceiveTimeout = Objects.requireNonNullElse(
+                consumerReceiveTimeout, Duration.milliseconds(DEFAULT_CONSUMER_RECEIVE_TIMEOUT_MILLIS));
+        this.producers = Objects.requireNonNullElse(producers, new ArrayList<>());
+        this.defaultProducers = Objects.requireNonNullElse(defaultProducers, new ArrayList<>());
+        this.allEventsQueueName = Objects.requireNonNullElse(allEventsQueueName, DEFAULT_ALL_EVENTS_QUEUE_NAME);
+        this.allowDynamicDestinations = Objects.requireNonNullElse(allowDynamicDestinations, false);
+        this.allowMultipleConsumersPerDestination = Objects.requireNonNullElse(allowMultipleConsumersPerDestination, false);
+        this.timeToLive = Objects.requireNonNullElse(timeToLive, Duration.hours(1));
+        this.healthConfig = Objects.requireNonNullElse(healthConfig, new ActiveMqHealthConfig());
+        this.useSecureActiveMQConnections = Objects.requireNonNullElse(useSecureActiveMQConnections, true);
+        this.verifyActiveMQBrokerHostnames = Objects.requireNonNullElse(verifyActiveMQBrokerHostnames, true);
+        this.jolokiaPort = Objects.requireNonNullElse(jolokiaPort, 8161);
+        this.useSecureRestConnections = Objects.requireNonNullElse(useSecureRestConnections, true);
+        this.verifyRestConnectionHostnames = Objects.requireNonNullElse(verifyRestConnectionHostnames, true);
+        this.tlsConfiguration = Objects.requireNonNullElse(
+                tlsConfiguration, TlsConfigProvider.builder().build().getTlsContextConfiguration());
     }
 }

@@ -3,17 +3,21 @@ package org.kiwiproject.dropwizard.activemq.config;
 import io.dropwizard.util.Duration;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Configuration for ActiveMQ stats health checks that use Jolokia to get ActiveMQ stats.
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class ActiveMqHealthConfig {
 
     /**
@@ -53,4 +57,25 @@ public class ActiveMqHealthConfig {
      */
     @NotBlank
     private String dlqName = DEFAULT_DLQ_NAME;
+
+    @Builder
+    public ActiveMqHealthConfig(String jmxUser,
+                                String jmxCred,
+                                List<String> ignoredDestinations,
+                                Integer minConsumerThreshold,
+                                Integer maxPendingThreshold,
+                                Duration refreshInterval,
+                                Boolean ignoreEmptyQueuesWithNoConsumers,
+                                Duration statsTimeout,
+                                String dlqName) {
+        this.jmxUser = jmxUser;
+        this.jmxCred = jmxCred;
+        this.ignoredDestinations = Objects.requireNonNullElse(ignoredDestinations, new ArrayList<>());
+        this.minConsumerThreshold = Objects.requireNonNullElse(minConsumerThreshold, 0);
+        this.maxPendingThreshold = Objects.requireNonNullElse(maxPendingThreshold, 100);
+        this.refreshInterval = Objects.requireNonNullElse(refreshInterval, Duration.minutes(2));
+        this.ignoreEmptyQueuesWithNoConsumers = Objects.requireNonNullElse(ignoreEmptyQueuesWithNoConsumers, true);
+        this.statsTimeout = Objects.requireNonNullElse(statsTimeout, Duration.seconds(10));
+        this.dlqName = Objects.requireNonNullElse(dlqName, DEFAULT_DLQ_NAME);
+    }
 }
