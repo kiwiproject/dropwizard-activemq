@@ -428,7 +428,7 @@ class StatsHealthCheckTest {
     }
 
     private String getSampleJson() {
-        return Fixtures.fixture("sample-jolokia-stats-response.json");
+        return Fixtures.fixture("sample-jolokia-stats-response-amq5.json");
     }
 
     private String getSampleJsonForNoSubscriptionsWithQueueCount(int queueCount) {
