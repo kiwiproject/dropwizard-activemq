@@ -489,7 +489,7 @@ class Validation {
                     () -> assertThat(built.getBrokerUri()).isEqualTo(defaulted.getBrokerUri()),
                     () -> assertThat(built.isRegisterBrokerHealthCheck()).isEqualTo(defaulted.isRegisterBrokerHealthCheck()),
                     () -> assertThat(built.getBrokerHealthCheckConsumerReceiveTimeout()).isEqualTo(defaulted.getBrokerHealthCheckConsumerReceiveTimeout()),
-                    () -> assertThat(built.getHealthCheckNamePrefix()).isNull(),
+                    () -> assertThat(built.getHealthCheckNamePrefix()).isEqualTo(defaulted.getHealthCheckNamePrefix()),
                     () -> assertThat(built.isEnableStatsHealthChecks()).isEqualTo(defaulted.isEnableStatsHealthChecks()),
                     () -> assertThat(built.isEnableElucidation()).isEqualTo(defaulted.isEnableElucidation()),
                     () -> assertThat(built.getDestinationNormalizers()).isEmpty(),
@@ -576,6 +576,25 @@ class Validation {
                     () -> assertThat(built.isVerifyRestConnectionHostnames()).isFalse(),
                     () -> assertThat(built.getTlsConfiguration()).isSameAs(tls)
             );
+        }
+
+        @Test
+        @RestoreSystemProperties
+        void shouldPassBeanValidation_WhenAllRequiredFieldsAreSet() {
+            setTlsConfigSystemProperties();
+
+            var healthConfig = ActiveMqHealthConfig.builder()
+                    .jmxUser("admin")
+                    .jmxCred("secret")
+                    .build();
+            var built = ActiveMqConfig.builder()
+                    .brokerUri("ssl://broker.example.com:61617")
+                    .consumers(List.of("queue:orders"))
+                    .healthConfig(healthConfig)
+                    .build();
+
+            var violations = KiwiValidations.validate(built);
+            assertThat(violations).isEmpty();
         }
     }
 

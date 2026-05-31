@@ -1,5 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.config;
 
+import static java.util.Objects.requireNonNullElse;
+
 import io.dropwizard.util.Duration;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +12,6 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Configuration for ActiveMQ stats health checks that use Jolokia to get ActiveMQ stats.
@@ -58,6 +59,12 @@ public class ActiveMqHealthConfig {
     @NotBlank
     private String dlqName = DEFAULT_DLQ_NAME;
 
+    /**
+     * Builder constructor for programmatic construction.
+     * <p>
+     * Note: {@code jmxUser} and {@code jmxCred} have no defaults and must be supplied;
+     * they are required by the {@code @NotBlank} constraint.
+     */
     @Builder
     public ActiveMqHealthConfig(String jmxUser,
                                 String jmxCred,
@@ -70,12 +77,12 @@ public class ActiveMqHealthConfig {
                                 String dlqName) {
         this.jmxUser = jmxUser;
         this.jmxCred = jmxCred;
-        this.ignoredDestinations = Objects.requireNonNullElse(ignoredDestinations, new ArrayList<>());
-        this.minConsumerThreshold = Objects.requireNonNullElse(minConsumerThreshold, 0);
-        this.maxPendingThreshold = Objects.requireNonNullElse(maxPendingThreshold, 100);
-        this.refreshInterval = Objects.requireNonNullElse(refreshInterval, Duration.minutes(2));
-        this.ignoreEmptyQueuesWithNoConsumers = Objects.requireNonNullElse(ignoreEmptyQueuesWithNoConsumers, true);
-        this.statsTimeout = Objects.requireNonNullElse(statsTimeout, Duration.seconds(10));
-        this.dlqName = Objects.requireNonNullElse(dlqName, DEFAULT_DLQ_NAME);
+        this.ignoredDestinations = requireNonNullElse(ignoredDestinations, new ArrayList<>());
+        this.minConsumerThreshold = requireNonNullElse(minConsumerThreshold, 0);
+        this.maxPendingThreshold = requireNonNullElse(maxPendingThreshold, 100);
+        this.refreshInterval = requireNonNullElse(refreshInterval, Duration.minutes(2));
+        this.ignoreEmptyQueuesWithNoConsumers = requireNonNullElse(ignoreEmptyQueuesWithNoConsumers, true);
+        this.statsTimeout = requireNonNullElse(statsTimeout, Duration.seconds(10));
+        this.dlqName = requireNonNullElse(dlqName, DEFAULT_DLQ_NAME);
     }
 }

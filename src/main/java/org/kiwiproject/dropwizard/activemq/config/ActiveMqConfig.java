@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.config;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNullElse;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import io.dropwizard.util.Duration;
@@ -24,7 +25,6 @@ import org.kiwiproject.validation.KiwiValidations;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,6 +52,11 @@ public class ActiveMqConfig {
      * The default broker URI, using the ActiveMQ SSL port.
      */
     public static final String DEFAULT_BROKER_URI = "ssl://localhost:61617";
+
+    /**
+     * The default Jolokia port.
+     */
+    public static final int DEFAULT_JOLOKIA_PORT = 8161;
 
     /**
      * The full URI of the ActiveMQ broker, including failover, connection options, etc.
@@ -217,7 +222,7 @@ public class ActiveMqConfig {
      * The port to use when connecting to the ActiveMQ Jolokia REST API.
      */
     @PositiveOrZero
-    private int jolokiaPort = 8161;
+    private int jolokiaPort = DEFAULT_JOLOKIA_PORT;
 
     /**
      * Should DropwizardActiveMq connect to the ActiveMQ Jolokia REST API only via secure connections, e.g., TLS,
@@ -390,31 +395,31 @@ public class ActiveMqConfig {
                           Boolean useSecureRestConnections,
                           Boolean verifyRestConnectionHostnames,
                           TlsContextConfiguration tlsConfiguration) {
-        this.brokerUri = Objects.requireNonNullElse(brokerUri, DEFAULT_BROKER_URI);
-        this.registerBrokerHealthCheck = Objects.requireNonNullElse(registerBrokerHealthCheck, true);
-        this.brokerHealthCheckConsumerReceiveTimeout = Objects.requireNonNullElse(
+        this.brokerUri = requireNonNullElse(brokerUri, DEFAULT_BROKER_URI);
+        this.registerBrokerHealthCheck = requireNonNullElse(registerBrokerHealthCheck, true);
+        this.brokerHealthCheckConsumerReceiveTimeout = requireNonNullElse(
                 brokerHealthCheckConsumerReceiveTimeout, Duration.milliseconds(DEFAULT_CONSUMER_RECEIVE_TIMEOUT_MILLIS));
         this.healthCheckNamePrefix = healthCheckNamePrefix;
-        this.enableStatsHealthChecks = Objects.requireNonNullElse(enableStatsHealthChecks, true);
-        this.enableElucidation = Objects.requireNonNullElse(enableElucidation, false);
-        this.destinationNormalizers = Objects.requireNonNullElse(destinationNormalizers, new ArrayList<>());
-        this.autoRegisterConsumers = Objects.requireNonNullElse(autoRegisterConsumers, true);
-        this.consumers = Objects.requireNonNullElse(consumers, new ArrayList<>());
-        this.consumerReceiveTimeout = Objects.requireNonNullElse(
+        this.enableStatsHealthChecks = requireNonNullElse(enableStatsHealthChecks, true);
+        this.enableElucidation = requireNonNullElse(enableElucidation, false);
+        this.destinationNormalizers = requireNonNullElse(destinationNormalizers, new ArrayList<>());
+        this.autoRegisterConsumers = requireNonNullElse(autoRegisterConsumers, true);
+        this.consumers = requireNonNullElse(consumers, new ArrayList<>());
+        this.consumerReceiveTimeout = requireNonNullElse(
                 consumerReceiveTimeout, Duration.milliseconds(DEFAULT_CONSUMER_RECEIVE_TIMEOUT_MILLIS));
-        this.producers = Objects.requireNonNullElse(producers, new ArrayList<>());
-        this.defaultProducers = Objects.requireNonNullElse(defaultProducers, new ArrayList<>());
-        this.allEventsQueueName = Objects.requireNonNullElse(allEventsQueueName, DEFAULT_ALL_EVENTS_QUEUE_NAME);
-        this.allowDynamicDestinations = Objects.requireNonNullElse(allowDynamicDestinations, false);
-        this.allowMultipleConsumersPerDestination = Objects.requireNonNullElse(allowMultipleConsumersPerDestination, false);
-        this.timeToLive = Objects.requireNonNullElse(timeToLive, Duration.hours(1));
-        this.healthConfig = Objects.requireNonNullElse(healthConfig, new ActiveMqHealthConfig());
-        this.useSecureActiveMQConnections = Objects.requireNonNullElse(useSecureActiveMQConnections, true);
-        this.verifyActiveMQBrokerHostnames = Objects.requireNonNullElse(verifyActiveMQBrokerHostnames, true);
-        this.jolokiaPort = Objects.requireNonNullElse(jolokiaPort, 8161);
-        this.useSecureRestConnections = Objects.requireNonNullElse(useSecureRestConnections, true);
-        this.verifyRestConnectionHostnames = Objects.requireNonNullElse(verifyRestConnectionHostnames, true);
-        this.tlsConfiguration = Objects.requireNonNullElse(
+        this.producers = requireNonNullElse(producers, new ArrayList<>());
+        this.defaultProducers = requireNonNullElse(defaultProducers, new ArrayList<>());
+        this.allEventsQueueName = requireNonNullElse(allEventsQueueName, DEFAULT_ALL_EVENTS_QUEUE_NAME);
+        this.allowDynamicDestinations = requireNonNullElse(allowDynamicDestinations, false);
+        this.allowMultipleConsumersPerDestination = requireNonNullElse(allowMultipleConsumersPerDestination, false);
+        this.timeToLive = requireNonNullElse(timeToLive, Duration.hours(1));
+        this.healthConfig = requireNonNullElse(healthConfig, new ActiveMqHealthConfig());
+        this.useSecureActiveMQConnections = requireNonNullElse(useSecureActiveMQConnections, true);
+        this.verifyActiveMQBrokerHostnames = requireNonNullElse(verifyActiveMQBrokerHostnames, true);
+        this.jolokiaPort = requireNonNullElse(jolokiaPort, DEFAULT_JOLOKIA_PORT);
+        this.useSecureRestConnections = requireNonNullElse(useSecureRestConnections, true);
+        this.verifyRestConnectionHostnames = requireNonNullElse(verifyRestConnectionHostnames, true);
+        this.tlsConfiguration = requireNonNullElse(
                 tlsConfiguration, TlsConfigProvider.builder().build().getTlsContextConfiguration());
     }
 }

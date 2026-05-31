@@ -98,6 +98,16 @@ class ActiveMqHealthConfigTest {
                     () -> assertThat(built.getDlqName()).isEqualTo("ActiveMQ.DLQ.custom")
             );
         }
+
+        @Test
+        void shouldPassBeanValidation_WhenAllRequiredFieldsAreSet() {
+            var built = ActiveMqHealthConfig.builder()
+                    .jmxUser("admin")
+                    .jmxCred("secret")
+                    .build();
+
+            assertNoViolations(built);
+        }
     }
 
     @Nested
