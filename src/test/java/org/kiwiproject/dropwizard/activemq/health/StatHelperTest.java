@@ -20,8 +20,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -56,6 +56,8 @@ class StatHelperTest {
     private static final String STATS_URL_2 = BASE_HTTP_URL_2 + DESTINATION_URL_FOO;
     private static final String STATS_URL_3 = BASE_HTTP_URL_3 + DESTINATION_URL_FOO;
 
+    private static final Headers EMPTY_HEADERS = new Headers.Builder().build();
+
     private static final String JOLOKIA_RESPONSE_FIXTURE_AMQ5 = Fixtures.fixture("sample-jolokia-stats-response.json");
     private static final String JOLOKIA_RESPONSE_FIXTURE_AMQ6 = Fixtures.fixture("sample-jolokia-stats-response-amq6.json");
 
@@ -89,7 +91,7 @@ class StatHelperTest {
         @ParameterizedTest
         @MethodSource("jolokiaResponseFixtures")
         void getStatsForDestination_shouldReturnTrue_OnSuccess(String fixture) {
-            server.enqueue(new MockResponse(200, new Headers.Builder().build(), fixture));
+            server.enqueue(new MockResponse(200, EMPTY_HEADERS, fixture));
 
             var urls = List.of(server.url("/api/jolokia/read/foo").toString());
             List<JolokiaResponseValue> stats = statHelper.getStatsForDestination(urls);
@@ -104,7 +106,7 @@ class StatHelperTest {
 
         @Test
         void getStatsForDestination_shouldThrow_OnUnsuccessfulResponse() {
-            server.enqueue(new MockResponse(500, new Headers.Builder().build(), "oops"));
+            server.enqueue(new MockResponse(500, EMPTY_HEADERS, "oops"));
 
             var urls = List.of(server.url("/api/jolokia/read/foo").toString());
             assertUnableToFetchStatsFor(urls);
@@ -130,7 +132,7 @@ class StatHelperTest {
 
         @Test
         void attemptClientGet_shouldReturnTrue_OnSuccessfulResponse() {
-            server.enqueue(new MockResponse(200, new Headers.Builder().build(), JOLOKIA_RESPONSE_FIXTURE_AMQ5));
+            server.enqueue(new MockResponse(200, EMPTY_HEADERS, JOLOKIA_RESPONSE_FIXTURE_AMQ5));
 
             var url = server.url("/api/jolokia/read/foo").toString();
             var successfulResponses = new ArrayList<Response>();
@@ -143,7 +145,7 @@ class StatHelperTest {
 
         @Test
         void attemptClientGet_shouldReturnFalse_OnUnsuccessfulResponse() {
-            server.enqueue(new MockResponse(500, new Headers.Builder().build(), "oops"));
+            server.enqueue(new MockResponse(500, EMPTY_HEADERS, "oops"));
 
             var url = server.url("/api/jolokia/read/foo").toString();
             var successfulResponses = new ArrayList<Response>();
