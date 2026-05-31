@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kiwiproject.base.KiwiStrings;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
@@ -54,7 +55,8 @@ class StatHelperTest {
     private static final String STATS_URL_2 = BASE_HTTP_URL_2 + DESTINATION_URL_FOO;
     private static final String STATS_URL_3 = BASE_HTTP_URL_3 + DESTINATION_URL_FOO;
 
-    private static final String JOLOKIA_RESPONSE_FIXTURE = Fixtures.fixture("sample-jolokia-stats-response.json");
+    private static final String JOLOKIA_RESPONSE_FIXTURE_AMQ5 = Fixtures.fixture("sample-jolokia-stats-response.json");
+    private static final String JOLOKIA_RESPONSE_FIXTURE_AMQ6 = Fixtures.fixture("sample-jolokia-stats-response-amq6.json");
 
     @Nested
     class IntegrationTests {
@@ -77,16 +79,21 @@ class StatHelperTest {
             client.close();
         }
 
-        @Test
-        void getStatsForDestination_shouldReturnTrue_OnSuccess() {
-            mockServer.server().enqueue(new MockResponse(200, new Headers.Builder().build(), JOLOKIA_RESPONSE_FIXTURE));
+        static List<String> jolokiaResponseFixtures() {
+            return List.of(JOLOKIA_RESPONSE_FIXTURE_AMQ5, JOLOKIA_RESPONSE_FIXTURE_AMQ6);
+        }
+
+        @ParameterizedTest
+        @MethodSource("jolokiaResponseFixtures")
+        void getStatsForDestination_shouldReturnTrue_OnSuccess(String fixture) {
+            mockServer.server().enqueue(new MockResponse(200, new Headers.Builder().build(), fixture));
 
             var urls = List.of(mockServer.server().url("/api/jolokia/read/foo").toString());
             List<JolokiaResponseValue> stats = statHelper.getStatsForDestination(urls);
 
             assertThat(stats).hasSize(1);
 
-            JolokiaResponse expectedResponse = JSON_HELPER.toObject(JOLOKIA_RESPONSE_FIXTURE, JolokiaResponse.class);
+            JolokiaResponse expectedResponse = JSON_HELPER.toObject(fixture, JolokiaResponse.class);
             JolokiaResponseValue expectedValue = first(List.copyOf(expectedResponse.getValue().values()));
 
             assertThat(first(stats)).usingRecursiveComparison().isEqualTo(expectedValue);
@@ -120,7 +127,7 @@ class StatHelperTest {
 
         @Test
         void attemptClientGet_shouldReturnTrue_OnSuccessfulResponse() {
-            mockServer.server().enqueue(new MockResponse(200, new Headers.Builder().build(), JOLOKIA_RESPONSE_FIXTURE));
+            mockServer.server().enqueue(new MockResponse(200, new Headers.Builder().build(), JOLOKIA_RESPONSE_FIXTURE_AMQ5));
 
             var url = mockServer.server().url("/api/jolokia/read/foo").toString();
             var successfulResponses = new ArrayList<Response>();
