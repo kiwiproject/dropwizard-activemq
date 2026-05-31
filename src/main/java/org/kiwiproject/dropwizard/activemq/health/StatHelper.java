@@ -186,6 +186,7 @@ class StatHelper {
         if (isNotNullOrEmpty(successfulResponses)) {
             //noinspection resource
             var json = first(successfulResponses).readEntity(String.class);
+            LOG.trace("Received JSON response from ActiveMQ: {}", json);
             var jolokiaResponse = jsonHelper.toObject(json, JolokiaResponse.class);
 
             if (nonNull(jolokiaResponse.getValue())) {

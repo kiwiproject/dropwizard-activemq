@@ -1,0 +1,21 @@
+{
+  "request": {
+    "mbean": "org.apache.activemq:brokerName=*,destinationName=test,destinationType=*,type=Broker",
+    "attribute": [],
+    "type": "read"
+  },
+  "value": {
+    "org.apache.activemq:brokerName=test-broker,destinationName=test,destinationType=Queue,type=Broker": {
+      "Name": "test",
+      "QueueSize": 3,
+      "EnqueueCount": 5,
+      "DequeueCount": 2,
+      "BlockedSends": 0,
+      "ConsumerCount": 2,
+      "ProducerCount": 0,
+      "MessageGroups": {}
+    }
+  },
+  "timestamp": 1710783708,
+  "status": 200
+}

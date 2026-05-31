@@ -14,7 +14,7 @@ import java.util.Map;
 @Setter
 public class JolokiaResponse extends FlexibleJsonModel {
 
-    private Map<String, String> request;
+    private Map<String, Object> request;
     private Map<String, JolokiaResponseValue> value;
     private Long timestamp;
     private Long status;
