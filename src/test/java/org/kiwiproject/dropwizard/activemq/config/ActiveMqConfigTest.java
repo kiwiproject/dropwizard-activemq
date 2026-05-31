@@ -502,7 +502,7 @@ class Validation {
                     () -> assertThat(built.isAllowDynamicDestinations()).isEqualTo(defaulted.isAllowDynamicDestinations()),
                     () -> assertThat(built.isAllowMultipleConsumersPerDestination()).isEqualTo(defaulted.isAllowMultipleConsumersPerDestination()),
                     () -> assertThat(built.getTimeToLive()).isEqualTo(defaulted.getTimeToLive()),
-                    () -> assertThat(built.getHealthConfig()).isNotNull(),
+                    () -> assertThat(built.getHealthConfig()).usingRecursiveComparison().isEqualTo(defaulted.getHealthConfig()),
                     () -> assertThat(built.isUseSecureActiveMQConnections()).isEqualTo(defaulted.isUseSecureActiveMQConnections()),
                     () -> assertThat(built.isVerifyActiveMQBrokerHostnames()).isEqualTo(defaulted.isVerifyActiveMQBrokerHostnames()),
                     () -> assertThat(built.getJolokiaPort()).isEqualTo(defaulted.getJolokiaPort()),
