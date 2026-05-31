@@ -2,7 +2,6 @@ package org.kiwiproject.dropwizard.activemq.health;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.kiwiproject.collect.KiwiLists.first;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
@@ -34,9 +33,10 @@ class JolokiaResponseTest {
                             .containsEntry("mbean", "org.apache.activemq:brokerName=*,destinationName=test,destinationType=*,type=Broker")
                             .containsEntry("type", "read")
                             .doesNotContainKey("attribute"),
-                    () -> assertThat(values).hasSize(1),
-                    () -> assertThat(first(values).getQueueSize()).isEqualTo(3L),
-                    () -> assertThat(first(values).getConsumerCount()).isEqualTo(2L),
+                    () -> assertThat(values).satisfiesExactly(v -> {
+                        assertThat(v.getQueueSize()).isEqualTo(3L);
+                        assertThat(v.getConsumerCount()).isEqualTo(2L);
+                    }),
                     () -> assertThat(response.getTimestamp()).isEqualTo(1710783708L),
                     () -> assertThat(response.getStatus()).isEqualTo(200L)
             );
@@ -56,9 +56,10 @@ class JolokiaResponseTest {
                     () -> assertThat(response.getRequest().get("attribute"))
                             .asInstanceOf(InstanceOfAssertFactories.LIST)
                             .contains("QueueSize", "ConsumerCount", "Name"),
-                    () -> assertThat(values).hasSize(1),
-                    () -> assertThat(first(values).getQueueSize()).isEqualTo(3L),
-                    () -> assertThat(first(values).getConsumerCount()).isEqualTo(2L),
+                    () -> assertThat(values).satisfiesExactly(v -> {
+                        assertThat(v.getQueueSize()).isEqualTo(3L);
+                        assertThat(v.getConsumerCount()).isEqualTo(2L);
+                    }),
                     () -> assertThat(response.getTimestamp()).isEqualTo(1710783708L),
                     () -> assertThat(response.getStatus()).isEqualTo(200L)
             );
