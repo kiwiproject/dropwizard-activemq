@@ -372,7 +372,7 @@ public class ActiveMqConfig {
     }
 
     @Builder
-    public ActiveMqConfig(String brokerUri,
+    private ActiveMqConfig(String brokerUri,
                           Boolean registerBrokerHealthCheck,
                           Duration brokerHealthCheckConsumerReceiveTimeout,
                           String healthCheckNamePrefix,
