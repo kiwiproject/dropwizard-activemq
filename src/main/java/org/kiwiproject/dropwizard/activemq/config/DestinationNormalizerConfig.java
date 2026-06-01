@@ -1,11 +1,14 @@
 package org.kiwiproject.dropwizard.activemq.config;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNullElse;
 
 import io.dropwizard.validation.ValidationMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.regex.Pattern;
@@ -37,6 +40,7 @@ import java.util.regex.PatternSyntaxException;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class DestinationNormalizerConfig {
 
     @NotBlank
@@ -56,5 +60,17 @@ public class DestinationNormalizerConfig {
         } catch (PatternSyntaxException e) {
             return false;
         }
+    }
+
+    /**
+     * Builder constructor for programmatic construction.
+     * <p>
+     * Note: {@code pattern} has no default and must be supplied;
+     * it is required by the {@code @NotBlank} constraint.
+     */
+    @Builder
+    private DestinationNormalizerConfig(String pattern, String replacement) {
+        this.pattern = pattern;
+        this.replacement = requireNonNullElse(replacement, "");
     }
 }
