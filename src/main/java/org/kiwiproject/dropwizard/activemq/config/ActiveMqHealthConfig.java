@@ -66,7 +66,7 @@ public class ActiveMqHealthConfig {
      * they are required by the {@code @NotBlank} constraint.
      */
     @Builder
-    public ActiveMqHealthConfig(String jmxUser,
+    private ActiveMqHealthConfig(String jmxUser,
                                 String jmxCred,
                                 List<String> ignoredDestinations,
                                 Integer minConsumerThreshold,
