@@ -371,6 +371,11 @@ public class ActiveMqConfig {
         return useSecureActiveMQConnections == getBrokerUri().contains("ssl://");
     }
 
+    /**
+     * Builder constructor for programmatic construction.
+     * <p>
+     * Note: {@code healthCheckNamePrefix} has no default and may be {@code null}.
+     */
     @Builder
     private ActiveMqConfig(String brokerUri,
                           Boolean registerBrokerHealthCheck,
