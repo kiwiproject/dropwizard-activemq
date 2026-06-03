@@ -53,6 +53,17 @@ public interface ActiveMqProducersAndConsumers {
     Set<String> getInitializedConsumers();
 
     /**
+     * Check whether any consumer for the given destination is actively consuming messages.
+     * <p>
+     * Returns {@code false} if no consumer has been started for the destination, or if a consumer
+     * was registered but its thread has not yet started or has since terminated.
+     *
+     * @param destination the destination to check
+     * @return true if at least one consumer for the destination is currently consuming messages
+     */
+    boolean isConsumerConsuming(String destination);
+
+    /**
      * Get the {@link ActiveMqProducer} if {@link #startProducers()} has been called.
      * Otherwise, return empty Optional.
      * <p>

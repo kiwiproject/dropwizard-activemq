@@ -17,6 +17,7 @@ import static org.kiwiproject.test.assertj.KiwiAssertJ.assertIsExactType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,7 +26,9 @@ import static org.mockito.Mockito.when;
 import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import io.dropwizard.core.setup.Environment;
+import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
+import org.awaitility.Durations;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +44,7 @@ import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqEx
 import org.kiwiproject.dropwizard.activemq.test.mock.MockActiveMqConsumer;
 import org.kiwiproject.jersey.client.RegistryAwareClient;
 import org.kiwiproject.test.dropwizard.mockito.DropwizardMockitoMocks;
+import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 
@@ -210,6 +214,52 @@ class ActiveMqProducerAndConsumerTest {
 
             verify(lifecycle, times(2)).manage(isA(Consumer.class));
             verify(healthChecks, times(2)).register(eq("consumer-topic:dest1"), isA(HealthCheck.class));
+        }
+
+        @Test
+        void shouldReturnFalse_fromIsConsumerConsuming_forUnknownDestination() {
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.isConsumerConsuming("topic:unknown")).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_fromIsConsumerConsuming_whenConsumerRegisteredButThreadNotYetStarted() {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+
+            // consumer is registered but Dropwizard has not called start() on the managed object yet
+            assertThat(dropwizardActiveMq.isConsumerConsuming(destination)).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_fromIsConsumerConsuming_whenConsumerThreadIsRunning() throws Exception {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+
+            var captor = ArgumentCaptor.forClass(Managed.class);
+            verify(lifecycle, atLeastOnce()).manage(captor.capture());
+            var managedConsumer = captor.getAllValues().stream()
+                    .filter(Consumer.class::isInstance)
+                    .map(Consumer.class::cast)
+                    .findFirst()
+                    .orElseThrow();
+
+            managedConsumer.start();
+            try {
+                await().atMost(Durations.TWO_SECONDS).until(
+                        () -> dropwizardActiveMq.isConsumerConsuming(destination));
+
+                assertThat(dropwizardActiveMq.isConsumerConsuming(destination)).isTrue();
+            } finally {
+                managedConsumer.stop();
+            }
         }
     }
 

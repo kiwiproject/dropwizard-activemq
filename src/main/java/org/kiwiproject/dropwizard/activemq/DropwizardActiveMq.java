@@ -11,6 +11,8 @@ import static org.kiwiproject.base.KiwiStrings.f;
 import static org.kiwiproject.collect.KiwiArrays.isNotNullOrEmpty;
 import static org.kiwiproject.collect.KiwiLists.isNotNullOrEmpty;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import io.dropwizard.core.setup.Environment;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +34,6 @@ import org.kiwiproject.jersey.client.RegistryAwareClient;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -63,9 +64,9 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
     private Function<String, Optional<ConnectionEvent>> consumingTextMessageEventFactory;
     private Function<String, Optional<ConnectionEvent>> producingTextMessageEventFactory;
 
-    // This is used to track consumer destinations; it is used in
-    // conjunction with allowMultipleConsumersPerDestination.
-    private final Set<String> initializedConsumers = ConcurrentHashMap.newKeySet();
+    // Tracks Consumer instances by destination; used in conjunction with
+    // allowMultipleConsumersPerDestination and to support isConsumerConsuming().
+    private final ListMultimap<String, Consumer> initializedConsumers = ArrayListMultimap.create();
 
     private ActiveMqProducer activeMqProducer;
 
@@ -195,7 +196,7 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
                 configuration.getActiveMqConfig()
         );
 
-        addConsumer(destination);
+        addConsumer(destination, consumer);
 
         environment.lifecycle().manage(consumer);
         environment.healthChecks().register("consumer-" + destination, consumer.getHealthCheck());
@@ -204,14 +205,14 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
     private void checkForExistingConsumer(String destination) {
         checkArgumentNotBlank(destination);
 
-        if (!allowMultipleConsumersPerDestination && initializedConsumers.contains(destination)) {
+        if (!allowMultipleConsumersPerDestination && initializedConsumers.containsKey(destination)) {
             throw new IllegalStateException(f("A consumer for destination '{}' already exists", destination));
         }
     }
 
-    private void addConsumer(String destination) {
+    private void addConsumer(String destination, Consumer consumer) {
         LOG.debug("Adding initialized consumer for destination: {}", destination);
-        initializedConsumers.add(destination);
+        initializedConsumers.put(destination, consumer);
     }
 
     @Override
@@ -232,7 +233,12 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
 
     @Override
     public Set<String> getInitializedConsumers() {
-        return Set.copyOf(initializedConsumers);
+        return Set.copyOf(initializedConsumers.keySet());
+    }
+
+    @Override
+    public boolean isConsumerConsuming(String destination) {
+        return initializedConsumers.get(destination).stream().anyMatch(Consumer::isConsuming);
     }
 
     @Override
