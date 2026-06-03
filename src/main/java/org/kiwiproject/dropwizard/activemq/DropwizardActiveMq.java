@@ -13,6 +13,7 @@ import static org.kiwiproject.collect.KiwiLists.isNotNullOrEmpty;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimaps;
 import io.dropwizard.core.setup.Environment;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +67,10 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
 
     // Tracks Consumer instances by destination; used in conjunction with
     // allowMultipleConsumersPerDestination and to support isConsumerConsuming().
-    private final ListMultimap<String, Consumer> initializedConsumers = ArrayListMultimap.create();
+    // Synchronized because health-check threads may call isConsumerConsuming() concurrently
+    // with startConsumer() calls, and iteration requires holding the lock.
+    private final ListMultimap<String, Consumer> initializedConsumers =
+            Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
 
     private ActiveMqProducer activeMqProducer;
 
@@ -233,12 +237,16 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
 
     @Override
     public Set<String> getInitializedConsumers() {
-        return Set.copyOf(initializedConsumers.keySet());
+        synchronized (initializedConsumers) {
+            return Set.copyOf(initializedConsumers.keySet());
+        }
     }
 
     @Override
     public boolean isConsumerConsuming(String destination) {
-        return initializedConsumers.get(destination).stream().anyMatch(Consumer::isConsuming);
+        synchronized (initializedConsumers) {
+            return initializedConsumers.get(destination).stream().anyMatch(Consumer::isConsuming);
+        }
     }
 
     @Override

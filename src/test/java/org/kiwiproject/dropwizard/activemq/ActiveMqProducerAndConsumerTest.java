@@ -243,13 +243,7 @@ class ActiveMqProducerAndConsumerTest {
 
             dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
 
-            var captor = ArgumentCaptor.forClass(Managed.class);
-            verify(lifecycle, atLeastOnce()).manage(captor.capture());
-            var managedConsumer = captor.getAllValues().stream()
-                    .filter(Consumer.class::isInstance)
-                    .map(Consumer.class::cast)
-                    .findFirst()
-                    .orElseThrow();
+            var managedConsumer = captureConsumer();
 
             managedConsumer.start();
             try {
@@ -260,6 +254,83 @@ class ActiveMqProducerAndConsumerTest {
             } finally {
                 managedConsumer.stop();
             }
+        }
+
+        @Test
+        void shouldReturnFalse_fromIsConsumerConsuming_afterConsumerStops() throws Exception {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+
+            var managedConsumer = captureConsumer();
+
+            managedConsumer.start();
+            await().atMost(Durations.TWO_SECONDS).until(
+                    () -> dropwizardActiveMq.isConsumerConsuming(destination));
+
+            managedConsumer.stop();
+            await().atMost(Durations.TWO_SECONDS).until(
+                    () -> !dropwizardActiveMq.isConsumerConsuming(destination));
+
+            assertThat(dropwizardActiveMq.isConsumerConsuming(destination)).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_fromIsConsumerConsuming_whenAtLeastOneOfMultipleConsumersIsRunning() throws Exception {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            activeMqConfig.setAllowMultipleConsumersPerDestination(true);
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+            dropwizardActiveMq.startConsumer(newMockActiveMqConsumer(), destination);
+
+            var captor = ArgumentCaptor.forClass(Managed.class);
+            verify(lifecycle, atLeastOnce()).manage(captor.capture());
+            var consumers = captor.getAllValues().stream()
+                    .filter(Consumer.class::isInstance)
+                    .map(Consumer.class::cast)
+                    .toList();
+
+            assertThat(consumers).hasSize(2);
+
+            var first = consumers.get(0);
+            var second = consumers.get(1);
+
+            first.start();
+            try {
+                await().atMost(Durations.TWO_SECONDS).until(
+                        () -> dropwizardActiveMq.isConsumerConsuming(destination));
+
+                // stop the first; second is not started — anyMatch should now return false
+                first.stop();
+                await().atMost(Durations.TWO_SECONDS).until(
+                        () -> !dropwizardActiveMq.isConsumerConsuming(destination));
+
+                assertThat(dropwizardActiveMq.isConsumerConsuming(destination)).isFalse();
+
+                // start the second; should return true again
+                second.start();
+                await().atMost(Durations.TWO_SECONDS).until(
+                        () -> dropwizardActiveMq.isConsumerConsuming(destination));
+
+                assertThat(dropwizardActiveMq.isConsumerConsuming(destination)).isTrue();
+            } finally {
+                first.stop();
+                second.stop();
+            }
+        }
+
+        private Consumer captureConsumer() {
+            var captor = ArgumentCaptor.forClass(Managed.class);
+            verify(lifecycle, atLeastOnce()).manage(captor.capture());
+            return captor.getAllValues().stream()
+                    .filter(Consumer.class::isInstance)
+                    .map(Consumer.class::cast)
+                    .findFirst()
+                    .orElseThrow();
         }
     }
 
