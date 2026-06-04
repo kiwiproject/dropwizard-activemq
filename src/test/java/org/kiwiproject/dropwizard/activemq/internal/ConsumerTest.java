@@ -33,7 +33,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqExtension;
-import org.kiwiproject.dropwizard.activemq.test.mock.MockActiveMqConsumer;
+import org.kiwiproject.dropwizard.activemq.testing.FakeActiveMqConsumer;
 import org.kiwiproject.dropwizard.activemq.test.util.ActiveMqTestUtils;
 import org.kiwiproject.elucidation.client.ElucidationClient;
 import org.kiwiproject.elucidation.client.ElucidationResult;
@@ -110,7 +110,7 @@ class ConsumerTest {
 
     @Test
     void shouldConsumeTextMessage_withJson() throws JMSException {
-        var jmsConsumer = createMockActiveMqConsumerOf(SPECIFIC_TEXT_MESSAGE_TYPE);
+        var jmsConsumer = createFakeActiveMqConsumerOf(SPECIFIC_TEXT_MESSAGE_TYPE);
 
         var textMessage = session.createTextMessage(JSON_HELPER.toJson(new InternalMessage()));
         producer.send(textMessage);
@@ -128,7 +128,7 @@ class ConsumerTest {
 
     @Test
     void shouldNotConsume_TextMessage_whenShouldConsumeReturnsFalse() throws JMSException {
-        var jmsConsumer = createMockActiveMqConsumerThatWillNotConsume();
+        var jmsConsumer = createFakeActiveMqConsumerThatWillNotConsume();
 
         var textMessage = session.createTextMessage(JSON_HELPER.toJson(new InternalMessage()));
         producer.send(textMessage);
@@ -146,7 +146,7 @@ class ConsumerTest {
 
     @Test
     void shouldIgnoreTextMessage_withBareText() throws JMSException {
-        var jmsConsumer = createMockActiveMqConsumer();
+        var jmsConsumer = createFakeActiveMqConsumer();
 
         var textMessage = session.createTextMessage("this is not a valid message");
         producer.send(textMessage);
@@ -166,7 +166,7 @@ class ConsumerTest {
 
     @Test
     void shouldIgnoreTextMessage_withBadJson_whenNotRequireMessageType() throws JMSException {
-        var jmsConsumer = createMockActiveMqConsumerOf(SPECIFIC_TEXT_MESSAGE_TYPE);
+        var jmsConsumer = createFakeActiveMqConsumerOf(SPECIFIC_TEXT_MESSAGE_TYPE);
         
          // JSON has missing trailing double quote
         var textMessage = session.createTextMessage("""
@@ -192,7 +192,7 @@ class ConsumerTest {
 
     @Test
     void shouldConsumeTextMessage_withBadJson_requiringMessageType_andThrowException() throws JMSException {
-        var jmsConsumer = createMockActiveMqConsumer();
+        var jmsConsumer = createFakeActiveMqConsumer();
 
         // JSON has missing trailing double quote
         var textMessage = session.createTextMessage("""
@@ -217,7 +217,7 @@ class ConsumerTest {
 
     @Test
     void shouldIgnoreTextMessage_withJsonWithoutMessageType_whenNotRequireMessageType() throws JMSException {
-        var jmsConsumer = createMockActiveMqConsumerOf(SPECIFIC_TEXT_MESSAGE_TYPE);
+        var jmsConsumer = createFakeActiveMqConsumerOf(SPECIFIC_TEXT_MESSAGE_TYPE);
 
         var textMessage = session.createTextMessage("""
                 {
@@ -242,7 +242,7 @@ class ConsumerTest {
 
     @Test
     void shouldConsumeTextMessage_withJsonWithoutMessageType_whenRequireMessageType_andThrowException() throws JMSException {
-        var jmsConsumer = createMockActiveMqConsumer();
+        var jmsConsumer = createFakeActiveMqConsumer();
 
         var textMessage = session.createTextMessage("""
                 {
@@ -266,7 +266,7 @@ class ConsumerTest {
 
     @Test
     void shouldConsumeTextMessage_withXML() throws JMSException {
-        var jmsConsumer = createMockActiveMqConsumerOf(GENERIC_TEXT_MESSAGE_TYPE);
+        var jmsConsumer = createFakeActiveMqConsumerOf(GENERIC_TEXT_MESSAGE_TYPE);
 
         var textMessage = session.createTextMessage(KiwiXml.toXml(new InternalMessage()));
         producer.send(textMessage);
@@ -284,7 +284,7 @@ class ConsumerTest {
 
     @Test
     void shouldConsumeBytesMessage() throws JMSException {
-        var jmsConsumer = createMockActiveMqConsumerOf(BYTES_MESSAGE_TYPE);
+        var jmsConsumer = createFakeActiveMqConsumerOf(BYTES_MESSAGE_TYPE);
 
         var bytesMessage = session.createBytesMessage();
         bytesMessage.writeBytes(PAYLOAD.getBytes(UTF_8));
@@ -304,7 +304,7 @@ class ConsumerTest {
 
     @Test
     void shouldIgnoreTextMessage_usingConsumerThatIgnoresSpecificMessageType() throws JMSException {
-        var jmsConsumer = MockActiveMqConsumer.builder()
+        var jmsConsumer = FakeActiveMqConsumer.builder()
                 .ignoringMessagesOfType(QUEUE_NAME, SPECIFIC_TEXT_MESSAGE_TYPE)
                 .buildConsumer();
 
@@ -327,7 +327,7 @@ class ConsumerTest {
 
     @Test
     void shouldStopWhenRequested() throws Exception {
-        var jmsConsumer = MockActiveMqConsumer.builder().buildConsumer();
+        var jmsConsumer = FakeActiveMqConsumer.builder().buildConsumer();
 
         createAndStartConsumerWith(jmsConsumer);
 
@@ -346,7 +346,7 @@ class ConsumerTest {
     @Test
     void shouldHandleUncaughtExceptions() throws JMSException {
         var error = new NoClassDefFoundError("com.acme.widget.SomeWidget");
-        var jmsConsumer = MockActiveMqConsumer.builder()
+        var jmsConsumer = FakeActiveMqConsumer.builder()
                 .throwError(error)
                 .buildConsumer();
 
@@ -370,8 +370,8 @@ class ConsumerTest {
         await().atMost(Durations.TWO_SECONDS).until(() -> !consumer.isConsuming());
     }
 
-    private MockActiveMqConsumer createMockActiveMqConsumerOf(String messageType) {
-        var jmsConsumer = MockActiveMqConsumer.builder()
+    private FakeActiveMqConsumer createFakeActiveMqConsumerOf(String messageType) {
+        var jmsConsumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(QUEUE_NAME, messageType)
                 .validateBodyIsPresentOrThrowException()
                 .buildConsumer();
@@ -381,8 +381,8 @@ class ConsumerTest {
         return jmsConsumer;
     }
 
-    private MockActiveMqConsumer createMockActiveMqConsumer() {
-        var jmsConsumer = MockActiveMqConsumer.builder()
+    private FakeActiveMqConsumer createFakeActiveMqConsumer() {
+        var jmsConsumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(QUEUE_NAME, SPECIFIC_TEXT_MESSAGE_TYPE)
                 .validateBodyIsPresentOrThrowException()
                 .validateMessageTypeIsPresentOrThrowException()
@@ -393,8 +393,8 @@ class ConsumerTest {
         return jmsConsumer;
     }
 
-    private MockActiveMqConsumer createMockActiveMqConsumerThatWillNotConsume() {
-        var jmsConsumer = MockActiveMqConsumer.builder()
+    private FakeActiveMqConsumer createFakeActiveMqConsumerThatWillNotConsume() {
+        var jmsConsumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(QUEUE_NAME, SPECIFIC_TEXT_MESSAGE_TYPE)
                 .withShouldConsume(acttiveMqMessage -> false)
                 .buildConsumer();
@@ -404,12 +404,12 @@ class ConsumerTest {
         return jmsConsumer;
     }
 
-    private void createAndStartConsumerWith(MockActiveMqConsumer jmsConsumer) {
+    private void createAndStartConsumerWith(FakeActiveMqConsumer jmsConsumer) {
         consumer = new Consumer(connectionFactory, QUEUE, jmsConsumer, elucidationClient, serviceName, config);     
         consumer.start();
     }
 
-    private void waitForSingleMessageAndCondition(MockActiveMqConsumer jmsConsumer, Callable<Boolean> additionalCondition) {
+    private void waitForSingleMessageAndCondition(FakeActiveMqConsumer jmsConsumer, Callable<Boolean> additionalCondition) {
         await().atMost(FIVE_SECONDS)
                 .alias("received count")
                 .until(() -> jmsConsumer.getReceivedCount() >= 1);
@@ -421,7 +421,7 @@ class ConsumerTest {
         }        
     }
 
-    private void assertMessageWasConsumed(MockActiveMqConsumer jmsConsumer) {
+    private void assertMessageWasConsumed(FakeActiveMqConsumer jmsConsumer) {
         assertAll(
                 () -> assertThat(jmsConsumer.consumedHistory()).hasSize(1),
                 () -> assertThat(jmsConsumer.consumedHistory(QUEUE_NAME)).hasSize(1),
