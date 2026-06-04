@@ -323,6 +323,23 @@ class ActiveMqProducerAndConsumerTest {
             }
         }
 
+        @Test
+        void shouldReflectStartedConsumer_InHasConsumers_AndIsConsumerStarted() {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.hasConsumersStarted()).isFalse();
+            assertThat(dropwizardActiveMq.isConsumerStarted(destination)).isFalse();
+            assertThat(dropwizardActiveMq.isConsumerStarted("topic:other")).isFalse();
+
+            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+
+            assertThat(dropwizardActiveMq.hasConsumersStarted()).isTrue();
+            assertThat(dropwizardActiveMq.isConsumerStarted(destination)).isTrue();
+            assertThat(dropwizardActiveMq.isConsumerStarted("topic:other")).isFalse();
+        }
+
         private Consumer captureConsumer() {
             var captor = ArgumentCaptor.forClass(Managed.class);
             verify(lifecycle, atLeastOnce()).manage(captor.capture());
@@ -456,6 +473,28 @@ class ActiveMqProducerAndConsumerTest {
                     () -> assertThat(listenerB.getCount()).isOne(),
                     () -> assertThat(listenerC.getCount()).isOne()
             );
+        }
+    }
+
+    @Nested
+    class IsProducerStarted {
+
+        @Test
+        void shouldReturnFalse_BeforeStartProducers() {
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.isProducerStarted()).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_AfterStartProducers() {
+            activeMqConfig.setProducers(List.of("topic:dest1"));
+            activeMqConfig.setDefaultProducers(List.of());
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startProducers();
+
+            assertThat(dropwizardActiveMq.isProducerStarted()).isTrue();
         }
     }
 

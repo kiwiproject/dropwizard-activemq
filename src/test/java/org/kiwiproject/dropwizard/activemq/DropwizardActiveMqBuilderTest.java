@@ -95,8 +95,18 @@ class DropwizardActiveMqBuilderTest {
         }
 
         @Test
+        void shouldNotHaveConsumersStarted_AfterCreation() {
+            assertThat(dropwizardActiveMq.hasConsumersStarted()).isFalse();
+        }
+
+        @Test
         void shouldNotHaveInitializedActiveMqProducer_AfterCreation() {
             assertThat(dropwizardActiveMq.getActiveMqProducer()).isEmpty();
+        }
+
+        @Test
+        void shouldNotHaveProducerStarted_AfterCreation() {
+            assertThat(dropwizardActiveMq.isProducerStarted()).isFalse();
         }
     }
 
