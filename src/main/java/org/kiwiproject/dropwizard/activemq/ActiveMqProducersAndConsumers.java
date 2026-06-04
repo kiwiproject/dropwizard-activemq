@@ -102,4 +102,12 @@ public interface ActiveMqProducersAndConsumers {
     default boolean isProducerStarted() {
         return getActiveMqProducer().isPresent();
     }
+
+    /**
+     * Check whether multiple consumers per destination are allowed.
+     *
+     * @return true if multiple consumers may be started for the same destination
+     * @see org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig#isAllowMultipleConsumersPerDestination()
+     */
+    boolean isAllowMultipleConsumersPerDestination();
 }
