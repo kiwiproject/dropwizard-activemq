@@ -3,6 +3,7 @@ package org.kiwiproject.dropwizard.activemq;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.nullToEmpty;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
@@ -224,6 +225,10 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
         requireNonNull(factory);
         requireNonNull(producerDestinations);
         requireNonNull(defaultProducerDestinations);
+
+        if (nonNull(activeMqProducer)) {
+            throw new IllegalStateException("startProducers() has already been called; it should only be called once");
+        }
 
         activeMqProducer = new ProducerDelegate(factory,
                 producerDestinations,
