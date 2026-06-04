@@ -248,6 +248,16 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
     }
 
     @Override
+    public int getConsumerCount() {
+        return initializedConsumers.size();
+    }
+
+    @Override
+    public int getConsumerCountForDestination(String destination) {
+        return initializedConsumers.get(destination).size();
+    }
+
+    @Override
     public boolean isConsumerConsuming(String destination) {
         synchronized (initializedConsumers) {
             return initializedConsumers.get(destination).stream().anyMatch(Consumer::isConsuming);
