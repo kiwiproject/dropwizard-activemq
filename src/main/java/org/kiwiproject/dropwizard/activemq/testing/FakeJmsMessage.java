@@ -1,12 +1,10 @@
 package org.kiwiproject.dropwizard.activemq.testing;
 
-import com.google.errorprone.annotations.Immutable;
 import lombok.Getter;
 
 import java.util.Map;
 
 @Getter
-@Immutable
 class FakeJmsMessage {
 
     final String payload;

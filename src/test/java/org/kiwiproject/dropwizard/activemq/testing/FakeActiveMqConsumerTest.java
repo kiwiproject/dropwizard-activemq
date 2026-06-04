@@ -15,6 +15,9 @@ import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageInvalidMessageTypeException;
 import org.kiwiproject.dropwizard.activemq.exception.ActiveMqMessageMissingBodyException;
 import org.kiwiproject.dropwizard.activemq.test.util.ActiveMqMessages;
+import org.kiwiproject.dropwizard.activemq.util.UncheckedJMSException;
+
+import jakarta.jms.JMSException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -454,6 +457,69 @@ class FakeActiveMqConsumerTest {
         // Clear ignored messages
         consumer.clearIgnoredMessages();
         assertThat(consumer.ignoredHistory()).isEmpty();
+    }
+
+    @Test
+    void shouldClearBothHistories_WhenClearCalled() {
+        var consumer = FakeActiveMqConsumer.builder()
+                .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
+                .ignoringMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_2)
+                .buildConsumer();
+
+        consumer.consume(createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1));
+        consumer.consume(createMessageFrom(TARGET_MESSAGE_TYPE_2, TARGET_QUEUE_1));
+
+        assertThat(consumer.consumedHistory()).hasSize(1);
+        assertThat(consumer.ignoredHistory()).hasSize(1);
+
+        consumer.clear();
+
+        assertAll(
+                () -> assertThat(consumer.consumedHistory()).isEmpty(),
+                () -> assertThat(consumer.ignoredHistory()).isEmpty()
+        );
+    }
+
+    @Test
+    void shouldThrowUncheckedJMSException_WhenQueueGetNameThrowsJMSException() {
+        var throwingQueue = new ActiveMQQueue() {
+            @Override
+            public String getQueueName() throws JMSException {
+                throw new JMSException("queue name failure");
+            }
+        };
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(ActiveMqMessage.JMS_DESTINATION, throwingQueue);
+        var message = ActiveMqMessages.newJsonActiveMqMessage(PAYLOAD_JSON, TARGET_MESSAGE_TYPE_1, properties);
+
+        var consumer = FakeActiveMqConsumer.builder()
+                .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
+                .buildConsumer();
+
+        assertThatExceptionOfType(UncheckedJMSException.class)
+                .isThrownBy(() -> consumer.consume(message));
+    }
+
+    @Test
+    void shouldThrowUncheckedJMSException_WhenTopicGetNameThrowsJMSException() {
+        var throwingTopic = new ActiveMQTopic() {
+            @Override
+            public String getTopicName() throws JMSException {
+                throw new JMSException("topic name failure");
+            }
+        };
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(ActiveMqMessage.JMS_DESTINATION, throwingTopic);
+        var message = ActiveMqMessages.newJsonActiveMqMessage(PAYLOAD_JSON, TARGET_MESSAGE_TYPE_1, properties);
+
+        var consumer = FakeActiveMqConsumer.builder()
+                .consumeMessagesOfType(TARGET_TOPIC_1_NAME, TARGET_MESSAGE_TYPE_1)
+                .buildConsumer();
+
+        assertThatExceptionOfType(UncheckedJMSException.class)
+                .isThrownBy(() -> consumer.consume(message));
     }
 
     private static String createJsonPayload(String destinationType, int destinationNumber, int messageNumber) {
