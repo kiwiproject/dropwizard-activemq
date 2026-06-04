@@ -482,6 +482,7 @@ class FakeActiveMqConsumerTest {
 
     @Test
     void shouldThrowUncheckedJMSException_WhenQueueGetNameThrowsJMSException() {
+        //noinspection ExternalizableWithoutPublicNoArgConstructor
         var throwingQueue = new ActiveMQQueue() {
             @Override
             public String getQueueName() throws JMSException {
@@ -503,6 +504,7 @@ class FakeActiveMqConsumerTest {
 
     @Test
     void shouldThrowUncheckedJMSException_WhenTopicGetNameThrowsJMSException() {
+        //noinspection ExternalizableWithoutPublicNoArgConstructor
         var throwingTopic = new ActiveMQTopic() {
             @Override
             public String getTopicName() throws JMSException {
