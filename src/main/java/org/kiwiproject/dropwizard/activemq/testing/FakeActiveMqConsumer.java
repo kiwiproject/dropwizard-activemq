@@ -7,7 +7,6 @@ import static org.kiwiproject.base.KiwiStrings.f;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
@@ -64,7 +63,7 @@ public class FakeActiveMqConsumer implements ActiveMqConsumer {
             return this;
         }
 
-        private void populateMapWith(Multimap<String, String> map, String destination, Collection<String> types) {
+        private void populateMapWith(ListMultimap<String, String> map, String destination, Collection<String> types) {
             types.forEach(type -> map.put(destination, type));
         }
 
@@ -116,8 +115,8 @@ public class FakeActiveMqConsumer implements ActiveMqConsumer {
     private final AtomicLong shouldConsumeCount = new AtomicLong();
     private final AtomicLong receivedCount = new AtomicLong();
 
-    private FakeActiveMqConsumer(Multimap<String, String> consuming,
-                                 Multimap<String, String> ignoring,
+    private FakeActiveMqConsumer(ListMultimap<String, String> consuming,
+                                 ListMultimap<String, String> ignoring,
                                  Error error,
                                  boolean validateBodyIsPresentOrThrowException,
                                  boolean validateMessageTypeIsPresentOrThrowException,
@@ -261,11 +260,11 @@ public class FakeActiveMqConsumer implements ActiveMqConsumer {
         return history(destination, ignoredMessages);
     }
 
-    private List<ActiveMqMessage> history(Multimap<String, ActiveMqMessage> messages) {
+    private List<ActiveMqMessage> history(ListMultimap<String, ActiveMqMessage> messages) {
         return List.copyOf(messages.values());
     }
 
-    private List<ActiveMqMessage> history(String destination, Multimap<String, ActiveMqMessage> messages) {
+    private List<ActiveMqMessage> history(String destination, ListMultimap<String, ActiveMqMessage> messages) {
         checkArgumentNotBlank(destination);
         return List.copyOf(messages.get(destination));
     }

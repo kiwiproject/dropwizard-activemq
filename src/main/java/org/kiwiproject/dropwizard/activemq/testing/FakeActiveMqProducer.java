@@ -10,7 +10,6 @@ import static org.kiwiproject.collect.KiwiLists.last;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.kiwiproject.dropwizard.activemq.ActiveMqProducer;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
@@ -86,7 +85,7 @@ public class FakeActiveMqProducer implements ActiveMqProducer {
     private static void produceInternal(String destination,
                                         String payload,
                                         Map<String, Object> headers,
-                                        Multimap<String, FakeJmsMessage> messages) {
+                                        ListMultimap<String, FakeJmsMessage> messages) {
 
         var fakeJmsMessage = FakeJmsMessage.of(payload, headers);
         messages.put(destination, fakeJmsMessage);
@@ -207,13 +206,13 @@ public class FakeActiveMqProducer implements ActiveMqProducer {
                 .toList();
     }
 
-    private static List<String> history(Multimap<String, FakeJmsMessage> messages) {
+    private static List<String> history(ListMultimap<String, FakeJmsMessage> messages) {
         return messages.values().stream()
                 .map(FakeJmsMessage::getPayload)
                 .toList();
     }
 
-    private static List<String> history(String destination, Multimap<String, FakeJmsMessage> messages) {
+    private static List<String> history(String destination, ListMultimap<String, FakeJmsMessage> messages) {
         checkArgumentNotBlank(destination);
         checkArgumentNotNull(messages);
 
