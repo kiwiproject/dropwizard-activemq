@@ -474,6 +474,19 @@ class ActiveMqProducerAndConsumerTest {
                     () -> assertThat(listenerC.getCount()).isOne()
             );
         }
+
+        @Test
+        void shouldThrowIllegalState_WhenStartProducers_CalledMoreThanOnce() {
+            activeMqConfig.setProducers(List.of("topic:dest1"));
+            activeMqConfig.setDefaultProducers(List.of());
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startProducers();
+
+            assertThatIllegalStateException()
+                    .isThrownBy(() -> dropwizardActiveMq.startProducers())
+                    .withMessage("startProducers() has already been called; it should only be called once");
+        }
     }
 
     @Nested
