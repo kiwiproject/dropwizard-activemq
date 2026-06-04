@@ -9,6 +9,7 @@ import static org.kiwiproject.collect.KiwiLists.isNullOrEmpty;
 import static org.kiwiproject.collect.KiwiLists.last;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.kiwiproject.dropwizard.activemq.ActiveMqProducer;
@@ -29,9 +30,9 @@ public class FakeActiveMqProducer implements ActiveMqProducer {
     private static final String DEFAULT_ALL_EVENTS_QUEUE = "queue:" + ActiveMqConfig.DEFAULT_ALL_EVENTS_QUEUE_NAME;
 
     private final String allEventsQueue;
-    private final Multimap<String, FakeJmsMessage> messages = ArrayListMultimap.create();
-    private final Multimap<String, FakeJmsMessage> bytesMessages = ArrayListMultimap.create();
-    private final Multimap<String, FakeJmsMessage> allEventsMessages = ArrayListMultimap.create();
+    private final ListMultimap<String, FakeJmsMessage> messages = ArrayListMultimap.create();
+    private final ListMultimap<String, FakeJmsMessage> bytesMessages = ArrayListMultimap.create();
+    private final ListMultimap<String, FakeJmsMessage> allEventsMessages = ArrayListMultimap.create();
 
     /**
      * Creates a new instance using the default all-events queue ({@code "queue:all_events"}).

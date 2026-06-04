@@ -6,6 +6,7 @@ import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotBlank;
 import static org.kiwiproject.base.KiwiStrings.f;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer;
@@ -38,8 +39,8 @@ public class FakeActiveMqConsumer implements ActiveMqConsumer {
 
     public static final class Builder {
 
-        private final Multimap<String, String> consuming = ArrayListMultimap.create();
-        private final Multimap<String, String> ignoring = ArrayListMultimap.create();
+        private final ListMultimap<String, String> consuming = ArrayListMultimap.create();
+        private final ListMultimap<String, String> ignoring = ArrayListMultimap.create();
         private Error error;
         private boolean validateBodyIsPresentOrThrowException;
         private boolean validateMessageTypeIsPresentOrThrowException;
@@ -102,11 +103,11 @@ public class FakeActiveMqConsumer implements ActiveMqConsumer {
         }
     }
 
-    private final Multimap<String, ActiveMqMessage> consumedMessages = ArrayListMultimap.create();
-    private final Multimap<String, ActiveMqMessage> ignoredMessages = ArrayListMultimap.create();
+    private final ListMultimap<String, ActiveMqMessage> consumedMessages = ArrayListMultimap.create();
+    private final ListMultimap<String, ActiveMqMessage> ignoredMessages = ArrayListMultimap.create();
 
-    private final Multimap<String, String> consuming = ArrayListMultimap.create();
-    private final Multimap<String, String> ignoring = ArrayListMultimap.create();
+    private final ListMultimap<String, String> consuming = ArrayListMultimap.create();
+    private final ListMultimap<String, String> ignoring = ArrayListMultimap.create();
     private final Error error;
     private final boolean validateBodyIsPresentOrThrowException;
     private final boolean validateMessageTypeIsPresentOrThrowException;
