@@ -53,6 +53,25 @@ public interface ActiveMqProducersAndConsumers {
     Set<String> getInitializedConsumers();
 
     /**
+     * Check whether any consumers have been started.
+     *
+     * @return true if at least one consumer has been started for any destination
+     */
+    default boolean hasConsumersStarted() {
+        return !getInitializedConsumers().isEmpty();
+    }
+
+    /**
+     * Check whether a consumer has been started for the given destination.
+     *
+     * @param destination the destination to check
+     * @return true if a consumer has been started for the destination
+     */
+    default boolean isConsumerStarted(String destination) {
+        return getInitializedConsumers().contains(destination);
+    }
+
+    /**
      * Check whether any consumer for the given destination is actively consuming messages.
      * <p>
      * Returns {@code false} if no consumer has been started for the destination, or if a consumer
@@ -74,4 +93,13 @@ public interface ActiveMqProducersAndConsumers {
      * {@link #startProducers()}, or an empty Optional if no producer has been started.
      */
     Optional<ActiveMqProducer> getActiveMqProducer();
+
+    /**
+     * Check whether a producer has been started.
+     *
+     * @return true if {@link #startProducers()} has been called
+     */
+    default boolean isProducerStarted() {
+        return getActiveMqProducer().isPresent();
+    }
 }
