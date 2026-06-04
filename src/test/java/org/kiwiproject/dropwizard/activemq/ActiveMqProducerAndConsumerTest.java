@@ -511,6 +511,57 @@ class ActiveMqProducerAndConsumerTest {
         }
     }
 
+    @Nested
+    class ConsumerCount {
+
+        @Test
+        void shouldReturnZero_WhenNoConsumersStarted() {
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.getConsumerCount()).isZero();
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination("topic:dest1")).isZero();
+        }
+
+        @Test
+        void shouldReturnOne_WhenSingleConsumerStarted() {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+
+            assertThat(dropwizardActiveMq.getConsumerCount()).isOne();
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination(destination)).isOne();
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination("topic:other")).isZero();
+        }
+
+        @Test
+        void shouldCountPerDestination_WhenMultipleConsumersAllowed() {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            activeMqConfig.setAllowMultipleConsumersPerDestination(true);
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+            dropwizardActiveMq.startConsumer(newMockActiveMqConsumer(), destination);
+
+            assertThat(dropwizardActiveMq.getConsumerCount()).isEqualTo(2);
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination(destination)).isEqualTo(2);
+        }
+
+        @Test
+        void shouldCountAcrossMultipleDestinations() {
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumer(newMockActiveMqConsumer(), "topic:dest1", "topic:dest2", "topic:dest3");
+
+            assertThat(dropwizardActiveMq.getConsumerCount()).isEqualTo(3);
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination("topic:dest1")).isOne();
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination("topic:dest2")).isOne();
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination("topic:dest3")).isOne();
+        }
+    }
+
     private DropwizardActiveMq<TestAppConfig> newDropwizardActiveMq() {
         return DropwizardActiveMq.<TestAppConfig>builder()
                 .configuration(appConfig)

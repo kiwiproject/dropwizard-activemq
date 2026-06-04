@@ -62,6 +62,24 @@ public interface ActiveMqProducersAndConsumers {
     }
 
     /**
+     * Get the total number of consumers started across all destinations.
+     * <p>
+     * When multiple consumers per destination are allowed, this may exceed the number
+     * of distinct destinations returned by {@link #getInitializedConsumers()}.
+     *
+     * @return the total number of consumers started
+     */
+    int getConsumerCount();
+
+    /**
+     * Get the number of consumers started for the given destination.
+     *
+     * @param destination the destination to check
+     * @return the number of consumers started for the destination, or 0 if none
+     */
+    int getConsumerCountForDestination(String destination);
+
+    /**
      * Check whether a consumer has been started for the given destination.
      *
      * @param destination the destination to check
