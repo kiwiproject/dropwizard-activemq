@@ -1,4 +1,4 @@
-package org.kiwiproject.dropwizard.activemq.test.mock;
+package org.kiwiproject.dropwizard.activemq.testing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -22,8 +22,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-@DisplayName("MockActiveMqConsumer")
-class MockActiveMqConsumerTest {
+@DisplayName("FakeActiveMqConsumer")
+class FakeActiveMqConsumerTest {
 
     private static final String BLANK_MESSAGE_TYPE = "  ";
     private static final String TARGET_MESSAGE_TYPE_1 = "TargetType_1";
@@ -53,7 +53,7 @@ class MockActiveMqConsumerTest {
 
     @Test
     void shouldConsume_ShouldReturnTrue_WhenTheFunctionReturnsTrue() {
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .withShouldConsume(activeMqMessage -> true)
                 .buildConsumer();
 
@@ -71,7 +71,7 @@ class MockActiveMqConsumerTest {
 
     @Test
     void shouldConsume_ShouldReturnFalse_WhenTheFunctionReturnsFalse() {
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .withShouldConsume(activeMqMessage -> false)
                 .buildConsumer();
 
@@ -95,7 +95,7 @@ class MockActiveMqConsumerTest {
         Function<ActiveMqMessage, Boolean> processOnlyType1 =
                 activeMqMessage -> activeMqMessage.getMessageType().orElse("").equals(TARGET_MESSAGE_TYPE_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .withShouldConsume(processOnlyType1)
                 .buildConsumer();
 
@@ -123,7 +123,7 @@ class MockActiveMqConsumerTest {
     void shouldThrowException_WhenMessageHasNoTopicOrQueue() {
         var message = createMessageWithEmptyProperties();
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -136,7 +136,7 @@ class MockActiveMqConsumerTest {
     void shouldThrowException_WhenRequiringBody_AndMessageHasNoBody() {
         var message = createMessageWithoutBodyUsing(TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .validateBodyIsPresentOrThrowException()
                 .buildConsumer();
@@ -150,7 +150,7 @@ class MockActiveMqConsumerTest {
     void shouldThrowException_WhenRequiringMessageType_AndMessageHasNoMessageType() {
         var message = createMessageWithoutMessageTypeUsing(TARGET_QUEUE_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .validateBodyIsPresentOrThrowException()
                 .validateMessageTypeIsPresentOrThrowException()
@@ -167,7 +167,7 @@ class MockActiveMqConsumerTest {
     void shouldThrowException_WhenMessageHasQueueWithNoName() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, UNNAMED_QUEUE);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -180,7 +180,7 @@ class MockActiveMqConsumerTest {
     void shouldIgnoreQueueMessage_WhenDestinationIsNotRegistered() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_2_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -191,7 +191,7 @@ class MockActiveMqConsumerTest {
     void shouldIgnoreQueueMessage_WhenMessageType_IsBlank() {
         var message = createMessageFrom(BLANK_MESSAGE_TYPE, TARGET_QUEUE_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -202,7 +202,7 @@ class MockActiveMqConsumerTest {
     void shouldIgnoreQueueMessage_WhenMessageType_IsNotConfigured() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
 
-        var consumer = MockActiveMqConsumer.builder().buildConsumer();
+        var consumer = FakeActiveMqConsumer.builder().buildConsumer();
 
         assertMessageIsIgnored(consumer, TARGET_QUEUE_1_NAME, message);
     }
@@ -211,7 +211,7 @@ class MockActiveMqConsumerTest {
     void shouldIgnoreQueueMessage_WhenMessageType_IsConfiguredToBeIgnored() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .ignoringMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -222,7 +222,7 @@ class MockActiveMqConsumerTest {
     void shouldConsumeQueueMessage_WhenMessageType_IsConfigured() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -233,7 +233,7 @@ class MockActiveMqConsumerTest {
     void shouldConsumeQueueMessage_IfMessageTypeIsConfiguredForConsumptionAndIgnoring() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_QUEUE_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .ignoringMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
@@ -247,7 +247,7 @@ class MockActiveMqConsumerTest {
     void shouldThrowException_WhenMessageHasTopicWithNoName() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, UNNAMED_TOPIC);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_TOPIC_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -260,7 +260,7 @@ class MockActiveMqConsumerTest {
     void shouldIgnoreTopicMessage_WhenDestinationIsNotRegistered() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_TOPIC_2_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -271,7 +271,7 @@ class MockActiveMqConsumerTest {
     void shouldIgnoreTopicMessage_WhenMessageType_IsBlank() {
         var message = createMessageFrom(BLANK_MESSAGE_TYPE, TARGET_TOPIC_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_TOPIC_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -282,7 +282,7 @@ class MockActiveMqConsumerTest {
     void shouldIgnoreTopicMessage_WhenMessageType_IsNotConfigured() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1);
 
-        var consumer = MockActiveMqConsumer.builder().buildConsumer();
+        var consumer = FakeActiveMqConsumer.builder().buildConsumer();
 
         assertMessageIsIgnored(consumer, TARGET_TOPIC_1_NAME, message);
     }
@@ -291,7 +291,7 @@ class MockActiveMqConsumerTest {
     void shouldIgnoreTopicMessage_WhenMessageType_IsConfiguredToBeIgnored() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .ignoringMessagesOfType(TARGET_TOPIC_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -302,7 +302,7 @@ class MockActiveMqConsumerTest {
     void shouldConsumeTopicMessage_WhenMessageType_IsConfigured() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_TOPIC_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
 
@@ -313,7 +313,7 @@ class MockActiveMqConsumerTest {
     void shouldConsumeTopicMessage_IfMessageTypeIsConfiguredForConsumptionAndIgnoring() {
         var message = createMessageFrom(TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_1);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_TOPIC_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .ignoringMessagesOfType(TARGET_TOPIC_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .buildConsumer();
@@ -331,7 +331,7 @@ class MockActiveMqConsumerTest {
         var t2m1Payload = createJsonPayload("topic", 1, 1);
         var t2m1Message = createMessageFrom(t2m1Payload, TARGET_MESSAGE_TYPE_2, TARGET_TOPIC_2);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .consumeMessagesOfType(TARGET_TOPIC_2_NAME, TARGET_MESSAGE_TYPE_2)
                 .buildConsumer();
@@ -362,7 +362,7 @@ class MockActiveMqConsumerTest {
         var t2m1Payload = createJsonPayload("topic", 1, 1);
         var t2m1Message = createMessageFrom(t2m1Payload, TARGET_MESSAGE_TYPE_2, TARGET_TOPIC_2);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .ignoringMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .ignoringMessagesOfType(TARGET_TOPIC_2_NAME, TARGET_MESSAGE_TYPE_2)
                 .buildConsumer();
@@ -415,7 +415,7 @@ class MockActiveMqConsumerTest {
         var t2m2Payload = createJsonPayload("topic", 2, 2);
         var t2m2Message = createMessageFrom(t2m2Payload, TARGET_MESSAGE_TYPE_1, TARGET_TOPIC_2);
 
-        var consumer = MockActiveMqConsumer.builder()
+        var consumer = FakeActiveMqConsumer.builder()
                 .consumeMessagesOfType(TARGET_QUEUE_1_NAME, TARGET_MESSAGE_TYPE_1)
                 .consumeMessagesOfType(TARGET_QUEUE_2_NAME, Set.of(TARGET_MESSAGE_TYPE_1, TARGET_MESSAGE_TYPE_2))
                 .ignoringMessagesOfType(TARGET_TOPIC_1_NAME, Set.of(TARGET_MESSAGE_TYPE_1, TARGET_MESSAGE_TYPE_2))
@@ -493,14 +493,14 @@ class MockActiveMqConsumerTest {
         return properties;
     }
 
-    private static void assertMessagesAreIgnored(MockActiveMqConsumer consumer,
+    private static void assertMessagesAreIgnored(FakeActiveMqConsumer consumer,
                                                  String destination,
                                                  ActiveMqMessage... messages) {
 
         Stream.of(messages).forEach(message -> assertMessageIsIgnored(consumer, destination, message));
     }
 
-    private static void assertMessageIsIgnored(MockActiveMqConsumer consumer,
+    private static void assertMessageIsIgnored(FakeActiveMqConsumer consumer,
                                                String destination,
                                                ActiveMqMessage message) {
 
@@ -511,14 +511,14 @@ class MockActiveMqConsumerTest {
         );
     }
 
-    private static void assertMessagesAreConsumed(MockActiveMqConsumer consumer,
+    private static void assertMessagesAreConsumed(FakeActiveMqConsumer consumer,
                                                   String destination,
                                                   ActiveMqMessage... messages) {
 
         Stream.of(messages).forEach(message -> assertMessageIsConsumed(consumer, destination, message));
     }
 
-    private static void assertMessageIsConsumed(MockActiveMqConsumer consumer,
+    private static void assertMessageIsConsumed(FakeActiveMqConsumer consumer,
                                                 String destination,
                                                 ActiveMqMessage message) {
 

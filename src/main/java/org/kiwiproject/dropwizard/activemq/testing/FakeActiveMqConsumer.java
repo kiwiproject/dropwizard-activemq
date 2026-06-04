@@ -1,4 +1,4 @@
-package org.kiwiproject.dropwizard.activemq.test.mock;
+package org.kiwiproject.dropwizard.activemq.testing;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -22,8 +22,15 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Queue;
 import jakarta.jms.Topic;
 
+/**
+ * A fake implementation of {@link ActiveMqConsumer} for use in tests.
+ * <p>
+ * Records consumed and ignored messages for later inspection, supports configuring
+ * which message types to consume or ignore per destination, and can simulate
+ * uncaught errors via {@link Builder#throwError(Error)}.
+ */
 @Slf4j
-public class MockActiveMqConsumer implements ActiveMqConsumer {
+public class FakeActiveMqConsumer implements ActiveMqConsumer {
 
     public static Builder builder() {
         return new Builder();
@@ -83,8 +90,8 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
             return this;
         }
 
-        public MockActiveMqConsumer buildConsumer() {
-            return new MockActiveMqConsumer(
+        public FakeActiveMqConsumer buildConsumer() {
+            return new FakeActiveMqConsumer(
                     consuming,
                     ignoring,
                     error,
@@ -108,7 +115,7 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
     private final AtomicLong shouldConsumeCount = new AtomicLong();
     private final AtomicLong receivedCount = new AtomicLong();
 
-    private MockActiveMqConsumer(Multimap<String, String> consuming,
+    private FakeActiveMqConsumer(Multimap<String, String> consuming,
                                  Multimap<String, String> ignoring,
                                  Error error,
                                  boolean validateBodyIsPresentOrThrowException,
@@ -185,13 +192,13 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
     private static String getDestinationNameThatConsumed(ActiveMqMessage message) {
         if (message.wasConsumedFromAQueue()) {
             return message.getJMSDestinationAsQueue()
-                    .map(MockActiveMqConsumer::getQueueName)
+                    .map(FakeActiveMqConsumer::getQueueName)
                     .orElseThrow(() -> new IllegalStateException(dueToMissingDestinationOfType("queue")));
         }
 
         if (message.wasConsumedFromATopic()) {
             return message.getJMSDestinationAsTopic()
-                    .map(MockActiveMqConsumer::getTopicName)
+                    .map(FakeActiveMqConsumer::getTopicName)
                     .orElseThrow(() -> new IllegalStateException(dueToMissingDestinationOfType("topic")));
         }
 
