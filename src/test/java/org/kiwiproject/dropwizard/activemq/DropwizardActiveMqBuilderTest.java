@@ -111,6 +111,25 @@ class DropwizardActiveMqBuilderTest {
     }
 
     @Nested
+    class IsAllowMultipleConsumersPerDestination {
+
+        @Test
+        void shouldReturnFalse_ByDefault() {
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.isAllowMultipleConsumersPerDestination()).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_WhenConfigured() {
+            activeMqConfig.setAllowMultipleConsumersPerDestination(true);
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.isAllowMultipleConsumersPerDestination()).isTrue();
+        }
+    }
+
+    @Nested
     class ThrowsIllegalArgumentException {
 
         @Test

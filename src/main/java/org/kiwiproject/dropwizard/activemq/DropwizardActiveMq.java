@@ -255,6 +255,11 @@ public class DropwizardActiveMq<C extends ActiveMqConfigured> implements ActiveM
     }
 
     @Override
+    public boolean isAllowMultipleConsumersPerDestination() {
+        return allowMultipleConsumersPerDestination;
+    }
+
+    @Override
     public Optional<ActiveMqProducer> getActiveMqProducer() {
         return Optional.ofNullable(activeMqProducer);
     }
