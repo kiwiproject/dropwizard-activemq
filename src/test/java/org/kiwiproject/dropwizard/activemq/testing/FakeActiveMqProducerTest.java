@@ -1,4 +1,4 @@
-package org.kiwiproject.dropwizard.activemq.test.mock;
+package org.kiwiproject.dropwizard.activemq.testing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatException;
@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-@DisplayName("MockActiveMqProducer")
-class MockActiveMqProducerTest {
+@DisplayName("FakeActiveMqProducer")
+class FakeActiveMqProducerTest {
 
-    private MockActiveMqProducer producer;
+    private FakeActiveMqProducer producer;
 
     @BeforeEach
     void setUp() {
-        producer = new MockActiveMqProducer();
+        producer = new FakeActiveMqProducer();
     }
 
     @Test
@@ -35,7 +35,7 @@ class MockActiveMqProducerTest {
 
     @Test
     void shouldProduceToCustomAllEventsQueue() {
-        var customProducer = new MockActiveMqProducer("queue:my_events");
+        var customProducer = new FakeActiveMqProducer("queue:my_events");
 
         customProducer.produceToAllEventsQueue("message 1");
         customProducer.produceToAllEventsQueue("message 2");
@@ -48,7 +48,7 @@ class MockActiveMqProducerTest {
 
     @Test
     void shouldProduceToDestinationAndCustomAllEventsQueue() {
-        var customProducer = new MockActiveMqProducer("queue:my_events");
+        var customProducer = new FakeActiveMqProducer("queue:my_events");
 
         customProducer.produceToDestinationAndAllEventsQueue("topic:A", "message 1");
         customProducer.produceToDestinationAndAllEventsQueue("topic:A", "message 2");
@@ -287,11 +287,11 @@ class MockActiveMqProducerTest {
     }
 
     private void produceBytesMessages() {
-        producer.produceBytesMessage("topic:A", "message 1 for A");
-        producer.produceBytesMessage("topic:B", "message 1 for B");
-        producer.produceBytesMessage("topic:A", "message 2 for A");
-        producer.produceBytesMessage("topic:C", "message 1 for C");
-        producer.produceBytesMessage("topic:A", "message 3 for A");
+        producer.produceBytesMessage("topic:A", "message 1 for A".getBytes());
+        producer.produceBytesMessage("topic:B", "message 1 for B".getBytes());
+        producer.produceBytesMessage("topic:A", "message 2 for A".getBytes());
+        producer.produceBytesMessage("topic:C", "message 1 for C".getBytes());
+        producer.produceBytesMessage("topic:A", "message 3 for A".getBytes());
     }
 
     private void verifyAllEventsHasExpectedResults() {
@@ -345,7 +345,7 @@ class MockActiveMqProducerTest {
     private void verifyNamedDestinationsContainsEncodedVersionsOf(String destination, String... expectedMessages) {
         var messages = producer.bytesHistory(destination);
         var convertedMessages = messages.stream()
-                .map(MockActiveMqProducer::decodeFromBase64ToUTF8String)
+                .map(FakeActiveMqProducer::decodeFromBase64ToUTF8String)
                 .toList();
 
         assertThat(convertedMessages).containsExactlyInAnyOrder(expectedMessages);

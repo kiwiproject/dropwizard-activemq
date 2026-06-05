@@ -53,6 +53,54 @@ public interface ActiveMqProducersAndConsumers {
     Set<String> getInitializedConsumers();
 
     /**
+     * Check whether any consumers have been started.
+     *
+     * @return true if at least one consumer has been started for any destination
+     */
+    default boolean hasConsumersStarted() {
+        return !getInitializedConsumers().isEmpty();
+    }
+
+    /**
+     * Get the total number of consumers started across all destinations.
+     * <p>
+     * When multiple consumers per destination are allowed, this may exceed the number
+     * of distinct destinations returned by {@link #getInitializedConsumers()}.
+     *
+     * @return the total number of consumers started
+     */
+    int getConsumerCount();
+
+    /**
+     * Get the number of consumers started for the given destination.
+     *
+     * @param destination the destination to check
+     * @return the number of consumers started for the destination, or 0 if none
+     */
+    int getConsumerCountForDestination(String destination);
+
+    /**
+     * Check whether a consumer has been started for the given destination.
+     *
+     * @param destination the destination to check
+     * @return true if a consumer has been started for the destination
+     */
+    default boolean isConsumerStarted(String destination) {
+        return getInitializedConsumers().contains(destination);
+    }
+
+    /**
+     * Check whether any consumer for the given destination is actively consuming messages.
+     * <p>
+     * Returns {@code false} if no consumer has been started for the destination, or if a consumer
+     * was registered but its thread has not yet started or has since terminated.
+     *
+     * @param destination the destination to check
+     * @return true if at least one consumer for the destination is currently consuming messages
+     */
+    boolean isConsumerConsuming(String destination);
+
+    /**
      * Get the {@link ActiveMqProducer} if {@link #startProducers()} has been called.
      * Otherwise, return empty Optional.
      * <p>
@@ -63,4 +111,21 @@ public interface ActiveMqProducersAndConsumers {
      * {@link #startProducers()}, or an empty Optional if no producer has been started.
      */
     Optional<ActiveMqProducer> getActiveMqProducer();
+
+    /**
+     * Check whether a producer has been started.
+     *
+     * @return true if {@link #startProducers()} has been called
+     */
+    default boolean isProducerStarted() {
+        return getActiveMqProducer().isPresent();
+    }
+
+    /**
+     * Check whether multiple consumers per destination are allowed.
+     *
+     * @return true if multiple consumers may be started for the same destination
+     * @see org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig#isAllowMultipleConsumersPerDestination()
+     */
+    boolean isAllowMultipleConsumersPerDestination();
 }

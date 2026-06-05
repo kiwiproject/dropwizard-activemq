@@ -1,4 +1,4 @@
-package org.kiwiproject.dropwizard.activemq.test.mock;
+package org.kiwiproject.dropwizard.activemq.testing;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -6,7 +6,7 @@ import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotBlank;
 import static org.kiwiproject.base.KiwiStrings.f;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.ListMultimap;
 import lombok.extern.slf4j.Slf4j;
 import org.kiwiproject.dropwizard.activemq.ActiveMqConsumer;
 import org.kiwiproject.dropwizard.activemq.ActiveMqMessage;
@@ -22,8 +22,15 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Queue;
 import jakarta.jms.Topic;
 
+/**
+ * A fake implementation of {@link ActiveMqConsumer} for use in tests.
+ * <p>
+ * Records consumed and ignored messages for later inspection, supports configuring
+ * which message types to consume or ignore per destination, and can simulate
+ * uncaught errors via {@link Builder#throwError(Error)}.
+ */
 @Slf4j
-public class MockActiveMqConsumer implements ActiveMqConsumer {
+public class FakeActiveMqConsumer implements ActiveMqConsumer {
 
     public static Builder builder() {
         return new Builder();
@@ -31,8 +38,8 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
 
     public static final class Builder {
 
-        private final Multimap<String, String> consuming = ArrayListMultimap.create();
-        private final Multimap<String, String> ignoring = ArrayListMultimap.create();
+        private final ListMultimap<String, String> consuming = ArrayListMultimap.create();
+        private final ListMultimap<String, String> ignoring = ArrayListMultimap.create();
         private Error error;
         private boolean validateBodyIsPresentOrThrowException;
         private boolean validateMessageTypeIsPresentOrThrowException;
@@ -56,7 +63,7 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
             return this;
         }
 
-        private void populateMapWith(Multimap<String, String> map, String destination, Collection<String> types) {
+        private void populateMapWith(ListMultimap<String, String> map, String destination, Collection<String> types) {
             types.forEach(type -> map.put(destination, type));
         }
 
@@ -83,8 +90,8 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
             return this;
         }
 
-        public MockActiveMqConsumer buildConsumer() {
-            return new MockActiveMqConsumer(
+        public FakeActiveMqConsumer buildConsumer() {
+            return new FakeActiveMqConsumer(
                     consuming,
                     ignoring,
                     error,
@@ -95,11 +102,11 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
         }
     }
 
-    private final Multimap<String, ActiveMqMessage> consumedMessages = ArrayListMultimap.create();
-    private final Multimap<String, ActiveMqMessage> ignoredMessages = ArrayListMultimap.create();
+    private final ListMultimap<String, ActiveMqMessage> consumedMessages = ArrayListMultimap.create();
+    private final ListMultimap<String, ActiveMqMessage> ignoredMessages = ArrayListMultimap.create();
 
-    private final Multimap<String, String> consuming = ArrayListMultimap.create();
-    private final Multimap<String, String> ignoring = ArrayListMultimap.create();
+    private final ListMultimap<String, String> consuming = ArrayListMultimap.create();
+    private final ListMultimap<String, String> ignoring = ArrayListMultimap.create();
     private final Error error;
     private final boolean validateBodyIsPresentOrThrowException;
     private final boolean validateMessageTypeIsPresentOrThrowException;
@@ -108,8 +115,8 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
     private final AtomicLong shouldConsumeCount = new AtomicLong();
     private final AtomicLong receivedCount = new AtomicLong();
 
-    private MockActiveMqConsumer(Multimap<String, String> consuming,
-                                 Multimap<String, String> ignoring,
+    private FakeActiveMqConsumer(ListMultimap<String, String> consuming,
+                                 ListMultimap<String, String> ignoring,
                                  Error error,
                                  boolean validateBodyIsPresentOrThrowException,
                                  boolean validateMessageTypeIsPresentOrThrowException,
@@ -185,13 +192,13 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
     private static String getDestinationNameThatConsumed(ActiveMqMessage message) {
         if (message.wasConsumedFromAQueue()) {
             return message.getJMSDestinationAsQueue()
-                    .map(MockActiveMqConsumer::getQueueName)
+                    .map(FakeActiveMqConsumer::getQueueName)
                     .orElseThrow(() -> new IllegalStateException(dueToMissingDestinationOfType("queue")));
         }
 
         if (message.wasConsumedFromATopic()) {
             return message.getJMSDestinationAsTopic()
-                    .map(MockActiveMqConsumer::getTopicName)
+                    .map(FakeActiveMqConsumer::getTopicName)
                     .orElseThrow(() -> new IllegalStateException(dueToMissingDestinationOfType("topic")));
         }
 
@@ -253,11 +260,11 @@ public class MockActiveMqConsumer implements ActiveMqConsumer {
         return history(destination, ignoredMessages);
     }
 
-    private List<ActiveMqMessage> history(Multimap<String, ActiveMqMessage> messages) {
+    private List<ActiveMqMessage> history(ListMultimap<String, ActiveMqMessage> messages) {
         return List.copyOf(messages.values());
     }
 
-    private List<ActiveMqMessage> history(String destination, Multimap<String, ActiveMqMessage> messages) {
+    private List<ActiveMqMessage> history(String destination, ListMultimap<String, ActiveMqMessage> messages) {
         checkArgumentNotBlank(destination);
         return List.copyOf(messages.get(destination));
     }

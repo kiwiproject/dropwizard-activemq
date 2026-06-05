@@ -17,6 +17,7 @@ import static org.kiwiproject.test.assertj.KiwiAssertJ.assertIsExactType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,7 +26,9 @@ import static org.mockito.Mockito.when;
 import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import io.dropwizard.core.setup.Environment;
+import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
+import org.awaitility.Durations;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,9 +41,10 @@ import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.internal.Consumer;
 import org.kiwiproject.dropwizard.activemq.internal.ProducerDelegate;
 import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqExtension;
-import org.kiwiproject.dropwizard.activemq.test.mock.MockActiveMqConsumer;
+import org.kiwiproject.dropwizard.activemq.testing.FakeActiveMqConsumer;
 import org.kiwiproject.jersey.client.RegistryAwareClient;
 import org.kiwiproject.test.dropwizard.mockito.DropwizardMockitoMocks;
+import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 
@@ -118,8 +122,8 @@ class ActiveMqProducerAndConsumerTest {
             dropwizardActiveMq = newDropwizardActiveMq();
 
             var returnedValue = dropwizardActiveMq
-                    .startConsumers(newMockActiveMqConsumer())
-                    .startConsumer(newMockActiveMqConsumer(), "queue:destQ1", "queue:destQ2");
+                    .startConsumers(newFakeActiveMqConsumer())
+                    .startConsumer(newFakeActiveMqConsumer(), "queue:destQ1", "queue:destQ2");
 
             assertThat(returnedValue).isSameAs(dropwizardActiveMq);
         }
@@ -129,7 +133,7 @@ class ActiveMqProducerAndConsumerTest {
             activeMqConfig.setConsumers(List.of("topic:dest1"));
             dropwizardActiveMq = newDropwizardActiveMq();
 
-            var returnedValue = dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+            var returnedValue = dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
 
             assertThat(returnedValue).isSameAs(dropwizardActiveMq);
             assertThat(dropwizardActiveMq.getInitializedConsumers()).containsOnly("topic:dest1");
@@ -143,7 +147,7 @@ class ActiveMqProducerAndConsumerTest {
             activeMqConfig.setConsumers(List.of("topic:dest1", "topic:dest2"));
             dropwizardActiveMq = newDropwizardActiveMq();
 
-            var returnedValue = dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+            var returnedValue = dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
 
             assertThat(returnedValue).isSameAs(dropwizardActiveMq);
             assertThat(dropwizardActiveMq.getInitializedConsumers()).containsOnly("topic:dest1", "topic:dest2");
@@ -157,7 +161,7 @@ class ActiveMqProducerAndConsumerTest {
         void shouldStartToVarargsDestinations() {
             dropwizardActiveMq = newDropwizardActiveMq();
 
-            var returnedValue = dropwizardActiveMq.startConsumer(newMockActiveMqConsumer(),
+            var returnedValue = dropwizardActiveMq.startConsumer(newFakeActiveMqConsumer(),
                     "topic:dest1", "topic:dest2");
 
             assertThat(returnedValue).isSameAs(dropwizardActiveMq);
@@ -173,7 +177,7 @@ class ActiveMqProducerAndConsumerTest {
             dropwizardActiveMq = newDropwizardActiveMq();
 
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> dropwizardActiveMq.startConsumer(newMockActiveMqConsumer()))
+                    .isThrownBy(() -> dropwizardActiveMq.startConsumer(newFakeActiveMqConsumer()))
                     .withMessage("No destinations specified, which would result in no messages being consumed!");
         }
 
@@ -184,11 +188,11 @@ class ActiveMqProducerAndConsumerTest {
             dropwizardActiveMq = newDropwizardActiveMq();
 
             // start one consumer
-            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+            dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
 
             // second should not be allowed
             assertThatIllegalStateException()
-                    .isThrownBy(() -> dropwizardActiveMq.startConsumer(newMockActiveMqConsumer(), destination))
+                    .isThrownBy(() -> dropwizardActiveMq.startConsumer(newFakeActiveMqConsumer(), destination))
                     .withMessage("A consumer for destination '%s' already exists", destination);
 
             verify(lifecycle).manage(isA(Consumer.class));
@@ -203,18 +207,152 @@ class ActiveMqProducerAndConsumerTest {
             dropwizardActiveMq = newDropwizardActiveMq();
 
             // start one consumer
-            dropwizardActiveMq.startConsumers(newMockActiveMqConsumer());
+            dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
 
             // second should be allowed
-            dropwizardActiveMq.startConsumer(newMockActiveMqConsumer(), destination);
+            dropwizardActiveMq.startConsumer(newFakeActiveMqConsumer(), destination);
 
             verify(lifecycle, times(2)).manage(isA(Consumer.class));
             verify(healthChecks, times(2)).register(eq("consumer-topic:dest1"), isA(HealthCheck.class));
         }
+
+        @Test
+        void shouldReturnFalse_fromIsConsumerConsuming_forUnknownDestination() {
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.isConsumerConsuming("topic:unknown")).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_fromIsConsumerConsuming_whenConsumerRegisteredButThreadNotYetStarted() {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
+
+            // consumer is registered but Dropwizard has not called start() on the managed object yet
+            assertThat(dropwizardActiveMq.isConsumerConsuming(destination)).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_fromIsConsumerConsuming_whenConsumerThreadIsRunning() throws Exception {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
+
+            var managedConsumer = captureConsumer();
+
+            managedConsumer.start();
+            try {
+                await().atMost(Durations.TWO_SECONDS).until(
+                        () -> dropwizardActiveMq.isConsumerConsuming(destination));
+
+                assertThat(dropwizardActiveMq.isConsumerConsuming(destination)).isTrue();
+            } finally {
+                managedConsumer.stop();
+            }
+        }
+
+        @Test
+        void shouldReturnFalse_fromIsConsumerConsuming_afterConsumerStops() throws Exception {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
+
+            var managedConsumer = captureConsumer();
+
+            managedConsumer.start();
+            await().atMost(Durations.TWO_SECONDS).until(
+                    () -> dropwizardActiveMq.isConsumerConsuming(destination));
+
+            managedConsumer.stop();
+            await().atMost(Durations.TWO_SECONDS).until(
+                    () -> !dropwizardActiveMq.isConsumerConsuming(destination));
+
+            assertThat(dropwizardActiveMq.isConsumerConsuming(destination)).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_fromIsConsumerConsuming_whenAtLeastOneOfMultipleConsumersIsRunning() throws Exception {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            activeMqConfig.setAllowMultipleConsumersPerDestination(true);
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
+            dropwizardActiveMq.startConsumer(newFakeActiveMqConsumer(), destination);
+
+            var captor = ArgumentCaptor.forClass(Managed.class);
+            verify(lifecycle, atLeastOnce()).manage(captor.capture());
+            var consumers = captor.getAllValues().stream()
+                    .filter(Consumer.class::isInstance)
+                    .map(Consumer.class::cast)
+                    .toList();
+
+            assertThat(consumers).hasSize(2);
+
+            var first = consumers.get(0);
+            var second = consumers.get(1);
+
+            first.start();
+            try {
+                await().atMost(Durations.TWO_SECONDS).until(
+                        () -> dropwizardActiveMq.isConsumerConsuming(destination));
+
+                // stop the first; second is not started — anyMatch should now return false
+                first.stop();
+                await().atMost(Durations.TWO_SECONDS).until(
+                        () -> !dropwizardActiveMq.isConsumerConsuming(destination));
+
+                assertThat(dropwizardActiveMq.isConsumerConsuming(destination)).isFalse();
+
+                // start the second; should return true again
+                second.start();
+                await().atMost(Durations.TWO_SECONDS).until(
+                        () -> dropwizardActiveMq.isConsumerConsuming(destination));
+
+                assertThat(dropwizardActiveMq.isConsumerConsuming(destination)).isTrue();
+            } finally {
+                first.stop();
+                second.stop();
+            }
+        }
+
+        @Test
+        void shouldReflectStartedConsumer_InHasConsumers_AndIsConsumerStarted() {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.hasConsumersStarted()).isFalse();
+            assertThat(dropwizardActiveMq.isConsumerStarted(destination)).isFalse();
+            assertThat(dropwizardActiveMq.isConsumerStarted("topic:other")).isFalse();
+
+            dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
+
+            assertThat(dropwizardActiveMq.hasConsumersStarted()).isTrue();
+            assertThat(dropwizardActiveMq.isConsumerStarted(destination)).isTrue();
+            assertThat(dropwizardActiveMq.isConsumerStarted("topic:other")).isFalse();
+        }
+
+        private Consumer captureConsumer() {
+            var captor = ArgumentCaptor.forClass(Managed.class);
+            verify(lifecycle, atLeastOnce()).manage(captor.capture());
+            return captor.getAllValues().stream()
+                    .filter(Consumer.class::isInstance)
+                    .map(Consumer.class::cast)
+                    .findFirst()
+                    .orElseThrow();
+        }
     }
 
-    private static MockActiveMqConsumer newMockActiveMqConsumer() {
-        return MockActiveMqConsumer.builder().buildConsumer();
+    private static FakeActiveMqConsumer newFakeActiveMqConsumer() {
+        return FakeActiveMqConsumer.builder().buildConsumer();
     }
 
     @Nested
@@ -335,6 +473,92 @@ class ActiveMqProducerAndConsumerTest {
                     () -> assertThat(listenerB.getCount()).isOne(),
                     () -> assertThat(listenerC.getCount()).isOne()
             );
+        }
+
+        @Test
+        void shouldThrowIllegalState_WhenStartProducers_CalledMoreThanOnce() {
+            activeMqConfig.setProducers(List.of("topic:dest1"));
+            activeMqConfig.setDefaultProducers(List.of());
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startProducers();
+
+            assertThatIllegalStateException()
+                    .isThrownBy(() -> dropwizardActiveMq.startProducers())
+                    .withMessage("startProducers() has already been called; it should only be called once");
+        }
+    }
+
+    @Nested
+    class IsProducerStarted {
+
+        @Test
+        void shouldReturnFalse_BeforeStartProducers() {
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.isProducerStarted()).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_AfterStartProducers() {
+            activeMqConfig.setProducers(List.of("topic:dest1"));
+            activeMqConfig.setDefaultProducers(List.of());
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startProducers();
+
+            assertThat(dropwizardActiveMq.isProducerStarted()).isTrue();
+        }
+    }
+
+    @Nested
+    class ConsumerCount {
+
+        @Test
+        void shouldReturnZero_WhenNoConsumersStarted() {
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.getConsumerCount()).isZero();
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination("topic:dest1")).isZero();
+        }
+
+        @Test
+        void shouldReturnOne_WhenSingleConsumerStarted() {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
+
+            assertThat(dropwizardActiveMq.getConsumerCount()).isOne();
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination(destination)).isOne();
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination("topic:other")).isZero();
+        }
+
+        @Test
+        void shouldCountPerDestination_WhenMultipleConsumersAllowed() {
+            var destination = "topic:dest1";
+            activeMqConfig.setConsumers(List.of(destination));
+            activeMqConfig.setAllowMultipleConsumersPerDestination(true);
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumers(newFakeActiveMqConsumer());
+            dropwizardActiveMq.startConsumer(newFakeActiveMqConsumer(), destination);
+
+            assertThat(dropwizardActiveMq.getConsumerCount()).isEqualTo(2);
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination(destination)).isEqualTo(2);
+        }
+
+        @Test
+        void shouldCountAcrossMultipleDestinations() {
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            dropwizardActiveMq.startConsumer(newFakeActiveMqConsumer(), "topic:dest1", "topic:dest2", "topic:dest3");
+
+            assertThat(dropwizardActiveMq.getConsumerCount()).isEqualTo(3);
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination("topic:dest1")).isOne();
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination("topic:dest2")).isOne();
+            assertThat(dropwizardActiveMq.getConsumerCountForDestination("topic:dest3")).isOne();
         }
     }
 

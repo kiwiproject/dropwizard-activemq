@@ -1,4 +1,4 @@
-package org.kiwiproject.dropwizard.activemq.test.mock;
+package org.kiwiproject.dropwizard.activemq.testing;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotBlank;
@@ -9,7 +9,7 @@ import static org.kiwiproject.collect.KiwiLists.isNullOrEmpty;
 import static org.kiwiproject.collect.KiwiLists.last;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.ListMultimap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.kiwiproject.dropwizard.activemq.ActiveMqProducer;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
@@ -20,23 +20,23 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * A "real" mock for {@link ActiveMqProducer}.
+ * A fake (test double) implementation of {@link ActiveMqProducer}.
  *
  * @implNote This class is not thread-safe, i.e., from multiple threads simultaneously producing messages.
  */
-public class MockActiveMqProducer implements ActiveMqProducer {
+public class FakeActiveMqProducer implements ActiveMqProducer {
 
     private static final String DEFAULT_ALL_EVENTS_QUEUE = "queue:" + ActiveMqConfig.DEFAULT_ALL_EVENTS_QUEUE_NAME;
 
     private final String allEventsQueue;
-    private final Multimap<String, MockJmsMessage> messages = ArrayListMultimap.create();
-    private final Multimap<String, MockJmsMessage> bytesMessages = ArrayListMultimap.create();
-    private final Multimap<String, MockJmsMessage> allEventsMessages = ArrayListMultimap.create();
+    private final ListMultimap<String, FakeJmsMessage> messages = ArrayListMultimap.create();
+    private final ListMultimap<String, FakeJmsMessage> bytesMessages = ArrayListMultimap.create();
+    private final ListMultimap<String, FakeJmsMessage> allEventsMessages = ArrayListMultimap.create();
 
     /**
      * Creates a new instance using the default all-events queue ({@code "queue:all_events"}).
      */
-    public MockActiveMqProducer() {
+    public FakeActiveMqProducer() {
         this(DEFAULT_ALL_EVENTS_QUEUE);
     }
 
@@ -45,7 +45,7 @@ public class MockActiveMqProducer implements ActiveMqProducer {
      *
      * @param allEventsQueue the full destination string, e.g. {@code "queue:my_events"}
      */
-    public MockActiveMqProducer(String allEventsQueue) {
+    public FakeActiveMqProducer(String allEventsQueue) {
         this.allEventsQueue = requireNotBlank(allEventsQueue);
     }
 
@@ -85,10 +85,10 @@ public class MockActiveMqProducer implements ActiveMqProducer {
     private static void produceInternal(String destination,
                                         String payload,
                                         Map<String, Object> headers,
-                                        Multimap<String, MockJmsMessage> messages) {
+                                        ListMultimap<String, FakeJmsMessage> messages) {
 
-        var mockJmsMessage = MockJmsMessage.of(payload, headers);
-        messages.put(destination, mockJmsMessage);
+        var fakeJmsMessage = FakeJmsMessage.of(payload, headers);
+        messages.put(destination, fakeJmsMessage);
     }
 
     public static String encodeToBase64(byte[] payload) {
@@ -134,7 +134,7 @@ public class MockActiveMqProducer implements ActiveMqProducer {
     }
 
     /**
-     * Returns all messages produce to all destinations.
+     * Returns all messages produced to all destinations.
      * <p>
      * Note that there is no guarantee about topic ordering. Messages for a given topic will appear
      * in order, but messages for topic "A" may or may not appear before messages for topic "B".
@@ -206,19 +206,18 @@ public class MockActiveMqProducer implements ActiveMqProducer {
                 .toList();
     }
 
-    private static List<String> history(Multimap<String, MockJmsMessage> messages) {
+    private static List<String> history(ListMultimap<String, FakeJmsMessage> messages) {
         return messages.values().stream()
-                .map(MockJmsMessage::getPayload)
+                .map(FakeJmsMessage::getPayload)
                 .toList();
     }
 
-    private static List<String> history(String destination, Multimap<String, MockJmsMessage> messages) {
+    private static List<String> history(String destination, ListMultimap<String, FakeJmsMessage> messages) {
         checkArgumentNotBlank(destination);
         checkArgumentNotNull(messages);
 
         return messages.get(destination).stream()
-                .map(MockJmsMessage::getPayload)
+                .map(FakeJmsMessage::getPayload)
                 .toList();
     }
-
 }

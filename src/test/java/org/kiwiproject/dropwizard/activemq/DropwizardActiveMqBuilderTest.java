@@ -95,8 +95,37 @@ class DropwizardActiveMqBuilderTest {
         }
 
         @Test
+        void shouldNotHaveConsumersStarted_AfterCreation() {
+            assertThat(dropwizardActiveMq.hasConsumersStarted()).isFalse();
+        }
+
+        @Test
         void shouldNotHaveInitializedActiveMqProducer_AfterCreation() {
             assertThat(dropwizardActiveMq.getActiveMqProducer()).isEmpty();
+        }
+
+        @Test
+        void shouldNotHaveProducerStarted_AfterCreation() {
+            assertThat(dropwizardActiveMq.isProducerStarted()).isFalse();
+        }
+    }
+
+    @Nested
+    class IsAllowMultipleConsumersPerDestination {
+
+        @Test
+        void shouldReturnFalse_ByDefault() {
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.isAllowMultipleConsumersPerDestination()).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_WhenConfigured() {
+            activeMqConfig.setAllowMultipleConsumersPerDestination(true);
+            dropwizardActiveMq = newDropwizardActiveMq();
+
+            assertThat(dropwizardActiveMq.isAllowMultipleConsumersPerDestination()).isTrue();
         }
     }
 

@@ -127,7 +127,7 @@ public class Consumer implements Managed, Runnable {
     /**
      * Is this consumer actively consuming messages?
      */
-    boolean isConsuming() {
+    public boolean isConsuming() {
         return consuming.get();
     }
 
