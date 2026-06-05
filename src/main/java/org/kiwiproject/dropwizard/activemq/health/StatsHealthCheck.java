@@ -9,6 +9,7 @@ import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.base.KiwiStrings.f;
 import static org.kiwiproject.collect.KiwiLists.isNullOrEmpty;
 import static org.kiwiproject.collect.KiwiMaps.newHashMap;
+import static org.kiwiproject.time.KiwiDurationFormatters.formatDropwizardDurationWords;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.google.common.annotations.VisibleForTesting;
@@ -54,6 +55,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
     private final String simpleClassName;  // exists to allow logging the actual subclass for easier debugging
     
     private final long healthCheckRefreshIntervalMillis;
+    private final String healthCheckRefreshIntervalHuman;
     private final long statsTimeoutMillis;
 
     @VisibleForTesting
@@ -85,6 +87,7 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
         this.statHelper = requireNotNull(statHelper);
 
         this.lastUpdateTimestamp = new AtomicLong();
+        this.healthCheckRefreshIntervalHuman = formatDropwizardDurationWords(healthConfig.getRefreshInterval());
         this.healthCheckRefreshIntervalMillis = healthConfig.getRefreshInterval().toMilliseconds();
         this.statsTimeoutMillis = healthConfig.getStatsTimeout().toMilliseconds();
         this.simpleClassName = getClass().getSimpleName();
@@ -109,8 +112,8 @@ public abstract class StatsHealthCheck<C extends ActiveMqConfigured> extends Hea
                 return HealthCheckResults.newUnhealthyResult("Failed to retrieve stats: %s", e.getMessage());
             }
         } else {
-            LOG.debug("{}: Skipping stat check, refresh interval ({} seconds) not yet reached",
-                    simpleClassName, healthCheckRefreshIntervalMillis);
+            LOG.debug("{}: Skipping stat check, refresh interval ({}) not yet reached",
+                    simpleClassName, healthCheckRefreshIntervalHuman);
         }
 
         return lastResult;
