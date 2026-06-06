@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>dropwizard-activemq</artifactId>
-    <version>0.7.1-SNAPSHOT</version>
+    <version>0.8.0-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
         A small library that integrates Dropwizard and ActiveMQ, allowing applications to consume and produce messages.
