@@ -67,7 +67,6 @@
                 <version>${dropwizard-config-providers.version}</version>
             </dependency>
 
-            <!-- optional=true because Leader Latch integration is optional -->
             <dependency>
                 <groupId>org.kiwiproject</groupId>
                 <artifactId>dropwizard-leader-latch</artifactId>
@@ -150,6 +149,7 @@
             <artifactId>dropwizard-config-providers</artifactId>
         </dependency>
 
+        <!-- Note this is optional because Leader Latch integration is optional -->
         <dependency>
             <groupId>org.kiwiproject</groupId>
             <artifactId>dropwizard-leader-latch</artifactId>
