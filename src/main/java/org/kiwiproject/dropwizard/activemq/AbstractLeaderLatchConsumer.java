@@ -25,8 +25,8 @@ import org.kiwiproject.curator.leader.ManagedLeaderLatch;
  * a relatively low volume of messages from a regular JMS topic and that need to
  * ensure each message is processed only once.
  * <p>
- * When using this class, {@code dropwizard-leader-latch} is required.
- * By default, it is a provided-scope dependency and won't be included.
+ * When using this class, add {@code dropwizard-leader-latch} as an explicit
+ * dependency; it is declared optional and is not included transitively.
  */
 public abstract class AbstractLeaderLatchConsumer implements ActiveMqConsumer {
 
