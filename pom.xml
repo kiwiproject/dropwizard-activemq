@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>dropwizard-activemq</artifactId>
-    <version>0.8.2-SNAPSHOT</version>
+    <version>0.8.2</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
         A small library that integrates Dropwizard and ActiveMQ, allowing applications to consume and produce messages.
@@ -22,7 +22,7 @@
         <connection>scm:git:https://github.com/kiwiproject/dropwizard-activemq.git</connection>
         <developerConnection>scm:git:git@github.com:kiwiproject/dropwizard-activemq.git</developerConnection>
         <url>https://github.com/kiwiproject/dropwizard-activemq</url>
-        <tag>HEAD</tag>
+        <tag>v0.8.2</tag>
     </scm>
 
     <properties>
