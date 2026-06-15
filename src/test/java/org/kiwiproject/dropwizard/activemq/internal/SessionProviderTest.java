@@ -1,7 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.uniqueServiceName;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -56,35 +56,26 @@ class SessionProviderTest {
     }
 
     @Test
+    @SuppressWarnings("resource")
     void shouldThrowJMSException_CreatingInstance_WhenBadConnection() throws JMSException {
         when(factory.createConnection()).thenThrow(JMSException.class);
 
-        //noinspection unused — try-with-resources required; constructor throws before body executes
-        try (var provider = new SessionProvider(factory, serviceName)) {
-            fail("A JMSException should have been thrown");
-        } catch (Exception e) {
-            verify(factory).createConnection();
+        assertThrows(JMSException.class, () -> new SessionProvider(factory, serviceName));
 
-            assertThat(e).isInstanceOf(JMSException.class);
-        }
+        verify(factory).createConnection();
     }
 
     @Test
+    @SuppressWarnings("resource")
     void shouldThrowJMSException_CreatingInstance_WhenBadSession() throws JMSException {
         var connection = mock(Connection.class);
         when(factory.createConnection()).thenReturn(connection);
-
         when(connection.createSession(anyBoolean(), anyInt())).thenThrow(JMSException.class);
 
-        //noinspection unused — try-with-resources required; constructor throws before body executes
-        try (var provider = new SessionProvider(factory, serviceName)) {
-            fail("A JMSException should have been thrown");
-        } catch (Exception e) {
-            verify(factory).createConnection();
-            verify(connection).createSession(false, Session.AUTO_ACKNOWLEDGE);
+        assertThrows(JMSException.class, () -> new SessionProvider(factory, serviceName));
 
-            assertThat(e).isInstanceOf(JMSException.class);
-        }
+        verify(factory).createConnection();
+        verify(connection).createSession(false, Session.AUTO_ACKNOWLEDGE);
     }
 
     @Nested
