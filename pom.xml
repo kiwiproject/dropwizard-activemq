@@ -28,16 +28,16 @@
     <properties>
         <!-- required dependency versions -->
         <activemq.version>6.2.6</activemq.version>
-        <dropwizard-config-providers.version>3.0.2</dropwizard-config-providers.version>
-        <dropwizard-leader-latch.version>3.0.2</dropwizard-leader-latch.version>
-        <elucidation.version>7.0.1</elucidation.version>
-        <kiwi-bom.version>3.2.0</kiwi-bom.version>
-        <kiwi.version>5.3.1</kiwi.version>
-        <metrics-healthchecks-severity.version>3.0.2</metrics-healthchecks-severity.version>
-        <registry-aware-jersey-client.version>3.0.2</registry-aware-jersey-client.version>
+        <dropwizard-config-providers.version>3.0.3</dropwizard-config-providers.version>
+        <dropwizard-leader-latch.version>3.0.3</dropwizard-leader-latch.version>
+        <elucidation.version>7.0.2</elucidation.version>
+        <kiwi-bom.version>3.3.0</kiwi-bom.version>
+        <kiwi.version>5.4.0</kiwi.version>
+        <metrics-healthchecks-severity.version>3.1.0</metrics-healthchecks-severity.version>
+        <registry-aware-jersey-client.version>3.1.0</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
-        <kiwi-test.version>4.1.0</kiwi-test.version>
+        <kiwi-test.version>4.2.0</kiwi-test.version>
 
         <!-- Sonar properties -->
         <sonar.projectKey>kiwiproject_dropwizard-activemq</sonar.projectKey>
