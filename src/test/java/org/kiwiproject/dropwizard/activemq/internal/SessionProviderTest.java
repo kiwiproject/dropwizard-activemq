@@ -1,7 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.kiwiproject.dropwizard.activemq.test.util.TestObjectFactory.uniqueServiceName;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -60,7 +60,8 @@ class SessionProviderTest {
     void shouldThrowJMSException_CreatingInstance_WhenBadConnection() throws JMSException {
         when(factory.createConnection()).thenThrow(JMSException.class);
 
-        assertThrows(JMSException.class, () -> new SessionProvider(factory, serviceName));
+        assertThatExceptionOfType(JMSException.class)
+                .isThrownBy(() -> new SessionProvider(factory, serviceName));
 
         verify(factory).createConnection();
     }
@@ -72,7 +73,8 @@ class SessionProviderTest {
         when(factory.createConnection()).thenReturn(connection);
         when(connection.createSession(anyBoolean(), anyInt())).thenThrow(JMSException.class);
 
-        assertThrows(JMSException.class, () -> new SessionProvider(factory, serviceName));
+        assertThatExceptionOfType(JMSException.class)
+                .isThrownBy(() -> new SessionProvider(factory, serviceName));
 
         verify(factory).createConnection();
         verify(connection).createSession(false, Session.AUTO_ACKNOWLEDGE);
