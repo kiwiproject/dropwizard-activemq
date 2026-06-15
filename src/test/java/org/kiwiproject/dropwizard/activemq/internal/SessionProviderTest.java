@@ -10,6 +10,10 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.jms.Connection;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
+import jakarta.jms.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,11 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.kiwiproject.dropwizard.activemq.internal.DestinationIdentifier.ActorType;
-
-import jakarta.jms.Connection;
-import jakarta.jms.ConnectionFactory;
-import jakarta.jms.JMSException;
-import jakarta.jms.Session;
 
 @DisplayName("SessionProvider")
 class SessionProviderTest {
@@ -44,6 +43,7 @@ class SessionProviderTest {
         when(connection.createSession(anyBoolean(), anyInt())).thenReturn(session);
 
         try (var provider = new SessionProvider(factory, serviceName)) {
+            //noinspection resource
             verify(factory, only()).createConnection();
             verify(connection).createSession(false, Session.AUTO_ACKNOWLEDGE);
 
