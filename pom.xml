@@ -27,7 +27,7 @@
 
     <properties>
         <!-- required dependency versions -->
-        <activemq.version>6.2.6</activemq.version>
+        <activemq.version>6.2.7</activemq.version>
         <dropwizard-config-providers.version>3.0.3</dropwizard-config-providers.version>
         <dropwizard-leader-latch.version>3.0.3</dropwizard-leader-latch.version>
         <elucidation.version>7.0.2</elucidation.version>
