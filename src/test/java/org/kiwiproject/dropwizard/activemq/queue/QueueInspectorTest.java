@@ -64,6 +64,12 @@ class QueueInspectorTest {
     }
 
     @Test
+    void shouldThrow_OnConstruction_WhenActiveMqConfigIsNull() {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new QueueInspector((ActiveMqConfig) null, JSON_HELPER));
+    }
+
+    @Test
     void shouldThrow_OnConstruction_WhenConnectionFactoryIsNull() {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> new QueueInspector((ConnectionFactory) null, JSON_HELPER));

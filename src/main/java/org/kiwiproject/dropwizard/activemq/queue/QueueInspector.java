@@ -3,6 +3,7 @@ package org.kiwiproject.dropwizard.activemq.queue;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.dropwizard.activemq.util.MessageTypeParser.UNKNOWN_MESSAGE_TYPE;
@@ -19,6 +20,7 @@ import jakarta.jms.Session;
 import jakarta.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.jms.pool.PooledConnection;
+import org.apache.activemq.jms.pool.PooledConnectionFactory;
 import org.kiwiproject.dropwizard.activemq.ActiveMqHelper;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.util.MessageTypeParser;
@@ -39,13 +41,18 @@ public class QueueInspector implements Managed {
     private Connection connection;
 
     public QueueInspector(ActiveMqConfig activeMqConfig, JsonHelper jsonHelper) {
-        this(new ActiveMqHelper().newPooledConnectionFactory(activeMqConfig), jsonHelper);
+        this(newPooledConnectionFactory(activeMqConfig), jsonHelper);
+    }
+
+    private static PooledConnectionFactory newPooledConnectionFactory(ActiveMqConfig activeMqConfig) {
+        checkArgumentNotNull(activeMqConfig, "activeMqConfig must not be null");
+        return new ActiveMqHelper().newPooledConnectionFactory(activeMqConfig);
     }
 
     @VisibleForTesting
     QueueInspector(ConnectionFactory connectionFactory, JsonHelper jsonHelper) {
-        this.parser = new MessageTypeParser(requireNotNull(jsonHelper));
-        this.connectionFactory = requireNotNull(connectionFactory);
+        this.parser = new MessageTypeParser(requireNotNull(jsonHelper, "jsonHelper must not be null"));
+        this.connectionFactory = requireNotNull(connectionFactory, "connectionFactory must not be null");
     }
 
     /**
