@@ -2,6 +2,7 @@ package org.kiwiproject.dropwizard.activemq.queue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,30 @@ import java.util.Map;
 
 @DisplayName("QueueInfo")
 class QueueInfoTest {
+
+    @Test
+    void constructor_ShouldThrowIllegalArgument_ForNullMessageTypeCounts() {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new QueueInfo(true, 0, 0, 0, null))
+                .withMessage("messageTypeCounts must not be null");
+    }
+
+    @Test
+    void constructor_ShouldThrowIllegalArgument_ForInvalidMessageCounts() {
+        assertAll(
+                () -> assertThatIllegalArgumentException()
+                        .isThrownBy(() -> new QueueInfo(true, -1, 0, 0, Map.of()))
+                        .withMessage("textMessageCount must be greater than or equal to zero"),
+
+                () -> assertThatIllegalArgumentException()
+                        .isThrownBy(() -> new QueueInfo(true, 0, -1, 0, Map.of()))
+                        .withMessage("bytesMessageCount must be greater than or equal to zero"),
+
+                () -> assertThatIllegalArgumentException()
+                        .isThrownBy(() -> new QueueInfo(true, 0, 0, -1, Map.of()))
+                        .withMessage("otherMessageCount must be greater than or equal to zero")
+        );
+    }
 
     @Test
     void ofExists_ShouldSetAllFields() {
