@@ -8,6 +8,8 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Durations.FIVE_SECONDS;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.kiwiproject.dropwizard.activemq.test.util.ActiveMqTestUtils.createNonTransactedSession;
+import static org.kiwiproject.dropwizard.activemq.test.util.ActiveMqTestUtils.createQueueProducer;
 import static org.kiwiproject.dropwizard.activemq.util.MessageTypeParser.UNKNOWN_MESSAGE_TYPE;
 import static org.kiwiproject.test.constants.KiwiTestConstants.JSON_HELPER;
 import static org.mockito.Mockito.doThrow;
@@ -35,6 +37,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqExtension;
+import org.kiwiproject.dropwizard.activemq.test.util.ActiveMqTestUtils;
 import org.kiwiproject.dropwizard.activemq.util.UncheckedJMSException;
 
 import java.nio.charset.StandardCharsets;
@@ -277,9 +280,9 @@ class QueueInspectorTest {
     @SneakyThrows
     private void createQueue(ConnectionFactory connectionFactory) {
         try (var connection = connectionFactory.createConnection();
-             var session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
+             var session = createNonTransactedSession(connection)) {
 
-            var queue = session.createQueue(queueName);
+            var queue = ActiveMqTestUtils.createQueue(session, queueName);
 
             try (var consumer = session.createConsumer(queue)) {
                 consumer.receiveNoWait();
@@ -449,14 +452,11 @@ class QueueInspectorTest {
     @SneakyThrows
     private void sendMessage(ThrowingFunction<Session, Message> fn) {
         try (var connection = pooledConnectionFactory.createConnection();
-             var session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
+             var session = createNonTransactedSession(connection);
+             var producer = createQueueProducer(session, queueName)) {
 
-            var queue = session.createQueue(queueName);
-
-            try (var producer = session.createProducer(queue)) {
-                var message = fn.apply(session);
-                producer.send(message);
-            }
+            var message = fn.apply(session);
+            producer.send(message);
         }
     }
 
@@ -472,9 +472,9 @@ class QueueInspectorTest {
     @SneakyThrows
     private int countMessages() {
         try (var connection = pooledConnectionFactory.createConnection();
-             var session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
+             var session = createNonTransactedSession(connection)) {
 
-            var queue = session.createQueue(queueName);
+            var queue = ActiveMqTestUtils.createQueue(session, queueName);
 
             try (var browser = session.createBrowser(queue)) {
                 var iterator = browser.getEnumeration().asIterator();
@@ -486,9 +486,9 @@ class QueueInspectorTest {
     @SneakyThrows
     private void consumeSingleMessage() {
         try (var connection = pooledConnectionFactory.createConnection();
-             var session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
+             var session = createNonTransactedSession(connection)) {
 
-            var queue = session.createQueue(queueName);
+            var queue = ActiveMqTestUtils.createQueue(session, queueName);
 
             try (var consumer = session.createConsumer(queue)) {
                 consumer.receive(500);
