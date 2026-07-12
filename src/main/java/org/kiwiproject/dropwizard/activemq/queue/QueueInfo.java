@@ -29,6 +29,8 @@ public record QueueInfo(
         checkMessageCount(bytesMessageCount, "bytes");
         checkMessageCount(otherMessageCount, "other");
         checkArgumentNotNull(messageTypeCounts, "messageTypeCounts must not be null");
+        messageTypeCounts.forEach((type, count) ->
+                checkArgument(count >= 0, "count for message type '%s' must be greater than or equal to zero", type));
         messageTypeCounts = Collections.unmodifiableMap(new LinkedHashMap<>(messageTypeCounts));
     }
 

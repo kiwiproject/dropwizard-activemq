@@ -40,6 +40,15 @@ class QueueInfoTest {
     }
 
     @Test
+    void constructor_ShouldThrowIllegalArgument_ForNegativeMessageTypeCount() {
+        var messageTypeCounts = Map.of("STATUS_CHANGE", -1);
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new QueueInfo(true, 1, 0, 0, messageTypeCounts))
+                .withMessage("count for message type 'STATUS_CHANGE' must be greater than or equal to zero");
+    }
+
+    @Test
     void ofExists_ShouldSetAllFields() {
         var messageTypeCounts = Map.of("STATUS_CHANGE", 1);
 
