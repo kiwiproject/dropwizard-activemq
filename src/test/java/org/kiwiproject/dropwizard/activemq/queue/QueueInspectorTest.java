@@ -12,8 +12,10 @@ import static org.kiwiproject.dropwizard.activemq.test.util.ActiveMqTestUtils.cr
 import static org.kiwiproject.dropwizard.activemq.test.util.ActiveMqTestUtils.createQueueProducer;
 import static org.kiwiproject.dropwizard.activemq.util.MessageTypeParser.UNKNOWN_MESSAGE_TYPE;
 import static org.kiwiproject.test.constants.KiwiTestConstants.JSON_HELPER;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -212,6 +214,28 @@ class QueueInspectorTest {
         assertThatIllegalStateException()
                 .isThrownBy(() -> queueInspector.start())
                 .withMessageContaining("already started");
+    }
+
+    @Test
+    void shouldThrow_WhenQueueExistsThrowsJMSException() throws JMSException {
+        var spyInspector = spy(new QueueInspector(mock(ConnectionFactory.class), JSON_HELPER));
+        var jmsException = new JMSException("boom");
+        doThrow(jmsException).when(spyInspector).tryGetQueueExists(anyString());
+
+        assertThatExceptionOfType(UncheckedJMSException.class)
+                .isThrownBy(() -> spyInspector.queueExists(queueName))
+                .withCause(jmsException);
+    }
+
+    @Test
+    void shouldThrow_WhenGetQueueInfoThrowsJMSException() throws JMSException {
+        var spyInspector = spy(new QueueInspector(mock(ConnectionFactory.class), JSON_HELPER));
+        var jmsException = new JMSException("boom");
+        doThrow(jmsException).when(spyInspector).tryGetQueueInfo(anyString());
+
+        assertThatExceptionOfType(UncheckedJMSException.class)
+                .isThrownBy(() -> spyInspector.getQueueInfo(queueName))
+                .withCause(jmsException);
     }
 
     @Test

@@ -94,7 +94,8 @@ public class QueueInspector implements Managed {
         }
     }
 
-    private QueueInfo tryGetQueueInfo(String queueName) throws JMSException {
+    @VisibleForTesting
+    QueueInfo tryGetQueueInfo(String queueName) throws JMSException {
         if (!tryGetQueueExists(queueName)) {
             return QueueInfo.ofDoesNotExist();
         }
@@ -122,7 +123,8 @@ public class QueueInspector implements Managed {
         }
     }
 
-    private boolean tryGetQueueExists(String queueName) throws JMSException {
+    @VisibleForTesting
+    boolean tryGetQueueExists(String queueName) throws JMSException {
         requireNotBlank(queueName, "queueName must not be blank");
         checkState(nonNull(connection), "not started or already stopped - call start() first");
 
