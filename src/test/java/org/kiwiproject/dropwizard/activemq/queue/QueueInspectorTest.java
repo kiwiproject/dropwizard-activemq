@@ -162,6 +162,22 @@ class QueueInspectorTest {
     }
 
     @Test
+    void shouldClearConnection_WhenStartFails_SoSubsequentCallsReportNotStarted() throws JMSException {
+        var connectionFactory = mock(ConnectionFactory.class);
+        var badConnection = mock(Connection.class);
+        when(connectionFactory.createConnection()).thenReturn(badConnection);
+        doThrow(new JMSException("Unable to start connection")).when(badConnection).start();
+
+        var inspector = new QueueInspector(connectionFactory, JSON_HELPER);
+
+        assertThatExceptionOfType(UncheckedJMSException.class).isThrownBy(inspector::start);
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> inspector.queueExists(queueName))
+                .withMessageContaining("not started");
+    }
+
+    @Test
     void shouldThrow_WhenConnectionIsNeitherActiveMQConnectionNorPooledConnection() throws JMSException {
         var connectionFactory = mock(ConnectionFactory.class);
         var plainConnection = mock(Connection.class);

@@ -56,6 +56,7 @@ public class QueueInspector implements Managed {
             connection.start();
         } catch (JMSException e) {
             closeQuietly(connection);
+            connection = null;
             throw new UncheckedJMSException(e);
         }
     }
