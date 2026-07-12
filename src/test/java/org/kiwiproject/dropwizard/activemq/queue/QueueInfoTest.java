@@ -96,9 +96,10 @@ class QueueInfoTest {
     @Test
     void messageTypeCounts_ShouldBeUnmodifiable() {
         var queueInfo = QueueInfo.ofExists(1, 0, 0, new LinkedHashMap<>(Map.of("STATUS_CHANGE", 1)));
+        var messageTypeCounts = queueInfo.messageTypeCounts();
 
         assertThatExceptionOfType(UnsupportedOperationException.class)
-                .isThrownBy(() -> queueInfo.messageTypeCounts().put("OTHER", 1));
+                .isThrownBy(() -> messageTypeCounts.put("OTHER", 1));
     }
 
     @Test
