@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.kiwiproject.collect.KiwiMaps;
+import org.kiwiproject.dropwizard.activemq.config.ActiveMqHealthConfig;
 import org.kiwiproject.dropwizard.activemq.queue.QueueInfo;
 import org.kiwiproject.dropwizard.activemq.queue.QueueInspector;
 
@@ -34,6 +35,16 @@ class InspectDlqTaskTest {
         task = new InspectDlqTask(inspector, dlqName);
         sw = new StringWriter();
         pw = new PrintWriter(sw);
+    }
+
+    @Test
+    void shouldUseDefaultDlqName_WhenConstructedWithSingleArgConstructor() {
+        var defaultDlqTask = new InspectDlqTask(inspector);
+        when(inspector.getQueueInfo(anyString())).thenReturn(QueueInfo.ofDoesNotExist());
+
+        defaultDlqTask.execute(Map.of(), pw);
+
+        verify(inspector, only()).getQueueInfo(ActiveMqHealthConfig.DEFAULT_DLQ_NAME);
     }
 
     @Test
