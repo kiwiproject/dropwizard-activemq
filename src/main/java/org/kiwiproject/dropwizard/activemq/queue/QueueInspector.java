@@ -95,7 +95,7 @@ public class QueueInspector implements Managed {
     }
 
     private QueueInfo tryGetQueueInfo(String queueName) throws JMSException {
-        if (!queueExists(queueName)) {
+        if (!tryGetQueueExists(queueName)) {
             return QueueInfo.ofDoesNotExist();
         }
 
