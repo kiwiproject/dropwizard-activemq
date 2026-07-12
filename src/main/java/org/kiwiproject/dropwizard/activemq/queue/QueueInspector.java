@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.queue;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
@@ -52,6 +53,8 @@ public class QueueInspector implements Managed {
      */
     @Override
     public void start() {
+        checkState(isNull(connection), "already started - call stop() first");
+
         try {
             connection = connectionFactory.createConnection();
             connection.start();

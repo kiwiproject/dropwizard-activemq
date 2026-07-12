@@ -199,6 +199,13 @@ class QueueInspectorTest {
     }
 
     @Test
+    void shouldThrow_WhenStartIsCalled_WhileAlreadyStarted() {
+        assertThatIllegalStateException()
+                .isThrownBy(() -> queueInspector.start())
+                .withMessageContaining("already started");
+    }
+
+    @Test
     void shouldThrow_WhenConnectionIsNeitherActiveMQConnectionNorPooledConnection() throws JMSException {
         var connectionFactory = mock(ConnectionFactory.class);
         var plainConnection = mock(Connection.class);
