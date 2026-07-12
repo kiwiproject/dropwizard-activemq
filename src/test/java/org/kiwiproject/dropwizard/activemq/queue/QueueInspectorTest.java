@@ -30,6 +30,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.test.junit.jupiter.EmbeddedActiveMqExtension;
 import org.kiwiproject.dropwizard.activemq.util.UncheckedJMSException;
@@ -123,6 +126,24 @@ class QueueInspectorTest {
         assertThatIllegalStateException()
                 .isThrownBy(() -> queueInspector.getQueueInfo(queueName))
                 .withMessageContaining("already stopped");
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "  ", "\t"})
+    void shouldThrow_WhenQueueExistsIsCalled_WithBlankQueueName(String blankQueueName) {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> queueInspector.queueExists(blankQueueName))
+                .withMessageContaining("queueName must not be blank");
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "  ", "\t"})
+    void shouldThrow_WhenGetQueueInfoIsCalled_WithBlankQueueName(String blankQueueName) {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> queueInspector.getQueueInfo(blankQueueName))
+                .withMessageContaining("queueName must not be blank");
     }
 
     @Test

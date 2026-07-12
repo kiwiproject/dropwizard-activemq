@@ -2,6 +2,7 @@ package org.kiwiproject.dropwizard.activemq.queue;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.nonNull;
+import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.dropwizard.activemq.util.MessageTypeParser.UNKNOWN_MESSAGE_TYPE;
 import static org.kiwiproject.io.KiwiIO.closeQuietly;
@@ -112,6 +113,7 @@ public class QueueInspector implements Managed {
     }
 
     private boolean tryGetQueueExists(String queueName) throws JMSException {
+        requireNotBlank(queueName, "queueName must not be blank");
         checkState(nonNull(connection), "not started or already stopped - call start() first");
 
         var activeMQConnection = getActiveMQConnection(connection);
