@@ -16,7 +16,7 @@ import java.util.Map;
 class QueueInfoTest {
 
     @Test
-    void constructor_ShouldThrowIllegalArgument_ForNullMessageTypeCounts() {
+    void constructor_ShouldThrowIllegalArgument_WhenMessageTypeCountsMapIsNull() {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> new QueueInfo(true, 0, 0, 0, null))
                 .withMessage("messageTypeCounts must not be null");
