@@ -32,6 +32,12 @@ import java.util.LinkedHashMap;
 
 /**
  * Class to inspect an ActiveMQ queue.
+ * <p>
+ * Queue discovery relies on ActiveMQ
+ * <a href="https://activemq.apache.org/components/classic/documentation/advisory-message">destination advisories</a>,
+ * which are enabled by default, and <a href="https://activemq.apache.org/components/classic/documentation/maven/apidocs/org/apache/activemq/advisory/DestinationSource.html">DestinationSource</a>.
+ * If advisory support is disabled, or the connection is not permitted to consume
+ * queue advisory messages, queue existence checks may not work correctly.
  */
 public class QueueInspector implements Managed {
 
@@ -57,6 +63,8 @@ public class QueueInspector implements Managed {
 
     /**
      * Starts the ActiveMQ connection.
+     *
+     * @throws IllegalStateException if start has already been called
      */
     @Override
     public void start() {

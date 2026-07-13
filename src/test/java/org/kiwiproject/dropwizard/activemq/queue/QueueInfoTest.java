@@ -58,6 +58,48 @@ class QueueInfoTest {
     }
 
     @Test
+    void constructor_ShouldThrowIllegalArgument_WhenQueueDoesNotExist_ButHasNonZeroCounts() {
+        var expectedMessage =
+                "all message counts must be zero and messageTypeCounts must be empty when the queue does not exist";
+
+        assertAll(
+                () -> assertThatIllegalArgumentException()
+                        .isThrownBy(() -> new QueueInfo(false, 1, 0, 0, Map.of()))
+                        .withMessage(expectedMessage),
+
+                () -> assertThatIllegalArgumentException()
+                        .isThrownBy(() -> new QueueInfo(false, 0, 1, 0, Map.of()))
+                        .withMessage(expectedMessage),
+
+                () -> assertThatIllegalArgumentException()
+                        .isThrownBy(() -> new QueueInfo(false, 0, 0, 1, Map.of()))
+                        .withMessage(expectedMessage),
+
+                () -> assertThatIllegalArgumentException()
+                        .isThrownBy(() -> new QueueInfo(false, 0, 0, 0, Map.of("STATUS_CHANGE", 1)))
+                        .withMessage(expectedMessage)
+        );
+    }
+
+    @Test
+    void constructor_ShouldThrowIllegalArgument_WhenMessageTypeCountsSumExceedsTextMessageCount() {
+        var messageTypeCounts = Map.of("STATUS_CHANGE", 1, "ORDER_STATUS_CHANGE", 1);
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new QueueInfo(true, 1, 0, 0, messageTypeCounts))
+                .withMessage("sum of messageTypeCounts must not exceed textMessageCount");
+    }
+
+    @Test
+    void constructor_ShouldAllow_WhenMessageTypeCountsSumIsLessThanTextMessageCount() {
+        var messageTypeCounts = Map.of("STATUS_CHANGE", 2);
+
+        var queueInfo = new QueueInfo(true, 5, 0, 0, messageTypeCounts);
+
+        assertThat(queueInfo.textMessageCount()).isEqualTo(5);
+    }
+
+    @Test
     void ofExists_ShouldSetAllFields() {
         var messageTypeCounts = Map.of("STATUS_CHANGE", 1);
 
