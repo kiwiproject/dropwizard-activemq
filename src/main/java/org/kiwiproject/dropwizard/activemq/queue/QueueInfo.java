@@ -30,14 +30,17 @@ public record QueueInfo(
         checkMessageCount(bytesMessageCount, "bytes");
         checkMessageCount(otherMessageCount, "other");
         checkArgumentNotNull(messageTypeCounts, "messageTypeCounts must not be null");
-        messageTypeCounts.forEach((type, count) ->
-                checkArgument(nonNull(count) && count >= 0,
-                        "count for message type '%s' must be greater than or equal to zero", type));
+        messageTypeCounts.forEach(QueueInfo::checkMessageTypeCount);
         messageTypeCounts = Collections.unmodifiableMap(new LinkedHashMap<>(messageTypeCounts));
     }
 
     private static void checkMessageCount(int count, String type) {
         checkArgument(count >= 0, "%sMessageCount must be greater than or equal to zero", type);
+    }
+
+    private static void checkMessageTypeCount(String type, Integer count) {
+        checkArgument(nonNull(count) && count >= 0,
+                "count for message type '%s' must be greater than or equal to zero", type);
     }
 
     public static QueueInfo ofExists(int textMessageCount,
