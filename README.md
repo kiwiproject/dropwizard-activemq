@@ -153,8 +153,10 @@ the message to `VirtualTopic.orders`. Each consumer group named `myservice` subs
 | `dlqName`                          | `ActiveMQ.DLQ` | Name of the dead-letter queue.                                                                      |
 | `ignoredDestinations`              | `[]`           | Destinations to exclude from stats health checks (use the full prefix form, e.g. `queue:my_queue`). |
 | `maxPendingThreshold`              | `100`          | Stats health check reports unhealthy when pending message count reaches or exceeds this value.      |
+| `minConsumerThreshold`             | `0`            | Stats health check reports unhealthy when the consumer count is less than or equal to this value, subject to `ignoreEmptyQueuesWithNoConsumers`. |
 | `ignoreEmptyQueuesWithNoConsumers` | `true`         | Treat empty queues with no consumers as healthy.                                                    |
 | `refreshInterval`                  | `2 minutes`    | How often Jolokia stats are refreshed.                                                              |
+| `statsTimeout`                     | `10 seconds`   | Maximum time to wait while retrieving destination statistics from Jolokia.                          |
 
 ## Health Checks
 
