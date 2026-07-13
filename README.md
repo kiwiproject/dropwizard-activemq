@@ -194,9 +194,9 @@ environment.admin().addTask(new InspectDlqTask(queueInspector));
 By default, the task inspects `ActiveMQ.DLQ`. A custom dead-letter queue name can be supplied to the `InspectDlqTask`
 constructor.
 
-**Note:** `QueueInspector` relies on
-ActiveMQ [destination advisories](https://activemq.apache.org/components/classic/documentation/advisory-message) and [
-`DestinationSource`](https://activemq.apache.org/components/classic/documentation/maven/apidocs/org/apache/activemq/advisory/DestinationSource.html)
+**Note:** `QueueInspector` relies on ActiveMQ
+[destination advisories](https://activemq.apache.org/components/classic/documentation/advisory-message) and
+[`DestinationSource`](https://activemq.apache.org/components/classic/documentation/maven/apidocs/org/apache/activemq/advisory/DestinationSource.html)
 to discover queues. Advisories are enabled by default. Because `DestinationSource` learns about destinations through
 advisory messages, a queue may briefly be reported as nonexistent after startup.
 

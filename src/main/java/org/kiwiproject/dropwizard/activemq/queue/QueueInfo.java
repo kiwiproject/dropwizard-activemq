@@ -10,6 +10,11 @@ import java.util.Map;
 
 /**
  * Basic information about a queue.
+ * <p>
+ * When {@code exists} is {@code false}, all counts must be zero and {@code messageTypeCounts} must be
+ * empty. When {@code exists} is {@code true}, the sum of {@code messageTypeCounts} values must not
+ * exceed {@code textMessageCount}, since a text message is either not yet categorized by type, or
+ * belongs to exactly one message type.
  *
  * @param exists            whether the queue exists (mainly useful for queues like the Dead Letter Queue)
  * @param textMessageCount  the number of {@link jakarta.jms.TextMessage} in the queue
@@ -78,6 +83,9 @@ public record QueueInfo(
      * @param otherMessageCount the number of all other message types in the queue
      * @param messageTypeCounts a map containing the number of each type of text message
      * @return a new instance
+     * @throws IllegalArgumentException if any count is negative, if messageTypeCounts is null or contains
+     *                                   a null or negative value, or if the sum of messageTypeCounts
+     *                                   exceeds textMessageCount
      */
     public static QueueInfo ofExists(int textMessageCount,
                                      int bytesMessageCount,

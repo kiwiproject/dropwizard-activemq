@@ -35,9 +35,12 @@ import java.util.LinkedHashMap;
  * <p>
  * Queue discovery relies on ActiveMQ
  * <a href="https://activemq.apache.org/components/classic/documentation/advisory-message">destination advisories</a>,
- * which are enabled by default, and <a href="https://activemq.apache.org/components/classic/documentation/maven/apidocs/org/apache/activemq/advisory/DestinationSource.html">DestinationSource</a>.
+ * which are enabled by default, and
+ * <a href="https://activemq.apache.org/components/classic/documentation/maven/apidocs/org/apache/activemq/advisory/DestinationSource.html">DestinationSource</a>.
  * If advisory support is disabled, or the connection is not permitted to consume
- * queue advisory messages, queue existence checks may not work correctly.
+ * queue advisory messages, queue existence checks may not work correctly. Advisory
+ * information is delivered asynchronously, so a queue may also be reported as
+ * nonexistent briefly after startup.
  */
 public class QueueInspector implements Managed {
 
@@ -65,6 +68,7 @@ public class QueueInspector implements Managed {
      * Starts the ActiveMQ connection.
      *
      * @throws IllegalStateException if start has already been called
+     * @throws UncheckedJMSException if the connection could not be created or started
      */
     @Override
     public void start() {
@@ -93,6 +97,9 @@ public class QueueInspector implements Managed {
      * Query ActiveMQ for information about the queue.
      *
      * @return a new {@link QueueInfo} instance
+     * @throws IllegalArgumentException if queueName is blank
+     * @throws IllegalStateException    if not started or already stopped
+     * @throws UncheckedJMSException    if the query fails
      */
     public QueueInfo getQueueInfo(String queueName) {
         try {
@@ -122,6 +129,9 @@ public class QueueInspector implements Managed {
      * Check if the queue exists.
      *
      * @return true if the queue exists, otherwise false
+     * @throws IllegalArgumentException if queueName is blank
+     * @throws IllegalStateException    if not started or already stopped
+     * @throws UncheckedJMSException    if the check fails
      */
     public boolean queueExists(String queueName) {
         try {
