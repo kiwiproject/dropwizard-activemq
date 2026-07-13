@@ -1,6 +1,7 @@
 package org.kiwiproject.dropwizard.activemq.queue;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.nonNull;
 import static org.kiwiproject.base.KiwiPreconditions.checkArgumentNotNull;
 
 import java.util.Collections;
@@ -30,7 +31,8 @@ public record QueueInfo(
         checkMessageCount(otherMessageCount, "other");
         checkArgumentNotNull(messageTypeCounts, "messageTypeCounts must not be null");
         messageTypeCounts.forEach((type, count) ->
-                checkArgument(count >= 0, "count for message type '%s' must be greater than or equal to zero", type));
+                checkArgument(nonNull(count) && count >= 0,
+                        "count for message type '%s' must be greater than or equal to zero", type));
         messageTypeCounts = Collections.unmodifiableMap(new LinkedHashMap<>(messageTypeCounts));
     }
 

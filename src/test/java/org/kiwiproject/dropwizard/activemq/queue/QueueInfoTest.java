@@ -49,6 +49,15 @@ class QueueInfoTest {
     }
 
     @Test
+    void constructor_ShouldThrowIllegalArgument_ForNullMessageTypeCount() {
+        var messageTypeCounts = KiwiMaps.<String, Integer>newLinkedHashMap("STATUS_CHANGE", null);
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new QueueInfo(true, 1, 0, 0, messageTypeCounts))
+                .withMessage("count for message type 'STATUS_CHANGE' must be greater than or equal to zero");
+    }
+
+    @Test
     void ofExists_ShouldSetAllFields() {
         var messageTypeCounts = Map.of("STATUS_CHANGE", 1);
 
