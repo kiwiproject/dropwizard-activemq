@@ -279,7 +279,9 @@ class QueueInspectorTest {
         doWithPlainAmqConnectionFactory((inspector, connectionFactory) -> {
             createQueue(connectionFactory);
 
-            assertThat(inspector.queueExists(queueName)).isTrue();
+            // Destination advisories are delivered asynchronously, so poll rather than
+            // asserting once immediately (see QueueInspector's class-level Javadoc).
+            await().atMost(FIVE_SECONDS).until(() -> inspector.queueExists(queueName));
         });
     }
 
