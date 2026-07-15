@@ -179,6 +179,27 @@ environment.healthChecks().register("dead-letter-queue",
         new DeadLetterQueueHealthCheck(config.getActiveMqConfig()));
 ```
 
+### Dead-letter queue inspection task
+
+`InspectDlqTask` is an optional Dropwizard admin task that reports message counts for the ActiveMQ dead-letter queue.
+Like the dead-letter queue health check, it is not registered automatically.
+
+```java
+var queueInspector = new QueueInspector(activeMqConfiguration, jsonHelper);
+
+environment.lifecycle().manage(queueInspector);
+environment.admin().addTask(new InspectDlqTask(queueInspector));
+```
+
+By default, the task inspects `ActiveMQ.DLQ`. A custom dead-letter queue name can be supplied to the `InspectDlqTask`
+constructor.
+
+**Note:** `QueueInspector` relies on ActiveMQ
+[destination advisories](https://activemq.apache.org/components/classic/documentation/advisory-message) and
+[`DestinationSource`](https://activemq.apache.org/components/classic/documentation/maven/apidocs/org/apache/activemq/advisory/DestinationSource.html)
+to discover queues. Advisories are enabled by default. Because `DestinationSource` learns about destinations through
+advisory messages, a queue may briefly be reported as nonexistent after startup.
+
 ## TLS / Secure Connections
 
 By default, `useSecureActiveMQConnections` and `useSecureRestConnections` are both `true`, and the
