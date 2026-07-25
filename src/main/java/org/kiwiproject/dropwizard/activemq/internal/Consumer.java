@@ -22,6 +22,12 @@ import static org.kiwiproject.metrics.health.HealthCheckResults.newUnhealthyResu
 import com.codahale.metrics.health.HealthCheck;
 import com.google.common.annotations.VisibleForTesting;
 import io.dropwizard.lifecycle.Managed;
+import jakarta.jms.BytesMessage;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.TextMessage;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +56,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
-import jakarta.jms.BytesMessage;
-import jakarta.jms.ConnectionFactory;
-import jakarta.jms.JMSException;
-import jakarta.jms.Message;
-import jakarta.jms.MessageConsumer;
-import jakarta.jms.TextMessage;
 
 /**
  * This is an internal class that instantiates and manages an {@link ActiveMQMessageConsumer}.
@@ -151,7 +150,7 @@ public class Consumer implements Managed, Runnable {
 
             } catch (Exception e) {
                 var errorCount = errors.incrementAndGet();
-                LOG.warn("Failure ${} - attempting to recover...", errorCount);
+                LOG.warn("Failure {} - attempting to recover...", errorCount);
                 LOG.error("Consumer failure exception:", e);
                 KIWI_ENVIRONMENT.sleepQuietly(ONE_SECOND_IN_MILLIS);
 
