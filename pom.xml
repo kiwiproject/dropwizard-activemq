@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.kiwiproject</groupId>
         <artifactId>kiwi-parent</artifactId>
-        <version>3.0.42</version>
+        <version>3.0.43</version>
     </parent>
 
     <artifactId>dropwizard-activemq</artifactId>
@@ -27,11 +27,11 @@
 
     <properties>
         <!-- required dependency versions -->
-        <activemq.version>6.3.0</activemq.version>
+        <activemq.version>6.3.1</activemq.version>
         <dropwizard-config-providers.version>3.0.3</dropwizard-config-providers.version>
         <dropwizard-leader-latch.version>3.0.3</dropwizard-leader-latch.version>
         <elucidation.version>7.0.2</elucidation.version>
-        <kiwi-bom.version>3.3.2</kiwi-bom.version>
+        <kiwi-bom.version>3.3.3</kiwi-bom.version>
         <kiwi.version>5.4.0</kiwi.version>
         <metrics-healthchecks-severity.version>3.1.0</metrics-healthchecks-severity.version>
         <registry-aware-jersey-client.version>3.1.0</registry-aware-jersey-client.version>
