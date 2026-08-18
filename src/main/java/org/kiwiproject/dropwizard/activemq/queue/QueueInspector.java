@@ -8,8 +8,10 @@ import static org.kiwiproject.base.KiwiPreconditions.requireNotBlank;
 import static org.kiwiproject.base.KiwiPreconditions.requireNotNull;
 import static org.kiwiproject.dropwizard.activemq.util.MessageTypeParser.UNKNOWN_MESSAGE_TYPE;
 import static org.kiwiproject.io.KiwiIO.closeQuietly;
+import static org.kiwiproject.logging.LazyLogParameterSupplier.lazy;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.VerifyException;
 import io.dropwizard.lifecycle.Managed;
 import jakarta.jms.BytesMessage;
 import jakarta.jms.Connection;
@@ -18,9 +20,11 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.Session;
 import jakarta.jms.TextMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.jms.pool.PooledConnection;
 import org.apache.activemq.jms.pool.PooledConnectionFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.kiwiproject.dropwizard.activemq.ActiveMqHelper;
 import org.kiwiproject.dropwizard.activemq.config.ActiveMqConfig;
 import org.kiwiproject.dropwizard.activemq.util.MessageTypeParser;
@@ -42,6 +46,7 @@ import java.util.LinkedHashMap;
  * information is delivered asynchronously, so a queue may also be reported as
  * nonexistent briefly after startup.
  */
+@Slf4j
 public class QueueInspector implements Managed {
 
     private final ConnectionFactory connectionFactory;
@@ -183,7 +188,7 @@ public class QueueInspector implements Managed {
                 ++textMessageCount;
 
                 var maybeJson = textMessage.getText();
-                var messageType = parser.findTypeSafe(maybeJson).orElse(UNKNOWN_MESSAGE_TYPE);
+                var messageType = findMessageTypeSafely(maybeJson);
                 messageTypeCounts.merge(messageType, 1, Integer::sum);
 
             } else if (message instanceof BytesMessage) {
@@ -194,6 +199,23 @@ public class QueueInspector implements Managed {
         }
 
         return QueueInfo.ofExists(textMessageCount, bytesMessageCount, otherMessageCount, messageTypeCounts);
+    }
+
+    /**
+     * Delegates to {@link MessageTypeParser#findTypeSafe(String)}, but also absorbs the
+     * {@link VerifyException} it can throw for a message with conflicting type values (see its Javadoc).
+     * A single such message must not abort inspection of the rest of the queue, so it is counted as
+     * {@link MessageTypeParser#UNKNOWN_MESSAGE_TYPE} instead.
+     */
+    private String findMessageTypeSafely(String maybeJson) {
+        try {
+            return parser.findTypeSafe(maybeJson).orElse(UNKNOWN_MESSAGE_TYPE);
+        } catch (VerifyException e) {
+            LOG.warn("Message contains conflicting message type values, counting as {} (msg: '{}', enable TRACE for full message content)",
+                    UNKNOWN_MESSAGE_TYPE, lazy(() -> StringUtils.abbreviate(maybeJson, 50)), e);
+            LOG.trace("Message content: {}", maybeJson);
+            return UNKNOWN_MESSAGE_TYPE;
+        }
     }
 
 }
