@@ -48,6 +48,8 @@ import java.util.function.BiConsumer;
 @DisplayName("QueueInspector")
 class QueueInspectorTest {
 
+    private static final long RECEIVE_TIMEOUT_MILLIS = 5_000;
+
     @RegisterExtension
     final EmbeddedActiveMqExtension broker = new EmbeddedActiveMqExtension();
 
@@ -517,7 +519,10 @@ class QueueInspectorTest {
             var queue = ActiveMqTestUtils.createQueue(session, queueName);
 
             try (var consumer = session.createConsumer(queue)) {
-                consumer.receive(500);
+                var message = consumer.receive(RECEIVE_TIMEOUT_MILLIS);
+                assertThat(message)
+                        .describedAs("expected to receive a message within %dms", RECEIVE_TIMEOUT_MILLIS)
+                        .isNotNull();
             }
         }
     }
