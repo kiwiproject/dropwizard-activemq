@@ -448,6 +448,25 @@ class QueueInspectorTest {
         );
     }
 
+    @Test
+    void shouldInspectTheQueue_WhenItContainsMessageWithConflictingTypes() {
+        sendJsonMessageWithConflictingTypes();
+        sendJsonMessageWithMessageType();
+        awaitMessageCount(2);
+
+        var queueInfo = queueInspector.getQueueInfo(queueName);
+
+        assertAll(
+                () -> assertThat(queueInfo.exists()).isTrue(),
+                () -> assertThat(queueInfo.textMessageCount()).isEqualTo(2),
+                () -> assertThat(queueInfo.bytesMessageCount()).isZero(),
+                () -> assertThat(queueInfo.otherMessageCount()).isZero(),
+                () -> assertThat(queueInfo.messageTypeCounts())
+                        .containsEntry(UNKNOWN_MESSAGE_TYPE, 1)
+                        .containsEntry("STATUS_CHANGE", 1)
+        );
+    }
+
     private void sendTextMessage() {
         sendMessage(session -> session.createTextMessage("some random message"));
     }
@@ -456,6 +475,15 @@ class QueueInspectorTest {
         sendMessage(session -> session.createTextMessage("""
                 {
                     "messageType": "STATUS_CHANGE"
+                }
+                """));
+    }
+
+    private void sendJsonMessageWithConflictingTypes() {
+        sendMessage(session -> session.createTextMessage("""
+                {
+                    "messageType": "STATUS_CHANGE",
+                    "metaData": { "type": "STATUS_CHANGE_LEGACY" }
                 }
                 """));
     }

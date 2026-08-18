@@ -49,6 +49,16 @@ public class MessageTypeParser {
      *
      * @param maybeJson the message (expected to be JSON, but we're not sure)
      * @return an Optional containing the type that was found, or an empty Optional
+     * @throws com.google.common.base.VerifyException if the message contains more than one distinct
+     *         message type across the paths checked - despite the name, this is deliberately
+     *         <em>not</em> caught here
+     * @implNote "Safe" refers specifically to malformed/non-JSON input, which this method absorbs into
+     *         an empty Optional. A message with conflicting type values is a different situation: there
+     *         is no way to know which value is correct, so this is treated as a hard failure rather than
+     *         silently guessing. Callers that process messages one at a time (e.g. {@code Consumer}) are
+     *         unaffected in practice because the JMS session acknowledges receipt before this is called.
+     *         Callers that process many messages in one pass (e.g. {@code QueueInspector}) must catch
+     *         {@code VerifyException} themselves if one malformed message shouldn't abort the whole batch.
      */
     public Optional<String> findTypeSafe(String maybeJson) {
         try {
@@ -72,6 +82,9 @@ public class MessageTypeParser {
      * @param json the message JSON
      * @return the upper-cased message type
      * @throws MessageTypeParsingException if JSON is malformed, the message is not JSON, etc.
+     * @throws com.google.common.base.VerifyException if the message contains more than one distinct
+     *         message type across the paths checked (messageType, metaData.type, echoedMessage.messageType,
+     *         echoedMessage.metaData.type) - there is no way to determine which value is correct
      */
     public String findType(String json) {
         Set<String> messageTypes = findTypesExcludingEcho(json);
@@ -105,6 +118,9 @@ public class MessageTypeParser {
         }
     }
 
+    /**
+     * @throws com.google.common.base.VerifyException if {@code messageTypes} contains more than one entry
+     */
     @VisibleForTesting
     static String extractMessageType(Set<String> messageTypes, String json) {
         int numTypes = messageTypes.size();
