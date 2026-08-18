@@ -37,7 +37,7 @@
         <registry-aware-jersey-client.version>3.1.0</registry-aware-jersey-client.version>
 
         <!-- test dependency versions -->
-        <kiwi-test.version>4.2.0</kiwi-test.version>
+        <kiwi-test.version>4.3.0</kiwi-test.version>
 
         <!-- Sonar properties -->
         <sonar.projectKey>kiwiproject_dropwizard-activemq</sonar.projectKey>
