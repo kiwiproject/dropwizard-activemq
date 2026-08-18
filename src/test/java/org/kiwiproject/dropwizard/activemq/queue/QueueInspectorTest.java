@@ -517,7 +517,10 @@ class QueueInspectorTest {
             var queue = ActiveMqTestUtils.createQueue(session, queueName);
 
             try (var consumer = session.createConsumer(queue)) {
-                consumer.receive(500);
+                var message = consumer.receive(FIVE_SECONDS.toMillis());
+                assertThat(message)
+                        .describedAs("expected to receive a message within %s", FIVE_SECONDS)
+                        .isNotNull();
             }
         }
     }
